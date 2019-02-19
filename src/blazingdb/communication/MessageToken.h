@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace blazgindb {
+namespace blazingdb {
 namespace communication {
 
 class MessageToken {

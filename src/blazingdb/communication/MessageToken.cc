@@ -1,6 +1,6 @@
 #include "MessageToken.h"
 
-namespace blazgindb {
+namespace blazingdb {
 namespace communication {
 
 MessageToken::MessageToken(const std::uint64_t rawToken)

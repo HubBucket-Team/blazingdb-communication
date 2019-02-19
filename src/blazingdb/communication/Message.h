@@ -3,7 +3,7 @@
 
 #include <blazingdb/communication/MessageToken.h>
 
-namespace blazgindb {
+namespace blazingdb {
 namespace communication {
 
 class Message {

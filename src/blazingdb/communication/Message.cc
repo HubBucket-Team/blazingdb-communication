@@ -1,6 +1,6 @@
 #include "Message.h"
 
-namespace blazgindb {
+namespace blazingdb {
 namespace communication {
 
 Message::Message(const MessageToken &messageToken)
