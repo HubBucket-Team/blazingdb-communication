@@ -1,7 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGE_H_
 #define BLAZINGDB_COMMUNICATION_MESSAGE_H_
 
-#include <blazgindb/communication/MessageToken.h>
+#include <blazingdb/communication/MessageToken.h>
 
 namespace blazgindb {
 namespace communication {
