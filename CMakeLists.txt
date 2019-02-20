@@ -53,6 +53,16 @@ if(BUILD_TESTING)
 
     if(GTEST_FOUND)
         add_subdirectory(tests)
+
+        enable_testing ()
+        add_executable (blazingdb-communication-test EXCLUDE_FROM_ALL
+          src/blazingdb/communication/buffer-test.cc
+          src/blazingdb/communication/router-builder-test.cc
+        )
+        target_include_directories (blazingdb-communication-test PUBLIC src)
+        target_link_libraries (blazingdb-communication-test GTest::GTest GTest::Main
+          blazingdb-communication)
+        gtest_discover_tests(blazingdb-communication-test)
     else()
         message(AUTHOR_WARNING "Google C++ Testing Framework (Google Test) not found: automated tests are disabled.")
     endif()
