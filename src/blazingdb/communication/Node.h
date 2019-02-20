@@ -11,7 +11,7 @@ namespace communication {
 
 class Node {
 public:
-  explicit Node(const NodeToken& nodeToken,
+  explicit Node(const std::shared_ptr<NodeToken>&& nodeToken,
                 const std::shared_ptr<Address>&& address);
   Node(const Node& other) = default;
   bool operator==(const Node& rhs);
@@ -20,7 +20,7 @@ public:
   void setAvailable(bool available);
 
 private:
-  NodeToken nodeToken_;
+  std::shared_ptr<NodeToken> nodeToken_;
   std::shared_ptr<Address> address_;
   bool isAvailable_;
 };

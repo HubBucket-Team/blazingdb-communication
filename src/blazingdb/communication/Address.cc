@@ -9,7 +9,7 @@ public:
   ConcreteAddress(const std::string &ip, const std::int16_t port)
       : ip_{ip}, port_{port} {}
 
-  bool SameValueAs(const Address &address) const {
+  bool SameValueAs(const Address &address) const final {
     const ConcreteAddress &concreteAddress =
         *static_cast<const ConcreteAddress *>(&address);
     return (ip_ == concreteAddress.ip_) && (port_ == concreteAddress.port_);

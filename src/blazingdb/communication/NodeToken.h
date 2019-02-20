@@ -1,17 +1,16 @@
 #ifndef BLAZINGDB_COMMUNICATION_NODETOKEN_H_
 #define BLAZINGDB_COMMUNICATION_NODETOKEN_H_
 
+#include <memory>
+
 namespace blazingdb {
 namespace communication {
 
 class NodeToken {
 public:
-  explicit NodeToken(int token);
-  NodeToken(const NodeToken& other) = default;
-  bool operator==(const NodeToken& rhs);
+  virtual bool operator==(const NodeToken& rhs) const = 0;
 
-private:
-  int token_;
+  static std::unique_ptr<NodeToken> Make(int seed);
 };
 
 }  // namespace communication
