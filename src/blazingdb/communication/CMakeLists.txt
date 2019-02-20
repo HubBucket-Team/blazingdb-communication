@@ -2,6 +2,8 @@ add_library (blazingdb-communication
   Buffer.cc
   Message.cc
   MessageToken.cc
+  Router.cc
+  RouterBuilder.cc
 )
 
 set (PUBLIC_HEADER

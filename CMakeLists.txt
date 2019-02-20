@@ -12,10 +12,13 @@ add_subdirectory (src)
 
 if (GTEST_FOUND)
   enable_testing ()
-  add_executable (blazingdb-communication-test
+  add_executable (blazingdb-communication-test EXCLUDE_FROM_ALL
     src/blazingdb/communication/buffer-test.cc
+    src/blazingdb/communication/router-builder-test.cc
   )
-  target_link_libraries (blazingdb-communication-test GTest::GTest GTest::Main)
+  target_include_directories (blazingdb-communication-test PUBLIC src)
+  target_link_libraries (blazingdb-communication-test GTest::GTest GTest::Main
+    blazingdb-communication)
   gtest_discover_tests(blazingdb-communication-test)
 endif ()
 

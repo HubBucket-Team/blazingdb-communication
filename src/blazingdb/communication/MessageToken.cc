@@ -6,5 +6,9 @@ namespace communication {
 MessageToken::MessageToken(const std::uint64_t rawToken)
     : rawToken_{rawToken} {}
 
+bool MessageToken::SameAs(const MessageToken &other) const noexcept {
+  return rawToken_ == other.rawToken_;
+}
+
 }  // namespace communication
-}  // namespace blazgindb
+}  // namespace blazingdb

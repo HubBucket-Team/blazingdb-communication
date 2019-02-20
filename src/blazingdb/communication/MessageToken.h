@@ -3,15 +3,19 @@
 
 #include <cstdint>
 
+#include <blazingdb/communication/shared/Identity.h>
+
 namespace blazingdb {
 namespace communication {
 
-class MessageToken {
+class MessageToken : public Identity<MessageToken> {
 public:
   explicit MessageToken(const std::uint64_t rawToken);
 
+  bool SameAs(const MessageToken &other) const noexcept final;
+
 private:
-  std::uint64_t rawToken_;
+  const std::uint64_t rawToken_;
 };
 
 }  // namespace communication
