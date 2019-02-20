@@ -5,6 +5,12 @@ add_library (blazingdb-communication
   Router.cc
   RouterBuilder.cc
   Server.cpp
+  NodeToken.cc
+  Address.cc
+  Node.cc
+  Cluster.cc
+  Context.cc
+  Manager.cc
 )
 
 set (PUBLIC_HEADER
