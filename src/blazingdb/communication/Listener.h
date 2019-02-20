@@ -8,7 +8,9 @@ namespace communication {
 
 class Listener {
 public:
-  virtual void process() const = 0;
+  Listener() = default;
+
+  virtual void Process() const = 0;
 
 private:
   BLAZINGDB_TURN_COPYASSIGN_OFF(Listener);

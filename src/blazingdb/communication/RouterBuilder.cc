@@ -46,13 +46,12 @@ public:
                      });
 
     if (messageTokens_.cend() == current) {
-      // TODO: Throw invalid call for messageToken
       throw std::runtime_error("Invalid message token");
     }
 
-    auto index = std::distance(current, messageTokens_.cend());
+    auto index = std::distance(messageTokens_.cbegin(), current);
 
-    listeners_.at(index)->process();
+    listeners_.at(index)->Process();
   }
 
 private:

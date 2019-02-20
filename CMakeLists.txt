@@ -24,6 +24,8 @@ message(AUTHOR_WARNING "Using old C++ ABI: -D_GLIBCXX_USE_CXX11_ABI=0")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 message(STATUS "CMAKE_MODULE_PATH:" "${CMAKE_MODULE_PATH}")
 
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Include CMake modules
 include(FeatureSummary)
 include(CheckIncludeFiles)
@@ -59,9 +61,10 @@ if(BUILD_TESTING)
           src/blazingdb/communication/buffer-test.cc
           src/blazingdb/communication/router-builder-test.cc
         )
-        target_include_directories (blazingdb-communication-test PUBLIC src)
-        target_link_libraries (blazingdb-communication-test GTest::GTest GTest::Main
-          blazingdb-communication)
+        target_include_directories (blazingdb-communication-test
+          PUBLIC src PUBLIC ${GTEST_INCLUDE_DIRS})
+        target_link_libraries (blazingdb-communication-test
+          GTest::GTest gmock_main gmock blazingdb-communication)
         gtest_discover_tests(blazingdb-communication-test)
     else()
         message(AUTHOR_WARNING "Google C++ Testing Framework (Google Test) not found: automated tests are disabled.")
