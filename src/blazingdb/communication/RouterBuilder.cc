@@ -31,19 +31,19 @@ void RouterBuilder::Append(const MessageToken &messageToken,
   routerBuilderPimpl->Append(messageToken, listener);
 }
 
-class UnorderedMapRouter : public Router {
+class PairVectorRouter : public Router {
 public:
-  UnorderedMapRouter(const std::vector<const MessageToken *> &&messageTokens,
-                     const std::vector<const Listener *> &&listeners)
+  PairVectorRouter(const std::vector<const MessageToken *> &&messageTokens,
+                   const std::vector<const Listener *> &&listeners)
       : messageTokens_{std::move(messageTokens)},
         listeners_{std::move(listeners)} {}
 
   void Call(const MessageToken &messageToken) final {
     auto current =
-        std::find(messageTokens_.cbegin(), messageTokens_.cend(),
-                  [&messageToken](const MessageToken &currentMessageToken) {
-                    return currentMessageToken.SameAs(messageToken);
-                  });
+        std::find_if(messageTokens_.cbegin(), messageTokens_.cend(),
+                     [&messageToken](const MessageToken *currentMessageToken) {
+                       return currentMessageToken->SameAs(messageToken);
+                     });
 
     if (messageTokens_.cend() == current) {
       // TODO: Throw invalid call for messageToken
@@ -58,13 +58,13 @@ private:
   std::vector<const MessageToken *> messageTokens_;
   std::vector<const Listener *> listeners_;
 
-  BLAZINGDB_TURN_COPYASSIGN_OFF(UnorderedMapRouter);
+  BLAZINGDB_TURN_COPYASSIGN_OFF(PairVectorRouter);
 };
 
 std::unique_ptr<Router> RouterBuilder::build() const {
   return std::unique_ptr<Router>(
-      new UnorderedMapRouter(std::move(routerBuilderPimpl->messageTokens),
-                             std::move(routerBuilderPimpl->listeners)));
+      new PairVectorRouter(std::move(routerBuilderPimpl->messageTokens),
+                           std::move(routerBuilderPimpl->listeners)));
 }
 
 }  // namespace communication

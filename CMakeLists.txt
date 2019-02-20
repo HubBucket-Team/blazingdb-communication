@@ -41,10 +41,7 @@ include_directories(
     ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
     ${CMAKE_SOURCE_DIR}/src)
 
-## Target source files
-set(SRC_FILES ${CMAKE_SOURCE_DIR}/src/Node.cpp)
-
-add_library(blazingdb-communication ${SRC_FILES})
+add_subdirectory(src)
 
 #target_link_libraries(blazingdb-communication
 #    ${X_STATIC_LIB}
