@@ -10,12 +10,13 @@ namespace communication {
 
 class MessageToken : public Identity<MessageToken> {
 public:
-  virtual bool Is(const MessageToken &other) const noexcept = 0;
+  // TODO: noexcept was commented to compile in a unit gtest
+  virtual bool Is(const MessageToken &other) const /*noexcept*/ = 0;
 
   static std::unique_ptr<MessageToken> Make();
 };
 
 }  // namespace communication
-}  // namespace blazgindb
+}  // namespace blazingdb
 
 #endif

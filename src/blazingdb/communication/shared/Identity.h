@@ -6,7 +6,8 @@
 template <class Concrete>
 class Identity {
 public:
-  virtual bool Is(const Concrete &other) const noexcept = 0;
+  // TODO: See MessageToken
+  virtual bool Is(const Concrete &other) const /*noexcept*/ = 0;
 
 private:
   // BLAZINGDB_TURN_COPYASSIGN_OFF(Identity);

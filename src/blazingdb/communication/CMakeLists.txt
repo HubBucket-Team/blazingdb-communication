@@ -1,16 +1,18 @@
 add_library (blazingdb-communication
+  Address.cc
   Buffer.cc
+  Context.cc
+  Cluster.cc
+  Manager.cc
   Message.cc
   MessageToken.cc
+  network/Client.cc
+  network/Server.cc
+  Node.cc
+  NodeToken.cc
   Router.cc
   RouterBuilder.cc
   Server.cpp
-  NodeToken.cc
-  Address.cc
-  Node.cc
-  Cluster.cc
-  Context.cc
-  Manager.cc
 )
 
 set (PUBLIC_HEADER

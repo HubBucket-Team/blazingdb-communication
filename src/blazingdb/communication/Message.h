@@ -4,21 +4,22 @@
 #include <memory>
 
 #include <blazingdb/communication/MessageToken.h>
+#include <blazingdb/communication/shared/Entity.h>
 
 namespace blazingdb {
 namespace communication {
 
-class Message {
+class Message : public Entity<Message, MessageToken> {
 public:
   explicit Message(const std::shared_ptr<MessageToken> &messageToken);
 
-  MessageToken getMessageToken();
+  ~Message();
 
 private:
   std::shared_ptr<MessageToken> messageToken_;
 };
 
 }  // namespace communication
-}  // namespace blazgindb
+}  // namespace blazingdb
 
 #endif

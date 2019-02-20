@@ -6,9 +6,7 @@ namespace communication {
 Message::Message(const std::shared_ptr<MessageToken> &messageToken)
     : messageToken_{messageToken} {}
 
-MessageToken Message::getMessageToken() {
-    return messageToken_;
-}
+Message::~Message() = default;
 
 }  // namespace communication
 }  // namespace blazingdb
