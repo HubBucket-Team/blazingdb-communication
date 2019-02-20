@@ -10,6 +10,8 @@ class Message {
 public:
   explicit Message(const MessageToken &messageToken);
 
+  MessageToken getMessageToken();
+
 private:
   MessageToken messageToken_;
 };

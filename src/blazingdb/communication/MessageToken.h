@@ -12,7 +12,10 @@ class MessageToken : public Identity<MessageToken> {
 public:
   explicit MessageToken(const std::uint64_t rawToken);
 
+
   bool SameAs(const MessageToken &other) const noexcept final;
+
+  std::uint64_t getToken();
 
 private:
   const std::uint64_t rawToken_;
