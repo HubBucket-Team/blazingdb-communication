@@ -32,7 +32,9 @@ include(CTest)
 
 # NOTE Do not change the inclusion order
 # Configure dependencies
-#include(ConfigureX)
+include(ConfigureBoost)
+include(ConfigureRapidJSON)
+include(ConfigureSimpleWebServer)
 
 # BEGIN MAIN #
 include_directories(
