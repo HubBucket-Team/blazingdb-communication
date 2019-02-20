@@ -9,17 +9,16 @@ namespace network {
 namespace {
 class ConcreteServer : public Server {
 public:
+  using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+
   std::shared_ptr<Message> GetMessage() const final { return nullptr; }
 
-  void Run() const final {
-    using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+  void Run() final {
+    httpServer_.config.port = 8000;
 
-    HttpServer httpServer;
-    httpServer.config.port = 8000;
-
-    httpServer.resource["^/ehlo$"]["GET"] =
+    httpServer_.resource["^/ehlo$"]["GET"] =
         [](std::shared_ptr<HttpServer::Response> response,
-           std::shared_ptr<HttpServer::Request> request) {
+           std::shared_ptr<HttpServer::Request>) {
           const std::string content =
               "EHLO from BlazingDB Communication Server";
 
@@ -28,8 +27,13 @@ public:
                     << content;
         };
 
-    httpServer.start();
+    httpServer_.start();
   }
+
+  void Close() noexcept final { httpServer_.stop(); }
+
+private:
+  HttpServer httpServer_;
 };
 }  // namespace
 

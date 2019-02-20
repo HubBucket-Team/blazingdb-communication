@@ -14,7 +14,9 @@ public:
   Server() = default;
 
   virtual std::shared_ptr<Message> GetMessage() const = 0;
-  virtual void Run() const = 0;
+
+  virtual void Run() = 0;
+  virtual void Close() noexcept = 0;
 
   static std::unique_ptr<Server> Make();
 };
