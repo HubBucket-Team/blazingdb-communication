@@ -8,7 +8,7 @@ class ConcreteNodeToken : public NodeToken {
 public:
   ConcreteNodeToken(int seed) : seed_{seed} {}
 
-  bool operator==(const NodeToken& other) const final {
+  bool SameValueAs(const NodeToken& other) const final {
     const ConcreteNodeToken& concreteNodeToken =
         *static_cast<const ConcreteNodeToken*>(&other);
     return seed_ == concreteNodeToken.seed_;
@@ -19,8 +19,8 @@ private:
 };
 }  // namespace
 
-bool NodeToken::operator==(const NodeToken& rhs) const {
-  return *static_cast<const ConcreteNodeToken*>(this) == rhs;
+bool NodeToken::SameValueAs(const NodeToken& rhs) const {
+  return static_cast<const ConcreteNodeToken*>(this)->SameValueAs(rhs);
 }
 
 std::unique_ptr<NodeToken> NodeToken::Make(int seed) {

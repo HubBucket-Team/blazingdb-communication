@@ -9,7 +9,7 @@ Node::Node(const std::shared_ptr<NodeToken>&& nodeToken,
       isAvailable_{true} {}
 
 bool Node::operator==(const Node& rhs) {
-  return (*nodeToken_ == *rhs.nodeToken_) &&
+  return nodeToken_->SameValueAs(*rhs.nodeToken_) &&
          address_->SameValueAs(*rhs.address_);
 }
 

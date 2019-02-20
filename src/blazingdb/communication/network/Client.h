@@ -13,7 +13,8 @@ namespace network {
 
 class Client {
 public:
-  virtual void Send(const Node &node, const Buffer &buffer) const = 0;
+  // TODO: cualifier has a internal discard
+  virtual void Send(const Node &node, const Buffer &buffer) /*const*/ = 0;
   virtual void Send(const Node &node, const Message &message,
                     const MessageSerializer &messageSerializer) const = 0;
 

@@ -8,7 +8,10 @@ namespace communication {
 
 class NodeToken {
 public:
-  virtual bool operator==(const NodeToken& rhs) const = 0;
+  virtual ~NodeToken() = default;
+
+  // TODO: See MessageToken
+  virtual bool SameValueAs(const NodeToken& rhs) const = 0;
 
   static std::unique_ptr<NodeToken> Make(int seed);
 };

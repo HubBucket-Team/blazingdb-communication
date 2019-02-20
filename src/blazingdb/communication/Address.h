@@ -9,6 +9,9 @@ namespace communication {
 
 class Address {
 public:
+  virtual ~Address() = default;
+
+  // TODO: See MessageToken
   virtual bool SameValueAs(const Address &address) const = 0;
 
   static std::unique_ptr<Address> Make(const std::string &ip,

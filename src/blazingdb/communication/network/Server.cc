@@ -16,11 +16,12 @@ public:
   void Run() final {
     httpServer_.config.port = 8000;
 
-    httpServer_.resource["^/ehlo$"]["GET"] =
+    httpServer_.resource["^/ehlo$"]["POST"] =
         [](std::shared_ptr<HttpServer::Response> response,
-           std::shared_ptr<HttpServer::Request>) {
+           std::shared_ptr<HttpServer::Request> request) {
           const std::string content =
-              "EHLO from BlazingDB Communication Server";
+              "EHLO from BlazingDB Communication Server  with \"" +
+              request->content.string() + "\"";
 
           *response << "HTTP/1.1 200 OK\r\nContent-Length: " << content.length()
                     << "\r\n\r\n"
