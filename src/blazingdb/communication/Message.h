@@ -12,6 +12,8 @@ class Message {
 public:
   explicit Message(const std::shared_ptr<MessageToken> &messageToken);
 
+  MessageToken getMessageToken();
+
 private:
   std::shared_ptr<MessageToken> messageToken_;
 };

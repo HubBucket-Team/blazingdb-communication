@@ -4,12 +4,20 @@ add_library (blazingdb-communication
   MessageToken.cc
   Router.cc
   RouterBuilder.cc
+  Server.cpp
+  NodeToken.cc
+  Address.cc
+  Node.cc
+  Cluster.cc
+  Context.cc
+  Manager.cc
 )
 
 set (PUBLIC_HEADER
   Buffer.h
   Message.h
   MessageToken.h
+  Server.h
 )
 
 set_target_properties (blazingdb-communication
