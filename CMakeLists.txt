@@ -64,9 +64,8 @@ if(BUILD_TESTING)
         )
         target_include_directories (blazingdb-communication-test
           PUBLIC src PUBLIC ${GTEST_INCLUDE_DIRS})
-        find_package(Boost REQUIRED COMPONENTS system)
         target_link_libraries (blazingdb-communication-test
-          GTest::GTest gmock_main gmock blazingdb-communication Boost::system)
+          GTest::GTest gmock_main gmock blazingdb-communication)
         gtest_discover_tests(blazingdb-communication-test)
     else()
         message(AUTHOR_WARNING "Google C++ Testing Framework (Google Test) not found: automated tests are disabled.")

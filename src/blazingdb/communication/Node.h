@@ -1,15 +1,18 @@
 #ifndef BLAZINGDB_COMMUNICATION_NODE_H_
 #define BLAZINGDB_COMMUNICATION_NODE_H_
 
-#include <blazingdb/communication/NodeToken.h>
+#include <memory>
+
 #include <blazingdb/communication/Address.h>
+#include <blazingdb/communication/NodeToken.h>
 
 namespace blazingdb {
 namespace communication {
 
 class Node {
 public:
-  explicit Node(const NodeToken& nodeToken, const Address& address);
+  explicit Node(const NodeToken& nodeToken,
+                const std::shared_ptr<Address>&& address);
   Node(const Node& other) = default;
   bool operator==(const Node& rhs);
 
@@ -18,7 +21,7 @@ public:
 
 private:
   NodeToken nodeToken_;
-  Address address_;
+  std::shared_ptr<Address> address_;
   bool isAvailable_;
 };
 

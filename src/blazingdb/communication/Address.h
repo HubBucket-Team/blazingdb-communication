@@ -1,6 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_ADDRESS_H_
 #define BLAZINGDB_COMMUNICATION_ADDRESS_H_
 
+#include <memory>
 #include <string>
 
 namespace blazingdb {
@@ -8,14 +9,10 @@ namespace communication {
 
 class Address {
 public:
-  explicit Address(std::string ip, int port);
-  Address(const Address& other) = default;
-  std::string getIp() const;
-  int getPort() const;
+  virtual bool SameValueAs(const Address &address) const = 0;
 
-private:
-  std::string ip_;
-  int port_;
+  static std::unique_ptr<Address> Make(const std::string &ip,
+                                       const std::int16_t port);
 };
 
 }  // namespace communication

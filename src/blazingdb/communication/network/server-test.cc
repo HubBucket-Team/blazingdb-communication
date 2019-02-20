@@ -22,11 +22,11 @@ TEST(ServerTest, Ehlo) {
   const std::uint8_t content[] = "HOLA";
   blazingdb::communication::Buffer buffer(content, sizeof(content));
 
-  blazingdb::communication::NodeToken nodeToken{0};
-  blazingdb::communication::Address address{"", 0};
-  blazingdb::communication::Node node{nodeToken, address};
+  /*blazingdb::communication::NodeToken nodeToken{0};*/
+  /*blazingdb::communication::Address address{"", 0};*/
+  /*blazingdb::communication::Node node{nodeToken, address};*/
 
-  client->Send(node, buffer);
+  /*client->Send(node, buffer);*/
 
   serverThread.join();
 }
