@@ -3,15 +3,13 @@
 
 #include <blazingdb/communication/shared/macros.h>
 
-template <class Entity>
+template <class Concrete>
 class Identity {
 public:
-  explicit Identity() = default;
-
-  virtual bool SameAs(const Entity &other) const noexcept = 0;
+  virtual bool Is(const Concrete &other) const noexcept = 0;
 
 private:
- // BLAZINGDB_TURN_COPYASSIGN_OFF(Identity);
+  // BLAZINGDB_TURN_COPYASSIGN_OFF(Identity);
 };
 
 #endif

@@ -3,8 +3,8 @@
 namespace blazingdb {
 namespace communication {
 
-Message::Message(const MessageToken &messageToken)
+Message::Message(const std::shared_ptr<MessageToken> &messageToken)
     : messageToken_{messageToken} {}
 
 }  // namespace communication
-}  // namespace blazgindb
+}  // namespace blazingdb

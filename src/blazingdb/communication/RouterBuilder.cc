@@ -42,7 +42,7 @@ public:
     auto current =
         std::find_if(messageTokens_.cbegin(), messageTokens_.cend(),
                      [&messageToken](const MessageToken *currentMessageToken) {
-                       return currentMessageToken->SameAs(messageToken);
+                       return currentMessageToken->Is(messageToken);
                      });
 
     if (messageTokens_.cend() == current) {

@@ -23,16 +23,16 @@ TEST(RouterBuilderTest, Build) {
 
   blazingdb::communication::RouterBuilder builder;
 
-  blazingdb::communication::MessageToken fooMessageToken{0};
-  blazingdb::communication::MessageToken barMessageToken{1};
-  blazingdb::communication::MessageToken bazMessageToken{2};
+  auto fooMessageToken = blazingdb::communication::MessageToken::Make();
+  auto barMessageToken = blazingdb::communication::MessageToken::Make();
+  auto bazMessageToken = blazingdb::communication::MessageToken::Make();
 
-  builder.Append(fooMessageToken, fooMockListener);
-  builder.Append(barMessageToken, barMockListener);
+  builder.Append(*fooMessageToken, fooMockListener);
+  builder.Append(*barMessageToken, barMockListener);
 
   std::unique_ptr<blazingdb::communication::Router> router = builder.build();
 
-  router->Call(fooMessageToken);
+  router->Call(*fooMessageToken);
 
-  EXPECT_THROW(router->Call(bazMessageToken), std::runtime_error);
+  EXPECT_THROW(router->Call(*bazMessageToken), std::runtime_error);
 }

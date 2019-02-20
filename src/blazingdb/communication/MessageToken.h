@@ -1,7 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGE_TOKEN_H_
 #define BLAZINGDB_COMMUNICATION_MESSAGE_TOKEN_H_
 
-#include <cstdint>
+#include <memory>
 
 #include <blazingdb/communication/shared/Identity.h>
 
@@ -10,12 +10,9 @@ namespace communication {
 
 class MessageToken : public Identity<MessageToken> {
 public:
-  explicit MessageToken(const std::uint64_t rawToken);
+  virtual bool Is(const MessageToken &other) const noexcept = 0;
 
-  bool SameAs(const MessageToken &other) const noexcept final;
-
-private:
-  const std::uint64_t rawToken_;
+  static std::unique_ptr<MessageToken> Make();
 };
 
 }  // namespace communication
