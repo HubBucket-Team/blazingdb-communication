@@ -16,7 +16,7 @@ public:
   // TODO: cualifier has a internal discard
   virtual void Send(const Node &node, const Buffer &buffer) /*const*/ = 0;
   virtual void Send(const Node &node, const Message &message,
-                    const MessageSerializer &messageSerializer) const = 0;
+                    const MessageSerializer &messageSerializer) /*const*/ = 0;
 
   static std::unique_ptr<Client> Make();
 };

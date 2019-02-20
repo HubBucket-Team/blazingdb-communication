@@ -11,7 +11,7 @@ class ConcreteClient : public Client {
 public:
   using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
-  void Send(const Node &node, const Buffer &buffer) final {
+  void Send(const Node &node, const Buffer &buffer) /*const*/ final {
     std::string body{reinterpret_cast<const char *>(buffer.data()),
                      buffer.size()};
     try {
@@ -23,7 +23,9 @@ public:
   }
 
   void Send(const Node &node, const Message &message,
-            const MessageSerializer &messageSerializer) const final {}
+            const MessageSerializer &messageSerializer) /*const*/ final {
+    Send(node, messageSerializer.serialize(message));
+  }
 
 private:
   HttpClient httpClient_{"localhost:8000"};
