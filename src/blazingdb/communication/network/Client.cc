@@ -25,6 +25,10 @@ public:
     Send(node, messageSerializer.serialize(message));
   }
 
+  void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) final {
+
+  }
+
 private:
   HttpClient httpClient_{"localhost:8000"};
 };

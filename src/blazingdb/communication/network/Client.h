@@ -17,6 +17,7 @@ public:
   virtual void Send(const Node &node, const Buffer &buffer) /*const*/ = 0;
   virtual void Send(const Node &node, const Message &message,
                     const MessageSerializer &messageSerializer) /*const*/ = 0;
+  virtual void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) /*const*/ = 0;
 
   static std::unique_ptr<Client> Make();
 };

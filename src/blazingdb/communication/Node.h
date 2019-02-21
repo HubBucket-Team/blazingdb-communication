@@ -14,14 +14,14 @@ public:
   explicit Node(const std::shared_ptr<NodeToken>&& nodeToken,
                 const std::shared_ptr<Address>&& address);
   Node(const Node& other) = default;
-  bool operator==(const Node& rhs);
+  bool operator== (const Node& rhs) const;
 
   bool isAvailable() const;
   void setAvailable(bool available);
 
 private:
-  std::shared_ptr<NodeToken> nodeToken_;
-  std::shared_ptr<Address> address_;
+  const std::shared_ptr<NodeToken> nodeToken_;
+  const std::shared_ptr<Address> address_;
   bool isAvailable_;
 };
 
