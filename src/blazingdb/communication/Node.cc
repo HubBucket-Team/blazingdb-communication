@@ -2,11 +2,9 @@
 
 using namespace blazingdb::communication;
 
-Node::Node(const std::shared_ptr<NodeToken>&& nodeToken,
-           const std::shared_ptr<Address>&& address)
-    : nodeToken_{std::move(nodeToken)},
-      address_{std::move(address)},
-      isAvailable_{true} {}
+Node::Node(const std::shared_ptr<NodeToken>& nodeToken,
+           const std::shared_ptr<Address>& address)
+    : nodeToken_{nodeToken}, address_{address}, isAvailable_{true} {}
 
 bool Node::operator==(const Node& rhs) const {
   return nodeToken_->SameValueAs(*rhs.nodeToken_);

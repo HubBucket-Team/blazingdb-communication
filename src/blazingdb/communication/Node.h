@@ -11,13 +11,19 @@ namespace communication {
 
 class Node {
 public:
-  explicit Node(const std::shared_ptr<NodeToken>&& nodeToken,
-                const std::shared_ptr<Address>&& address);
+  explicit Node(const std::shared_ptr<NodeToken>& nodeToken,
+                const std::shared_ptr<Address>& address);
   Node(const Node& other) = default;
-  bool operator== (const Node& rhs) const;
+  bool operator==(const Node& rhs) const;
 
   bool isAvailable() const;
   void setAvailable(bool available);
+
+  const std::shared_ptr<NodeToken>& nodeToken() const noexcept {
+    return nodeToken_;
+  }
+
+  const std::shared_ptr<Address>& address() const noexcept { return address_; }
 
 private:
   const std::shared_ptr<NodeToken> nodeToken_;

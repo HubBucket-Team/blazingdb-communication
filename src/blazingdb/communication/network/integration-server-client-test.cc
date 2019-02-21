@@ -1,5 +1,5 @@
-#include "Server.h"
 #include "Client.h"
+#include "Server.h"
 
 #include <chrono>
 #include <memory>
@@ -36,7 +36,7 @@ TEST(ServerTest, Ehlo) {
       std::make_shared<MockNodeToken>();
 
   std::shared_ptr<blazingdb::communication::Address> address =
-      std::make_shared<MockAddress>();
+      blazingdb::communication::Address::Make("localhost", 8000);
 
   blazingdb::communication::Node node{std::move(nodeToken), std::move(address)};
 
