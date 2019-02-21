@@ -1,6 +1,7 @@
 add_library (blazingdb-communication
   Address.cc
   Buffer.cc
+  ContextToken.cc
   Context.cc
   Cluster.cc
   Manager.cc

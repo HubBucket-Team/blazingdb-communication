@@ -6,25 +6,22 @@ namespace communication {
 namespace {
 class ConcreteNodeToken : public NodeToken {
 public:
-  ConcreteNodeToken(int seed) : seed_{seed} {}
+  ConcreteNodeToken(std::string ip, int port) : ip_{ip}, port_{port} {}
 
   bool SameValueAs(const NodeToken& other) const final {
     const ConcreteNodeToken& concreteNodeToken =
         *static_cast<const ConcreteNodeToken*>(&other);
-    return seed_ == concreteNodeToken.seed_;
+    return ip_ == concreteNodeToken.ip_ && port_ == concreteNodeToken.port_;
   }
 
 private:
-  int seed_;
+  std::string ip_;
+  int port_;
 };
 }  // namespace
 
-bool NodeToken::SameValueAs(const NodeToken& rhs) const {
-  return static_cast<const ConcreteNodeToken*>(this)->SameValueAs(rhs);
-}
-
-std::unique_ptr<NodeToken> NodeToken::Make(int seed) {
-  return std::unique_ptr<NodeToken>(new ConcreteNodeToken{seed});
+std::unique_ptr<NodeToken> NodeToken::Make(std::string ip, int port) {
+  return std::unique_ptr<NodeToken>(new ConcreteNodeToken{ip, port});
 }
 
 }  // namespace communication

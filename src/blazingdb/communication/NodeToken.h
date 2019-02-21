@@ -2,6 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_NODETOKEN_H_
 
 #include <memory>
+#include <string>
 
 namespace blazingdb {
 namespace communication {
@@ -13,7 +14,7 @@ public:
   // TODO: See MessageToken
   virtual bool SameValueAs(const NodeToken& rhs) const = 0;
 
-  static std::unique_ptr<NodeToken> Make(int seed);
+  static std::unique_ptr<NodeToken> Make(std::string ip, int port);
 };
 
 }  // namespace communication
