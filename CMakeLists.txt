@@ -62,7 +62,7 @@ if(BUILD_TESTING)
         add_executable (blazingdb-communication-test EXCLUDE_FROM_ALL
           src/blazingdb/communication/buffer-test.cc
           src/blazingdb/communication/router-builder-test.cc
-          src/blazingdb/communication/network/server-test.cc
+          src/blazingdb/communication/network/integration-server-client-test.cc
         )
         target_include_directories (blazingdb-communication-test
           PUBLIC src PUBLIC ${GTEST_INCLUDE_DIRS})
