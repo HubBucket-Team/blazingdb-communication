@@ -65,7 +65,9 @@ if(BUILD_TESTING)
           src/blazingdb/communication/network/integration-server-client-test.cc
         )
         target_include_directories (blazingdb-communication-test
-          PUBLIC src PUBLIC ${GTEST_INCLUDE_DIRS})
+          PUBLIC src
+          PUBLIC ${GTEST_INCLUDE_DIRS}
+          PUBLIC ${RAPIDJSON_INCLUDE_DIRS})
         target_link_libraries (blazingdb-communication-test
           GTest::GTest gmock_main gmock blazingdb-communication)
         gtest_discover_tests(blazingdb-communication-test)

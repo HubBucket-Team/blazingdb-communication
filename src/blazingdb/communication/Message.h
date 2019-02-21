@@ -11,12 +11,12 @@ namespace communication {
 
 class Message : public Entity<Message, MessageToken> {
 public:
-  explicit Message(const std::shared_ptr<MessageToken> &messageToken);
+  explicit Message(std::unique_ptr<MessageToken> &&messageToken);
 
   ~Message();
 
 private:
-  std::shared_ptr<MessageToken> messageToken_;
+  const std::unique_ptr<MessageToken> messageToken_;
 };
 
 }  // namespace communication

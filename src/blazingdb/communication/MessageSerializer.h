@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include <blazingdb/communication/Message.h>
 #include <blazingdb/communication/Buffer.h>
+#include <blazingdb/communication/Message.h>
 
 namespace blazingdb {
 namespace communication {
@@ -12,7 +12,7 @@ namespace communication {
 class MessageSerializer {
 public:
   virtual Buffer serialize(const Message &message) const = 0;
-  virtual std::unique_ptr<Message> deserialize(const Buffer &buffer) const = 0;
+  virtual std::shared_ptr<Message> deserialize(const Buffer &buffer) const = 0;
 };
 
 }  // namespace communication

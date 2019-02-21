@@ -11,8 +11,9 @@ class Entity {
 public:
   Entity() = default;
 
-  virtual bool SameIdentityAs(const Concrete &other) const noexcept = 0;
-  virtual const ID &Identity() const noexcept = 0;
+  // TODO: See MessageToken
+  virtual bool SameIdentityAs(const Concrete &other) const /*noexcept*/ = 0;
+  virtual const ID &Identity() const /*noexcept*/ = 0;
 
 private:
   BLAZINGDB_TURN_COPYASSIGN_OFF(Entity);

@@ -3,8 +3,8 @@
 namespace blazingdb {
 namespace communication {
 
-Message::Message(const std::shared_ptr<MessageToken> &messageToken)
-    : messageToken_{messageToken} {}
+Message::Message(std::unique_ptr<MessageToken> &&messageToken)
+    : messageToken_{std::move(messageToken)} {}
 
 Message::~Message() = default;
 
