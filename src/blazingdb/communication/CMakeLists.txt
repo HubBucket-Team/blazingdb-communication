@@ -26,7 +26,6 @@ set_target_properties (blazingdb-communication
 
 target_include_directories (blazingdb-communication
   PUBLIC ${PROJECT_SOURCE_DIR}/src
-  PUBLIC /home/gcca/src/Simple-Web-Server/build/prefix/include
 )
 
 find_package(Boost REQUIRED COMPONENTS system)

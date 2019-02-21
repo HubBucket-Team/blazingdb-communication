@@ -1,5 +1,7 @@
 #include "Client.h"
 
+#include <iostream>
+
 #include <simple-web-server/client_http.hpp>
 
 namespace blazingdb {
@@ -14,12 +16,8 @@ public:
   void Send(const Node &node, const Buffer &buffer) /*const*/ final {
     std::string body{reinterpret_cast<const char *>(buffer.data()),
                      buffer.size()};
-    try {
       auto request = httpClient_.request("POST", "/ehlo", body);
-      std::cout << request->content.string() << std::endl;
-    } catch (const SimpleWeb::system_error &e) {
-      std::cerr << "client request error: " << e.what() << std::endl;
-    }
+      std::cout << request->content.rdbuf() << std::endl;
   }
 
   void Send(const Node &node, const Message &message,
