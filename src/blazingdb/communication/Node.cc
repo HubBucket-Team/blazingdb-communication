@@ -15,6 +15,13 @@ bool Node::isAvailable() const { return isAvailable_; }
 void Node::setAvailable(bool available) { isAvailable_ = available; }
 
 void Node::serializeToJson(JsonSerializable::Writer& writer) const {
-  nodeToken_->serializeToJson(writer);
-  address_->serializeToJson(writer);
+  writer.StartObject();
+  {
+    writer.Key("nodeToken");
+    nodeToken_->serializeToJson(writer);
+
+    writer.Key("address");
+    address_->serializeToJson(writer);
+  }
+  writer.EndObject();
 }

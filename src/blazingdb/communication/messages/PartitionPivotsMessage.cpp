@@ -1,4 +1,5 @@
 #include "blazingdb/communication/messages/PartitionPivotsMessage.h"
+#include <rapidjson/writer.h>
 
 namespace blazingdb {
 namespace communication {
@@ -19,7 +20,7 @@ namespace messages {
 
     const std::string PartitionPivotsMessage::serializeToJson() const {
         rapidjson::StringBuffer string_buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(string_buffer);
+        rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
 
         writer.StartObject();
         {

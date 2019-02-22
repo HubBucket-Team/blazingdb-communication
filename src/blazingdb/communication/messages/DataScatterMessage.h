@@ -2,7 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_DATASCATTERMESSAGE_H
 
 #include <vector>
-#include <rapidjson/prettywriter.h>
+#include <rapidjson/writer.h>
 #include "blazingdb/communication/Message.h"
 #include "blazingdb/communication/messages/Serializer.h"
 
@@ -28,7 +28,7 @@ namespace messages {
     public:
         const std::string serializeToJson() const override {
             rapidjson::StringBuffer string_buffer;
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(string_buffer);
+            rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
 
             writer.StartObject();
             {

@@ -2,7 +2,6 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_PARTITIONPIVOTSMESSAGE_H
 
 #include <vector>
-#include <rapidjson/prettywriter.h>
 #include "src/blazingdb/communication/Message.h"
 #include "blazingdb/communication/messages/DataPivot.h"
 

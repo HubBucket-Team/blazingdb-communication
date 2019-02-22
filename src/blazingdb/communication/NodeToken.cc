@@ -15,10 +15,15 @@ public:
   }
 
   void serializeToJson(JsonSerializable::Writer& writer) const {
-    writer.Key("nodeTokenIp");
-    writer.String(ip_.c_str());
-    writer.Key("nodeTokenPort");
-    writer.Int(port_);
+    writer.StartObject();
+    {
+      writer.Key("nodeTokenIp");
+      writer.String(ip_.c_str());
+
+      writer.Key("nodeTokenPort");
+      writer.Int(port_);
+    }
+    writer.EndObject();
   };
 
 private:
