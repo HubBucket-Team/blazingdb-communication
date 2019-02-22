@@ -17,16 +17,6 @@ add_library (blazingdb-communication
   messages/PartitionPivotsMessage.cpp
 )
 
-set (PUBLIC_HEADER
-  Buffer.h
-  Message.h
-  MessageToken.h
-  Server.h
-)
-
-set_target_properties (blazingdb-communication
-  PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER}")
-
 target_include_directories (blazingdb-communication
   PUBLIC ${PROJECT_SOURCE_DIR}/src
 )
@@ -38,5 +28,8 @@ target_link_libraries(blazingdb-communication Boost::system)
 install (TARGETS blazingdb-communication
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include
+)
+
+install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
+  FILES_MATCHING PATTERN "*.h" PATTERN "*Internal.h" EXCLUDE
 )
