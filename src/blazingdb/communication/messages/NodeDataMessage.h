@@ -8,14 +8,16 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-class NodedataMessage : public Message {
+class NodeDataMessage : public Message {
 public:
-  NodedataMessage(const Node& node);
+  NodeDataMessage(const Node& node);
 
   const std::string serializeToJson() const override;
   const std::string serializeToBinary() const override;
   
   const Node node;
+
+  static std::shared_ptr<Message> make(const std::string& jsonBuffer, const std::string& binBuffer);
 };
 
 }  // namespace messages

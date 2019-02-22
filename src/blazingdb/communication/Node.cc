@@ -6,6 +6,11 @@ Node::Node(const std::shared_ptr<NodeToken>& nodeToken,
            const std::shared_ptr<Address>& address)
     : nodeToken_{nodeToken}, address_{address}, isAvailable_{true} {}
 
+Node::Node(rapidjson::Document& doc)
+    : nodeToken_{NodeToken::Make(doc)},
+      address_{Address::Make(doc)},
+      isAvailable_{true} {}
+
 bool Node::operator==(const Node& rhs) const {
   return nodeToken_->SameValueAs(*rhs.nodeToken_);
 }
@@ -15,13 +20,9 @@ bool Node::isAvailable() const { return isAvailable_; }
 void Node::setAvailable(bool available) { isAvailable_ = available; }
 
 void Node::serializeToJson(JsonSerializable::Writer& writer) const {
-  writer.StartObject();
-  {
-    writer.Key("nodeToken");
-    nodeToken_->serializeToJson(writer);
+  writer.Key("nodeToken");
+  nodeToken_->serializeToJson(writer);
 
-    writer.Key("address");
-    address_->serializeToJson(writer);
-  }
-  writer.EndObject();
+  writer.Key("address");
+  address_->serializeToJson(writer);
 }
