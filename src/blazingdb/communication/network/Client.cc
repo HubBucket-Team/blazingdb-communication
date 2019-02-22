@@ -3,6 +3,7 @@
 #include <blazingdb/communication/Address-Internal.h>
 
 #include <iostream>
+#include <map>
 
 #include <simple-web-server/client_http.hpp>
 
@@ -15,7 +16,9 @@ class ConcreteClient : public Client {
 public:
   using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
-  void Send(const Node &node, const Buffer &buffer) /*const*/ final {
+  void Send(const Node &node, const std::string &endpoint,
+            const std::string &data,
+            const std::string &buffer) /*const*/ final {
     const internal::ConcreteAddress *concreteAddress =
         static_cast<const internal::ConcreteAddress *>(node.address().get());
 
@@ -26,13 +29,20 @@ public:
 
     std::string body{reinterpret_cast<const char *>(buffer.data()),
                      buffer.size()};
-    auto request = httpClient.request("POST", "/ehlo", body);
-    std::cout << request->content.rdbuf() << std::endl;
+
+    std::map<std::string, std::string> headers{{"json_data", data}};
+
+    try {
+      auto request = httpClient.request("POST", "/" + endpoint, body, headers);
+      std::cout << request->content.rdbuf() << std::endl;
+    } catch (const boost::system::system_error &error) {
+      throw SendError(endpoint);
+    }
   }
 
-  void Send(const Node &node, const Message &message,
-            const MessageSerializer &messageSerializer) /*const*/ final {
-    Send(node, messageSerializer.serialize(message));
+  void Send(const Node &node, const std::string &endpoint,
+           const Message &message) final {
+    Send(node, endpoint, message.serializeToJson(), message.serializeToBinary();
   }
 
   void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) final {
