@@ -1,9 +1,9 @@
 #include "Client.h"
 #include "ClientExceptions.h"
+#include "Status.h"
 
 #include <blazingdb/communication/Address-Internal.h>
 
-#include <iostream>
 #include <map>
 
 #include <simple-web-server/client_http.hpp>
@@ -13,13 +13,30 @@ namespace communication {
 namespace network {
 
 namespace {
+using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+
+class ConcreteStatus : public Status {
+public:
+  ConcreteStatus(const std::shared_ptr<HttpClient::Response> &response)
+      : response_{response} {}
+
+  bool IsOk() const noexcept { return "200 OK" == response_->status_code; }
+
+  const std::string ToString() const noexcept {
+    std::ostringstream oss;
+    oss << response_->content.rdbuf();
+    return oss.str();
+  }
+
+private:
+  std::shared_ptr<HttpClient::Response> response_;
+};
+
 class ConcreteClient : public Client {
 public:
-  using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
-
-  void Send(const Node &node, const std::string &endpoint,
-            const std::string &data,
-            const std::string &buffer) /*const*/ final {
+  std::unique_ptr<Status> Send(const Node &node, const std::string &endpoint,
+                               const std::string &data,
+                               const std::string &buffer) /*const*/ final {
     const internal::ConcreteAddress *concreteAddress =
         static_cast<const internal::ConcreteAddress *>(node.address().get());
 
@@ -36,16 +53,16 @@ public:
     try {
       std::shared_ptr<HttpClient::Response> response =
           httpClient.request("POST", "/" + endpoint, body, headers);
-      std::cout << response->content.rdbuf() << std::endl;
+      return std::unique_ptr<Status>(new ConcreteStatus{response});
     } catch (const boost::system::system_error &error) {
       throw SendError(endpoint);
     }
   }
 
-  void Send(const Node &node, const std::string &endpoint,
-            const Message &message) final {
-    Send(node, endpoint, message.serializeToJson(),
-         message.serializeToBinary());
+  std::unique_ptr<Status> Send(const Node &node, const std::string &endpoint,
+                               const Message &message) final {
+    return Send(node, endpoint, message.serializeToJson(),
+                message.serializeToBinary());
   }
 
   void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) final {

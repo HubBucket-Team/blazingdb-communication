@@ -7,6 +7,7 @@
 #include <blazingdb/communication/Buffer.h>
 #include <blazingdb/communication/Message.h>
 #include <blazingdb/communication/Node.h>
+#include <blazingdb/communication/network/Status.h>
 
 namespace blazingdb {
 namespace communication {
@@ -16,13 +17,15 @@ class Client {
 public:
   class SendError;
 
-  virtual void Send(const Node &node, const std::string &endpoint,
-                    const std::string &data,
-                    const std::string &buffer) /*const*/
+  virtual std::unique_ptr<Status> Send(const Node &node,
+                                       const std::string &endpoint,
+                                       const std::string &data,
+                                       const std::string &buffer) /*const*/
       = 0;
 
-  virtual void Send(const Node &node, const std::string &endpoint,
-                    const Message &message) = 0;
+  virtual std::unique_ptr<Status> Send(const Node &node,
+                                       const std::string &endpoint,
+                                       const Message &message) = 0;
 
   virtual void SendNodeData(std::string ip, uint16_t port,
                             const Buffer &buffer) /*const*/
