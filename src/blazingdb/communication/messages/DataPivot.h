@@ -10,7 +10,7 @@ namespace messages {
 
     class DataPivot {
     public:
-        explicit DataPivot(const Node& node, const std::string& max_range, const std::string& min_range);
+        explicit DataPivot(const Node& node, const std::string& min_range, const std::string& max_range);
 
     public:
         const Node& getNode() const;
@@ -24,14 +24,14 @@ namespace messages {
         void serialize(Writer& writer) {
             writer.StartObject();
             {
-                // writer.Key("node");
-                // node.serialize(writer);
+                writer.Key("node");
+                node.serializeToJson(writer);
 
                 writer.Key("min_range");
-                writer.String(min_range);
+                writer.String(min_range.c_str());
 
                 writer.Key("max_range");
-                writer.String(max_range);
+                writer.String(max_range.c_str());
             }
             writer.EndObject();
         }

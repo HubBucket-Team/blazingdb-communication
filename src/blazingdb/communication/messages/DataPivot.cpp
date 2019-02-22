@@ -4,7 +4,7 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    DataPivot::DataPivot(const Node& node, const std::string& mix_range, const std::string& max_range)
+    DataPivot::DataPivot(const Node& node, const std::string& min_range, const std::string& max_range)
     : node {node}, min_range{min_range}, max_range{max_range}
     { }
 

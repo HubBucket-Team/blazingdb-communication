@@ -2,13 +2,17 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_PARTITIONPIVOTSMESSAGE_H
 
 #include <vector>
+#include <rapidjson/prettywriter.h>
+#include "src/blazingdb/communication/Message.h"
 #include "blazingdb/communication/messages/DataPivot.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    class PartitionPivotsMessage {
+    using blazingdb::communication::Message;
+
+    class PartitionPivotsMessage : public Message {
     public:
         PartitionPivotsMessage(const std::vector<DataPivot>& data);
 
@@ -16,23 +20,15 @@ namespace messages {
         const std::vector<DataPivot>& getDataPivots();
 
     public:
-        template <typename Writer>
-        void serialize(Writer& writer) {
-            writer.StartObject();
-            {
-                writer.StartArray();
-                {
-                    for (const auto &data_pivot : data_pivot_array) {
-                        data_pivot.serialize(writer);
-                    }
-                }
-                writer.EndArray();
-            }
-            writer.EndObject();
-        }
+        const std::string serializeToJson() const override;
+
+        const std::string serializeToBinary() const override;
 
     private:
         std::vector<DataPivot> data_pivot_array;
+
+    private:
+        static const std::string MessageID;
     };
 
 } // namespace messages
