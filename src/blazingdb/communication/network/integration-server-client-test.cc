@@ -7,9 +7,6 @@
 #include <memory>
 #include <thread>
 
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -23,45 +20,16 @@ public:
   MOCK_CONST_METHOD1(SameValueAs, bool(const Address &));
 };
 
-class FooMessage : public blazingdb::communication::Message {
+class MockMessage : public blazingdb::communication::Message {
 public:
   using blazingdb::communication::Message::Message;
 
-  const std::string code() const { return "qwerty"; }
-
-  MOCK_CONST_METHOD1(SameIdentityAs, bool(const Message &));
-  MOCK_CONST_METHOD0(Identity,
-                     const blazingdb::communication::MessageToken &());
+  MOCK_CONST_METHOD0(serializeToJson, const std::string());
+  MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 };
-
-class FooMessageSerializer {
-public:
-  blazingdb::communication::Buffer serialize(const FooMessage &fooMessage) {
-    rapidjson::StringBuffer stringBuffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(stringBuffer);
-
-    writer.StartObject();
-    writer.Key("code");
-    writer.String(fooMessage.code().c_str());
-    writer.EndObject();
-
-    const std::string *json = new std::string(stringBuffer.GetString());
-
-    return blazingdb::communication::Buffer(
-        reinterpret_cast<const std::uint8_t *>(json->data()), json->size());
-  }
-};
-
-FooMessage *CreateFooMessage() {
-  std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
-      blazingdb::communication::MessageToken::Make();
-
-  FooMessage *fooMessage = new FooMessage{std::move(messageToken)};
-
-  return fooMessage;
-}
 
 TEST(ServerTest, Ehlo) {
+  // Run server
   std::unique_ptr<blazingdb::communication::network::Server> server =
       blazingdb::communication::network::Server::Make();
 
@@ -69,13 +37,16 @@ TEST(ServerTest, Ehlo) {
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  std::unique_ptr<blazingdb::communication::network::Client> client =
-      blazingdb::communication::network::Client::Make();
+  // Create message
+  std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
+      blazingdb::communication::MessageToken::Make();
 
-  FooMessageSerializer serializer;
-  blazingdb::communication::Buffer buffer =
-      serializer.serialize(*CreateFooMessage());
+  MockMessage mockMessage{std::move(messageToken)};
 
+  EXPECT_CALL(mockMessage, serializeToJson).WillOnce(testing::Return("{}"));
+  EXPECT_CALL(mockMessage, serializeToBinary).WillOnce(testing::Return(""));
+
+  // Create node info
   std::shared_ptr<blazingdb::communication::NodeToken> nodeToken =
       std::make_shared<MockNodeToken>();
 
@@ -84,7 +55,14 @@ TEST(ServerTest, Ehlo) {
 
   blazingdb::communication::Node node{std::move(nodeToken), std::move(address)};
 
-  client->Send(node, buffer);
+  // Send message
+  std::unique_ptr<blazingdb::communication::network::Client> client =
+      blazingdb::communication::network::Client::Make();
+  try {
+    client->Send(node, "message", mockMessage);
+  } catch (const blazingdb::communication::network::Client::SendError &e) {
+    FAIL() << e.what();
+  }
 
   server->Close();
   serverThread.join();
