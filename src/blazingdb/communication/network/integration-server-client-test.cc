@@ -61,7 +61,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
       blazingdb::communication::network::Client::Make();
   try {
     std::unique_ptr<blazingdb::communication::network::Status> status =
-        client->Send(node, "message", mockMessage);
+        client->Send(node, "sample", mockMessage);
     EXPECT_TRUE(status->IsOk());
   } catch (const blazingdb::communication::network::Client::SendError &e) {
     FAIL() << e.what();
