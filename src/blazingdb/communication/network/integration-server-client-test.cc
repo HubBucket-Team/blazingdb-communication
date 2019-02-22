@@ -31,6 +31,11 @@ public:
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 };
 
+class MockFlag {
+public:
+  MOCK_METHOD0(Flag, void());
+};
+
 TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   // Run server
   std::unique_ptr<blazingdb::communication::network::Server> server =
@@ -39,14 +44,6 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::thread serverRunThread([&server]() { server->Run(); });
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
-
-  std::thread serverGetMessageThread([&server]() {
-    std::shared_ptr<blazingdb::communication::network::Server::Frame> frame =
-        server->GetFrame();
-
-    EXPECT_EQ("{}", frame->data());
-    EXPECT_EQ("data", frame->BufferString());
-  });
 
   // Create message
   std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
@@ -77,6 +74,20 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
     FAIL() << e.what();
   }
 
+  // Get a frame
+  MockFlag mockFlag;
+  EXPECT_CALL(mockFlag, Flag()).Times(1);
+
+  std::thread serverGetMessageThread([&server, &mockFlag]() {
+    std::shared_ptr<blazingdb::communication::network::Server::Frame> frame =
+        server->GetFrame();
+
+    EXPECT_EQ("{}", frame->data());
+    EXPECT_EQ("data", frame->BufferString());
+    mockFlag.Flag();
+  });
+
+  // Clean context
   serverGetMessageThread.join();
   server->Close();
   serverRunThread.join();
