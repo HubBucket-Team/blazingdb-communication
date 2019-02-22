@@ -55,7 +55,7 @@ public:
           httpClient.request("POST", "/" + endpoint, body, headers);
       return std::unique_ptr<Status>(new ConcreteStatus{response});
     } catch (const boost::system::system_error &error) {
-      throw SendError(endpoint);
+      throw SendError(endpoint, data, buffer.size());
     }
   }
 

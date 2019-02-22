@@ -9,15 +9,21 @@ namespace network {
 
 class Client::SendError {
 public:
-  SendError(const std::string &endpoint) : endpoint_{endpoint} {}
+  SendError(const std::string &endpoint, const std::string &data,
+            const std::size_t bufferSize)
+      : endpoint_{endpoint}, data_{data}, bufferSize_{bufferSize} {}
 
   const char *what() const noexcept {
-    return ("Communication::Client: Bad endpoint \"" + endpoint_ + "\"")
+    return ("Communication::Client: Bad endpoint \"" + endpoint_ +
+            "\" with buffer size = " + std::to_string(bufferSize_) +
+            " and data = " + data_)
         .c_str();
   }
 
 private:
   const std::string endpoint_;
+  const std::string data_;
+  const std::size_t bufferSize_;
 };
 
 }  // namespace network
