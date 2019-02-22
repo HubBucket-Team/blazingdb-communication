@@ -5,24 +5,22 @@
 namespace blazingdb {
 namespace communication {
 
-class Int64MessageToken : public MessageToken {
+class StringMessageToken : public MessageToken {
 public:
-  explicit Int64MessageToken(const std::uint64_t int64Token)
-      : int64Token_{int64Token} {}
+  explicit StringMessageToken(const std::string& id)
+      : token_{id} {}
 
-  bool Is(const MessageToken &other) const noexcept {
-    return int64Token_ ==
-           static_cast<const Int64MessageToken &>(other).int64Token_;
-  }
+  void serializeToJson(JsonSerializable::Writer& writer) const {
+    writer.Key("messageToken");
+    writer.String(token_.c_str());
+  };
 
 private:
-  std::uint64_t int64Token_;
+  const std::string token_;
 };
 
-std::unique_ptr<MessageToken> MessageToken::Make() {
-  static std::uint64_t counter = 0;
-
-  return std::unique_ptr<MessageToken>(new Int64MessageToken{counter++});
+std::unique_ptr<MessageToken> MessageToken::Make(const std::string& id) {
+  return std::unique_ptr<MessageToken>(new StringMessageToken{id});
 }
 
 }  // namespace communication

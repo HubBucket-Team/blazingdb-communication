@@ -12,9 +12,9 @@ add_library (blazingdb-communication
   Node.cc
   NodeToken.cc
   Router.cc
-  RouterBuilder.cc
   messages/DataPivot.cpp
   messages/PartitionPivotsMessage.cpp
+  messages/NodeDataMessage.cc
 )
 
 target_include_directories (blazingdb-communication

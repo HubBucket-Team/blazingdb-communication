@@ -41,6 +41,7 @@ include_directories(
     ${LIB_BLAZINGIO_INCLUDEDIR}
     ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}
     ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
+    ${RAPIDJSON_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(src)

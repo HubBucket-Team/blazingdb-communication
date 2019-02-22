@@ -2,19 +2,17 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGE_TOKEN_H_
 
 #include <memory>
-
-#include <blazingdb/communication/shared/Identity.h>
+#include <blazingdb/communication/shared/JsonSerializable.h>
 
 namespace blazingdb {
 namespace communication {
 
-class MessageToken : public Identity<MessageToken> {
+class MessageToken : public JsonSerializable {
 public:
-  // TODO: noexcept was commented to compile in a unit gtest
-  virtual bool Is(const MessageToken &other) const /*noexcept*/ = 0;
+  virtual void serializeToJson(JsonSerializable::Writer& writer) const = 0;
 
-  static std::unique_ptr<MessageToken> Make();
-};
+  static std::unique_ptr<MessageToken> Make(const std::string& id);
+};  
 
 }  // namespace communication
 }  // namespace blazingdb
