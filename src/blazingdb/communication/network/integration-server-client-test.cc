@@ -15,6 +15,7 @@
 class MockNodeToken : public blazingdb::communication::NodeToken {
 public:
   MOCK_CONST_METHOD1(SameValueAs, bool(const NodeToken &));
+  MOCK_CONST_METHOD1(serializeToJson, void(JsonSerializable::Writer &));
 };
 
 class MockAddress : public blazingdb::communication::Address {
@@ -49,7 +50,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
 
   // Create message
   std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
-      blazingdb::communication::MessageToken::Make();
+      blazingdb::communication::MessageToken::Make("sample");
 
   MockMessage mockMessage{std::move(messageToken)};
 
