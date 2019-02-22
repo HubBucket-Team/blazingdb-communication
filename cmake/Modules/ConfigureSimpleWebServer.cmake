@@ -6,6 +6,8 @@
 # BEGIN macros
 
 macro(CONFIGURE_SIMPLEWEBSERVER_EXTERNAL_PROJECT)
+    set(ENV{BOOST_ROOT} ${BOOST_ROOT})
+
     # NOTE percy c.gonzales if you want to pass other RAL CMAKE_CXX_FLAGS into this dependency add it by harcoding
     set(SIMPLEWEBSERVER_CMAKE_ARGS
         " -DARROW_INSTALL_DIR=${ARROW_ROOT}"
