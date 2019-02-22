@@ -39,8 +39,6 @@ private:
 
 class ConcreteServer : public Server {
 public:
-  std::shared_ptr<Message> GetMessage() final { return nullptr; }
-
   std::shared_ptr<Frame> GetFrame() /*const*/ final {
     wait();
     std::shared_ptr<HttpServer::Request> request = getRequestDeque();
@@ -68,6 +66,14 @@ public:
           *response << "HTTP/1.1 200 OK\r\nContent-Length: " << content.length()
                     << "\r\n\r\n"
                     << content;
+        };
+
+    httpServer_.resource["^/message/node_data$"]["POST"] =
+        [this](std::shared_ptr<HttpServer::Response> response,
+               std::shared_ptr<HttpServer::Request> request) {
+          putRequest(request);
+
+          *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
         };
 
     httpServer_.resource["^/message/sample$"]["POST"] =
@@ -106,6 +112,14 @@ public:
   }
 
   void Close() noexcept final { httpServer_.stop(); }
+
+  const std::string &FrameDataAsString(std::shared_ptr<Frame> &frame) final {
+    return frame->data();
+  }
+
+  const std::string FrameBufferAsString(std::shared_ptr<Frame> &frame) {
+    return frame->BufferString();
+  }
 
 private:
   std::shared_ptr<HttpServer::Request> getRequestDeque() {

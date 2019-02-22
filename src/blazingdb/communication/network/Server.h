@@ -14,7 +14,12 @@ class Server {
 public:
   Server() = default;
 
-  virtual std::shared_ptr<Message> GetMessage() = 0;
+  template <class MessageType>
+  std::shared_ptr<MessageType> GetMessage() {
+    std::shared_ptr<Frame> frame = GetFrame();
+    return MessageType::Make(FrameDataAsString(frame),
+                             FrameBufferAsString(frame));
+  }
 
   virtual void Run() = 0;
   virtual void Close() noexcept = 0;
@@ -23,6 +28,10 @@ public:
 
   class Frame;
   virtual std::shared_ptr<Frame> GetFrame() /*const*/ = 0;
+  virtual const std::string &FrameDataAsString(
+      std::shared_ptr<Frame> &frame) = 0;
+  virtual const std::string FrameBufferAsString(
+      std::shared_ptr<Frame> &frame) = 0;
 };
 
 }  // namespace network
