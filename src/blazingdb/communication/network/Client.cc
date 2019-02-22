@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "ClientExceptions.h"
 
 #include <blazingdb/communication/Address-Internal.h>
 
@@ -33,16 +34,18 @@ public:
     std::map<std::string, std::string> headers{{"json_data", data}};
 
     try {
-      auto request = httpClient.request("POST", "/" + endpoint, body, headers);
-      std::cout << request->content.rdbuf() << std::endl;
+      std::shared_ptr<HttpClient::Response> response =
+          httpClient.request("POST", "/" + endpoint, body, headers);
+      std::cout << response->content.rdbuf() << std::endl;
     } catch (const boost::system::system_error &error) {
       throw SendError(endpoint);
     }
   }
 
   void Send(const Node &node, const std::string &endpoint,
-           const Message &message) final {
-    Send(node, endpoint, message.serializeToJson(), message.serializeToBinary());
+            const Message &message) final {
+    Send(node, endpoint, message.serializeToJson(),
+         message.serializeToBinary());
   }
 
   void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) final {

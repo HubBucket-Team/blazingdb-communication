@@ -31,19 +31,6 @@ public:
   static std::unique_ptr<Client> Make();
 };
 
-class Client::SendError {
-public:
-  SendError(const std::string &endpoint) : endpoint_{endpoint} {}
-
-  const char *what() const noexcept {
-    return ("Communication::Client: Bad endpoint \"" + endpoint_ + "\"")
-        .c_str();
-  }
-
-private:
-  const std::string endpoint_;
-};
-
 }  // namespace network
 }  // namespace communication
 }  // namespace blazingdb

@@ -1,7 +1,8 @@
 #include "Client.h"
+#include "ClientExceptions.h"
 #include "Server.h"
 
-#include <blazingdb/communication/MessageSerializer.h>
+#include <blazingdb/communication/Message.h>
 
 #include <chrono>
 #include <memory>
