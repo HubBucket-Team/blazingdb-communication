@@ -13,6 +13,8 @@ add_library (blazingdb-communication
   NodeToken.cc
   Router.cc
   RouterBuilder.cc
+  messages/DataPivot.cpp
+  messages/PartitionPivotsMessage.cpp
 )
 
 set (PUBLIC_HEADER
