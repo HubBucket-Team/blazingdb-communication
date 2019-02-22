@@ -14,6 +14,13 @@ public:
     return ip_ == concreteNodeToken.ip_ && port_ == concreteNodeToken.port_;
   }
 
+  void serializeToJson(JsonSerializable::Writer& writer) const {
+    writer.Key("nodeTokenIp");
+    writer.String(ip_.c_str());
+    writer.Key("nodeTokenPort");
+    writer.Int(port_);
+  };
+
 private:
   std::string ip_;
   int port_;

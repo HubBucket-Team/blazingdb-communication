@@ -13,3 +13,8 @@ bool Node::operator==(const Node& rhs) const {
 bool Node::isAvailable() const { return isAvailable_; }
 
 void Node::setAvailable(bool available) { isAvailable_ = available; }
+
+void Node::serializeToJson(JsonSerializable::Writer& writer) const {
+  nodeToken_->serializeToJson(writer);
+  address_->serializeToJson(writer);
+}
