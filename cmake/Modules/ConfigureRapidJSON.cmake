@@ -10,6 +10,7 @@ macro(CONFIGURE_RAPIDJSON_EXTERNAL_PROJECT)
     set(RAPIDJSON_CMAKE_ARGS
         " -DCMAKE_C_FLAGS=-D_GLIBCXX_USE_CXX11_ABI=0"
         " -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_CXX11_ABI=0"
+        " -DRAPIDJSON_BUILD_TESTS=OFF"
     )
 
     # Download and unpack rapidjson at configure time
