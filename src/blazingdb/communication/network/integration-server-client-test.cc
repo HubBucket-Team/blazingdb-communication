@@ -25,10 +25,38 @@ public:
 
 class MockMessage : public blazingdb::communication::Message {
 public:
-  using blazingdb::communication::Message::Message;
+  MockMessage(
+      std::unique_ptr<blazingdb::communication::MessageToken> &&messageToken,
+      const std::size_t pages, const std::string &model)
+      : Message{std::forward<
+            std::unique_ptr<blazingdb::communication::MessageToken>>(
+            messageToken)},
+        pages_{pages},
+        model_{model} {}
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
+
+  static std::shared_ptr<MockMessage> Make(const std::string &json_data,
+                                           const std::string &binary_data) {
+    const std::string expected_json = "{\"pages\": 12, \"model\": \"qwerty\"}";
+    const std::string expected_binary = "";
+
+    EXPECT_EQ(expected_json, json_data);
+    EXPECT_EQ(expected_binary, binary_data);
+
+    std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
+        blazingdb::communication::MessageToken::Make("sample");
+    return std::make_shared<MockMessage>(std::move(messageToken), 12, "qwerty");
+  }
+
+  std::size_t pages() const { return pages_; }
+
+  const std::string model() const { return model_; }
+
+private:
+  const std::size_t pages_;
+  const std::string model_;
 };
 
 class MockFlag {
@@ -49,10 +77,15 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
       blazingdb::communication::MessageToken::Make("sample");
 
-  MockMessage mockMessage{std::move(messageToken)};
+  MockMessage mockMessage{std::move(messageToken), 12, "qwerty"};
 
-  EXPECT_CALL(mockMessage, serializeToJson).WillOnce(testing::Return("{}"));
-  EXPECT_CALL(mockMessage, serializeToBinary).WillOnce(testing::Return("data"));
+  const std::string json_data = "{\"pages\": 12, \"model\": \"qwerty\"}";
+  const std::string binary_data = "";
+
+  EXPECT_CALL(mockMessage, serializeToJson)
+      .WillOnce(testing::Return(json_data));
+  EXPECT_CALL(mockMessage, serializeToBinary)
+      .WillOnce(testing::Return(binary_data));
 
   // Create node info
   std::shared_ptr<blazingdb::communication::NodeToken> nodeToken =
@@ -79,11 +112,11 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   EXPECT_CALL(mockFlag, Flag()).Times(1);
 
   std::thread serverGetMessageThread([&server, &mockFlag]() {
-    std::shared_ptr<blazingdb::communication::network::Server::Frame> frame =
-        server->GetFrame();
+    std::shared_ptr<MockMessage> message = server->GetMessage<MockMessage>();
 
-    EXPECT_EQ("{}", frame->data());
-    EXPECT_EQ("data", frame->BufferString());
+    EXPECT_EQ(12, message->pages());
+    EXPECT_EQ("qwerty", message->model());
+
     mockFlag.Flag();
   });
 
