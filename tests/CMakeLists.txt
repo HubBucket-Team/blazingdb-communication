@@ -34,6 +34,5 @@ enable_testing()
 message(STATUS "******** Configuring tests ********")
 
 add_subdirectory(foo-test)
-add_subdirectory(server-test)
 
 message(STATUS "******** Tests are ready ********")
