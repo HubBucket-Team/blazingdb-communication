@@ -42,7 +42,7 @@ public:
 
   void Send(const Node &node, const std::string &endpoint,
            const Message &message) final {
-    Send(node, endpoint, message.serializeToJson(), message.serializeToBinary();
+    Send(node, endpoint, message.serializeToJson(), message.serializeToBinary());
   }
 
   void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) final {

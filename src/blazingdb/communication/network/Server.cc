@@ -26,6 +26,7 @@ public:
     // if (request_->header.cend() == jsonDataIt()) {
     // throw something for bad json header
     // }
+
     return jsonDataIt->second;
   }
 
@@ -81,7 +82,7 @@ public:
 
 private:
   std::shared_ptr<HttpServer::Request> getRequestDeque() {
-    std::unique_lock<std::mutex> locl(requests_mutex_);
+    std::unique_lock<std::mutex> lock(requests_mutex_);
     std::shared_ptr<HttpServer::Request> request = requests_.back();
     requests_.pop_back();
     return request;
@@ -101,7 +102,7 @@ private:
   }
 
   void notify() {
-    std::unique_lock<std::mutex> locl(condition_mutex_);
+    std::unique_lock<std::mutex> lock(condition_mutex_);
     ready++;
     condition_variable_.notify_one();
   }
