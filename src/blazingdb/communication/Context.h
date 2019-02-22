@@ -20,7 +20,7 @@ public:
   std::vector<std::string> getDataFiles() const;
 
 private:
-  const ContextToken token_;
+  const std::shared_ptr<ContextToken> token_;
   const std::vector<Node> taskNodes_;
   const Node* masterNode_;
   const std::string logicalPlan_;

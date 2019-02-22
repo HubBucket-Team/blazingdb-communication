@@ -22,6 +22,13 @@ public:
 
   std::int16_t port() const noexcept { return port_; }
 
+  void serializeToJson(JsonSerializable::Writer& writer) const {
+    writer.Key("addressIp");
+    writer.String(ip_.c_str());
+    writer.Key("addressPort");
+    writer.Int(port_);
+  };
+
 private:
   const std::string ip_;
   const std::int16_t port_;
