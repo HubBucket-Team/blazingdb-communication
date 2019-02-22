@@ -10,28 +10,19 @@ namespace blazingdb {
 namespace communication {
 namespace network {
 
-class Frame {
-public:
-  virtual const std::string &data() const = 0;
-  virtual std::streambuf &buffer() /*const*/ = 0;
-
-  const std::string BufferString() /*const*/ {
-    std::stringstream ss;
-    ss << &buffer();
-    return ss.str();
-  }
-};
-
 class Server {
 public:
   Server() = default;
 
-  virtual std::shared_ptr<Frame> GetMessage() /*const*/ = 0;
+  virtual std::shared_ptr<Message> GetMessage() = 0;
 
   virtual void Run() = 0;
   virtual void Close() noexcept = 0;
 
   static std::unique_ptr<Server> Make();
+
+  class Frame;
+  virtual std::shared_ptr<Frame> GetFrame() /*const*/ = 0;
 };
 
 }  // namespace network

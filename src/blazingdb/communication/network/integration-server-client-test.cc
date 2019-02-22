@@ -1,6 +1,7 @@
 #include "Client.h"
 #include "ClientExceptions.h"
 #include "Server.h"
+#include "ServerFrame.h"
 
 #include <blazingdb/communication/Message.h>
 
@@ -34,9 +35,17 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::unique_ptr<blazingdb::communication::network::Server> server =
       blazingdb::communication::network::Server::Make();
 
-  std::thread serverThread([&server]() { server->Run(); });
+  std::thread serverRunThread([&server]() { server->Run(); });
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
+
+  std::thread serverGetMessageThread([&server]() {
+    std::shared_ptr<blazingdb::communication::network::Server::Frame> frame =
+        server->GetFrame();
+
+    EXPECT_EQ("{}", frame->data());
+    EXPECT_EQ("data", frame->BufferString());
+  });
 
   // Create message
   std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
@@ -45,7 +54,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   MockMessage mockMessage{std::move(messageToken)};
 
   EXPECT_CALL(mockMessage, serializeToJson).WillOnce(testing::Return("{}"));
-  EXPECT_CALL(mockMessage, serializeToBinary).WillOnce(testing::Return(""));
+  EXPECT_CALL(mockMessage, serializeToBinary).WillOnce(testing::Return("data"));
 
   // Create node info
   std::shared_ptr<blazingdb::communication::NodeToken> nodeToken =
@@ -67,6 +76,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
     FAIL() << e.what();
   }
 
+  serverGetMessageThread.join();
   server->Close();
-  serverThread.join();
+  serverRunThread.join();
 }

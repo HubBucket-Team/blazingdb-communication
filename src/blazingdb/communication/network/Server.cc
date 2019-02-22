@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "ServerFrame.h"
 
 #include <condition_variable>
 #include <deque>
@@ -13,7 +14,7 @@ namespace network {
 namespace {
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
-class ConcreteFrame : public Frame {
+class ConcreteFrame : public Server::Frame {
 public:
   // TODO: Improve unnecessary copy storing shared ptr for request
   ConcreteFrame(const std::shared_ptr<HttpServer::Request> &request)
@@ -38,16 +39,18 @@ private:
 
 class ConcreteServer : public Server {
 public:
-  std::shared_ptr<Frame> GetMessage() /*const*/ final {
+  std::shared_ptr<Message> GetMessage() final { return nullptr; }
+
+  std::shared_ptr<Frame> GetFrame() /*const*/ final {
     wait();
     std::shared_ptr<HttpServer::Request> request = getRequestDeque();
     return std::make_shared<ConcreteFrame>(request);
   }
 
-  std::vector<std::shared_ptr<Frame>> GetMessages(int quantity) {
+  std::vector<std::shared_ptr<Frame>> GetFrames(int quantity) {
     std::vector<std::shared_ptr<Frame>> vector;
     for (int k = 0; k < quantity; ++k) {
-      vector.emplace_back(GetMessage());
+      vector.emplace_back(GetFrame());
     }
     return vector;
   }
