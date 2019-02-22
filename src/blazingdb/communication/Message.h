@@ -9,11 +9,14 @@
 namespace blazingdb {
 namespace communication {
 
-class Message : public Entity<Message, MessageToken> {
+class Message {
 public:
   explicit Message(std::unique_ptr<MessageToken> &&messageToken);
 
   ~Message();
+
+  virtual const std::string serializeToJson() const = 0;
+  virtual const std::string serializeToBinary() const = 0;
 
 private:
   const std::unique_ptr<MessageToken> messageToken_;
