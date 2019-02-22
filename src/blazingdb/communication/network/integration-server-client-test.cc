@@ -28,7 +28,7 @@ public:
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 };
 
-TEST(ServerTest, Ehlo) {
+TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   // Run server
   std::unique_ptr<blazingdb::communication::network::Server> server =
       blazingdb::communication::network::Server::Make();
