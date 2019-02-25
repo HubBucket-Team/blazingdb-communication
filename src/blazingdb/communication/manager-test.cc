@@ -19,7 +19,8 @@ TEST(TestManager, ConnectionAndGenerateContext) {
   std::unique_ptr<blazingdb::communication::network::Client> client =
       blazingdb::communication::network::Client::Make();
 
-  const std::string node = "{}";
+  const std::string node =
+      "{\"node_ip\": \"192.168.0.1\", \"node_port\": 8000}";
   blazingdb::communication::Buffer buffer{
       reinterpret_cast<const std::uint8_t *>(node.data()), node.size()};
 

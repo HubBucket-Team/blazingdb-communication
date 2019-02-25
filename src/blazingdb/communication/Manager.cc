@@ -1,5 +1,8 @@
 #include "Manager.h"
+
 #include <algorithm>
+
+#include <rapidjson/document.h>
 #include <simple-web-server/server_http.hpp>
 
 namespace {
@@ -23,9 +26,32 @@ public:
     httpServer_.resource["^/register_node$"]["POST"] =
         [](std::shared_ptr<HttpServer::Response> response,
            std::shared_ptr<HttpServer::Request> request) {
-          const std::string content =
-              "EHLO from BlazingDB Communication Server  with \"" +
-              request->content.string() + "\"";
+          // std::unordered_multimap<std::string, std::string>
+          auto it = request->header.find("json_data");
+
+          // if (request.header.cend() == it) {
+          //// TODO: raise exception
+          //}
+
+          const std::string jsonData = it->second;
+
+          rapidjson::Document document;
+
+          if (document.ParseInsitu(const_cast<char*>(jsonData.data()))
+                  .HasParseError()) {
+            // TODO: raise exception
+          }
+
+          // if (!document.HasMember("node_ip")) {
+          //// TODO: raise exception
+          //}
+
+          // if (!document.HasMember("node_port")) {
+          //// TODO: raise exception
+          //}
+
+          std::unique_ptr<NodeToken> nodeToken = NodeToken::Make(
+              document["node_ip"].GetString(), document["node_port"].GetInt());
 
           // cluster_.addNode(node);
 
