@@ -33,7 +33,7 @@ public:
           //// TODO: raise exception
           //}
 
-          const std::string jsonData = it->second;
+          const std::string& jsonData = it->second;
 
           rapidjson::Document document;
 
@@ -50,8 +50,12 @@ public:
           //// TODO: raise exception
           //}
 
-          std::unique_ptr<NodeToken> nodeToken = NodeToken::Make(
-              document["node_ip"].GetString(), document["node_port"].GetInt());
+          const std::string nodeIp = document["node_ip"].GetString();
+          const std::uint16_t nodePort =
+              static_cast<std::uint16_t>(document["node_port"].GetInt());
+
+          std::unique_ptr<NodeToken> nodeToken =
+              NodeToken::Make(nodeIp, nodePort);
 
           // cluster_.addNode(node);
 
