@@ -17,9 +17,11 @@ public:
   virtual void Run() = 0;
   virtual void Close() noexcept = 0;
 
+  virtual const Cluster& getCluster() const = 0;
   virtual Context* generateContext(
       std::string logicalPlan, std::vector<std::string> sourceDataFiles) = 0;
   // void completedTask(int id);
+
 
   static std::unique_ptr<Manager> Make();
 

@@ -26,7 +26,7 @@ const std::string NodeDataMessage::serializeToJson() const {
 
 const std::string NodeDataMessage::serializeToBinary() const { return ""; };
 
-std::shared_ptr<Message> NodeDataMessage::make(const std::string& jsonBuffer,
+std::shared_ptr<NodeDataMessage> NodeDataMessage::make(const std::string& jsonBuffer,
                                                const std::string& binBuffer) {
   rapidjson::Document doc;
 
@@ -41,7 +41,7 @@ std::shared_ptr<Message> NodeDataMessage::make(const std::string& jsonBuffer,
     return std::shared_ptr<NodeDataMessage>{};
   }
 
-  return std::make_shared<NodeDataMessage>(Node::make(doc.GetObject()));
+  return std::make_shared<NodeDataMessage>(Node::make(doc["node"].GetObject()));
 }
 
 }  // namespace messages
