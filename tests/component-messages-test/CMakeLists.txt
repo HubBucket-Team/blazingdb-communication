@@ -13,6 +13,7 @@ set(test_sources
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/NodeToken.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/DataPivot.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/PartitionPivotsMessage.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/NodeDataMessage.cc
 )
 
 add_executable(${test_name} ${test_sources})

@@ -17,7 +17,7 @@ public:
   
   const Node node;
 
-  static std::shared_ptr<Message> make(const std::string& jsonBuffer, const std::string& binBuffer);
+  static std::shared_ptr<NodeDataMessage> make(const std::string& jsonBuffer, const std::string& binBuffer);
 };
 
 }  // namespace messages
