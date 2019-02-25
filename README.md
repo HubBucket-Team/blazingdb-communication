@@ -7,6 +7,13 @@ apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev
 
 
 
-## Tests
-$ make blazingdb-communication-test
-$ ./blazingdb-communication-test
+## Run tests
+
+> $ make blazingdb-communication-test
+> $ ./blazingdb-communication-test
+
+## Get coverage
+
+> $ make coverage
+
+Open _coverage-html/index.html_
