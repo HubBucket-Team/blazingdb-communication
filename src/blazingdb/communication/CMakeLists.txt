@@ -35,11 +35,12 @@ install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
 )
 
 if (GTEST_FOUND)
-enable_testing ()
-add_executable (blazingdb-communication-test EXCLUDE_FROM_ALL
+set (TEST_FILES
   buffer-test.cc
   network/integration-server-client-test.cc
 )
+enable_testing ()
+add_executable (blazingdb-communication-test EXCLUDE_FROM_ALL ${TEST_FILES})
 target_compile_options (blazingdb-communication
   PUBLIC -g -O0 -fprofile-arcs -ftest-coverage -fPIC)
 target_include_directories (blazingdb-communication-test
