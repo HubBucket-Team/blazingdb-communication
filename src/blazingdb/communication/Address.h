@@ -19,7 +19,7 @@ public:
 
   static std::shared_ptr<Address> Make(const std::string& ip,
                                        const std::int16_t port);
-  static std::shared_ptr<Address> Make(rapidjson::Document& doc);
+  static std::shared_ptr<Address> Make(const rapidjson::Value::Object& object);
 };
 
 }  // namespace communication

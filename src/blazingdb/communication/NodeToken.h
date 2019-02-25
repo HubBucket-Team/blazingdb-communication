@@ -17,7 +17,7 @@ public:
   virtual void serializeToJson(JsonSerializable::Writer& writer) const = 0;
 
   static std::unique_ptr<NodeToken> Make(std::string ip, int port);
-  static std::unique_ptr<NodeToken> Make(rapidjson::Document& doc);
+  static std::unique_ptr<NodeToken> Make(const rapidjson::Value::Object& object);
 };
 
 }  // namespace communication
