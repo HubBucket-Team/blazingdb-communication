@@ -29,7 +29,7 @@ public:
 
   virtual std::unique_ptr<Status> SendNodeData(const std::string &ip,
                                                const std::uint16_t port,
-                                               const Buffer &buffer) = 0;
+                                               const Message &message) = 0;
 
   static std::unique_ptr<Client> Make();
 };

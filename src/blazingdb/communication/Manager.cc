@@ -1,12 +1,12 @@
 #include "Manager.h"
 
+#include <blazingdb/communication/messages/NodeDataMessage.h>
 #include <algorithm>
-
-#include <rapidjson/document.h>
 #include <simple-web-server/server_http.hpp>
 
 namespace {
 using namespace blazingdb::communication;
+using namespace blazingdb::communication::messages;
 
 class ConcreteManager : public Manager {
 public:
@@ -24,7 +24,7 @@ public:
     httpServer_.config.port = 9000;
 
     httpServer_.resource["^/register_node$"]["POST"] =
-        [](std::shared_ptr<HttpServer::Response> response,
+        [this](std::shared_ptr<HttpServer::Response> response,
            std::shared_ptr<HttpServer::Request> request) {
           // std::unordered_multimap<std::string, std::string>
           auto it = request->header.find("json_data");
@@ -33,27 +33,11 @@ public:
           //// TODO: raise exception
           //}
 
-          const std::string jsonData = it->second;
+          const std::string& jsonData = it->second;
+          std::shared_ptr<NodeDataMessage> nodeDataMessage =
+              NodeDataMessage::make(jsonData, "");
 
-          rapidjson::Document document;
-
-          if (document.ParseInsitu(const_cast<char*>(jsonData.data()))
-                  .HasParseError()) {
-            // TODO: raise exception
-          }
-
-          // if (!document.HasMember("node_ip")) {
-          //// TODO: raise exception
-          //}
-
-          // if (!document.HasMember("node_port")) {
-          //// TODO: raise exception
-          //}
-
-          std::unique_ptr<NodeToken> nodeToken = NodeToken::Make(
-              document["node_ip"].GetString(), document["node_port"].GetInt());
-
-          // cluster_.addNode(node);
+          this->cluster_.addNode(nodeDataMessage->node);
 
           *response << "HTTP/1.1 200 OK\r\nContent-Length: 0"
                     << "\r\n\r\n";
@@ -63,6 +47,8 @@ public:
   }
 
   void Close() noexcept final { httpServer_.stop(); }
+
+  const Cluster& getCluster() const { return cluster_; };
 
   Context* generateContext(std::string logicalPlan,
                            std::vector<std::string> sourceDataFiles) final {
