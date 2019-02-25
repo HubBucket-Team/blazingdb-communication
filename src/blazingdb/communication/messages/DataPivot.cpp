@@ -20,6 +20,19 @@ namespace messages {
         return max_range;
     }
 
+    DataPivot DataPivot::make(rapidjson::Value::Object&& object) {
+        // TODO: change hardcode data
+        Node node(NodeToken::Make("1.2.3.4", 1234), Address::Make("1.2.3.4", 1234));
+
+        const auto& value_min_range = object["min_range"];
+        std::string min_range(value_min_range.GetString(), value_min_range.GetStringLength());
+
+        const auto& value_max_range = object["max_range"];
+        std::string max_range(value_max_range.GetString(), value_max_range.GetStringLength());
+
+        return DataPivot(node, min_range, max_range);
+    }
+
 } // namespace messages
 } // namespace communication
 } // namespace blazingdb

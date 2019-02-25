@@ -24,8 +24,8 @@ namespace messages {
         void serialize(Writer& writer) {
             writer.StartObject();
             {
-                writer.Key("node");
-                node.serializeToJson(writer);
+                //writer.Key("node");
+                //node.serializeToJson(writer);
 
                 writer.Key("min_range");
                 writer.String(min_range.c_str());
@@ -35,6 +35,9 @@ namespace messages {
             }
             writer.EndObject();
         }
+
+    public:
+        static DataPivot make(rapidjson::Value::Object&& object);
 
     private:
         const Node node;

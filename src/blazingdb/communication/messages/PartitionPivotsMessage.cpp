@@ -22,23 +22,33 @@ namespace messages {
         rapidjson::StringBuffer string_buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
 
-        writer.StartObject();
+        writer.StartArray();
         {
-            writer.StartArray();
-            {
-                for (const auto &data_pivot : data_pivot_array) {
-                    const_cast<DataPivot&>(data_pivot).serialize(writer);
-                }
+            for (const auto &data_pivot : data_pivot_array) {
+                const_cast<DataPivot&>(data_pivot).serialize(writer);
             }
-            writer.EndArray();
         }
-        writer.EndObject();
+        writer.EndArray();
 
         return std::string(string_buffer.GetString(), string_buffer.GetSize());
     }
 
     const std::string PartitionPivotsMessage::serializeToBinary() const {
         return std::string();
+    }
+
+    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::make(const std::string& data) {
+        rapidjson::Document document;
+        document.Parse(data.c_str());
+
+        std::vector<DataPivot> data_pivot_array;
+
+        const auto& pivots = document.GetArray();
+        for (auto& pivot : pivots) {
+            data_pivot_array.emplace_back(DataPivot::make(pivot.GetObject()));
+        }
+
+        return std::make_unique<PartitionPivotsMessage>(data_pivot_array);
     }
 
 } // namespace messages
