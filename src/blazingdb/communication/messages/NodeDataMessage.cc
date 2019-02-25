@@ -41,7 +41,7 @@ std::shared_ptr<Message> NodeDataMessage::make(const std::string& jsonBuffer,
     return std::shared_ptr<NodeDataMessage>{};
   }
 
-  return std::make_shared<NodeDataMessage>(Node{doc});
+  return std::make_shared<NodeDataMessage>(Node::make(doc.GetObject()));
 }
 
 }  // namespace messages

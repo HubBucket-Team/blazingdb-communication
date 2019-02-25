@@ -9,9 +9,9 @@ std::shared_ptr<Address> Address::Make(const std::string& ip,
   return std::make_shared<internal::ConcreteAddress>(ip, port);
 }
 
-std::shared_ptr<Address> Address::Make(rapidjson::Document& doc) {
+std::shared_ptr<Address> Address::Make(const rapidjson::Value::Object& object) {
   return std::make_shared<internal::ConcreteAddress>(
-      doc["addressIp"].GetString(), doc["addressPort"].GetInt());
+      object["addressIp"].GetString(), object["addressPort"].GetInt());
 }
 
 }  // namespace communication
