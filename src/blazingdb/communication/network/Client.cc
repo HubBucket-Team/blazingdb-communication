@@ -38,7 +38,7 @@ public:
                                const std::string &data,
                                const std::string &buffer) /*const*/ final {
     const internal::ConcreteAddress *concreteAddress =
-        static_cast<const internal::ConcreteAddress *>(node.address().get());
+        static_cast<const internal::ConcreteAddress *>(node.address());
 
     const std::string serverPortPath =
         concreteAddress->ip() + ":" + std::to_string(concreteAddress->port());

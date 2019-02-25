@@ -15,10 +15,11 @@ public:
   }
 
   void serializeToJson(JsonSerializable::Writer& writer) const {
-    writer.Key("nodeTokenIp");
-    writer.String(ip_.c_str());
-    writer.Key("nodeTokenPort");
-    writer.Int(port_);
+      writer.Key("nodeTokenIp");
+      writer.String(ip_.c_str());
+
+      writer.Key("nodeTokenPort");
+      writer.Int(port_);
   };
 
 private:
@@ -29,6 +30,10 @@ private:
 
 std::unique_ptr<NodeToken> NodeToken::Make(std::string ip, int port) {
   return std::unique_ptr<NodeToken>(new ConcreteNodeToken{ip, port});
+}
+
+std::unique_ptr<NodeToken> NodeToken::Make(rapidjson::Document& doc){
+  return std::unique_ptr<NodeToken>(new ConcreteNodeToken{doc["nodeTokenIp"].GetString(), doc["nodeTokenPort"].GetInt()});
 }
 
 }  // namespace communication

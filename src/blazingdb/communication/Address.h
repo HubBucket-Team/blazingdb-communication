@@ -1,9 +1,10 @@
 #ifndef BLAZINGDB_COMMUNICATION_ADDRESS_H_
 #define BLAZINGDB_COMMUNICATION_ADDRESS_H_
 
+#include <blazingdb/communication/shared/JsonSerializable.h>
+#include <rapidjson/document.h>
 #include <memory>
 #include <string>
-#include <blazingdb/communication/shared/JsonSerializable.h>
 
 namespace blazingdb {
 namespace communication {
@@ -13,11 +14,12 @@ public:
   virtual ~Address() = default;
 
   // TODO: See MessageToken
-  virtual bool SameValueAs(const Address &address) const = 0;
+  virtual bool SameValueAs(const Address& address) const = 0;
   virtual void serializeToJson(JsonSerializable::Writer& writer) const = 0;
 
-  static std::shared_ptr<Address> Make(const std::string &&ip,
+  static std::shared_ptr<Address> Make(const std::string& ip,
                                        const std::int16_t port);
+  static std::shared_ptr<Address> Make(rapidjson::Document& doc);
 };
 
 }  // namespace communication
