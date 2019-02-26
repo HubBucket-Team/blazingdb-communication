@@ -12,16 +12,24 @@ namespace messages {
 
     using blazingdb::communication::Message;
 
-    template <typename GpuData, typename GpuFunctions>
+    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class DataScatterMessage : public Message {
+    private:
+        using MessageType = DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>;
+
     public:
-        DataScatterMessage(const std::vector<GpuData>& columns)
+        DataScatterMessage(std::vector<RalColumn>&& columns)
+        : Message(MessageToken::Make(MessageID)),
+          columns{std::move(columns)}
+        { }
+
+        DataScatterMessage(const std::vector<RalColumn>& columns)
         : Message(MessageToken::Make(MessageID)),
           columns{columns}
         { }
 
     public:
-        const std::vector<GpuData>& getColumns() const {
+        const std::vector<RalColumn>& getColumns() const {
             return columns;
         }
 
@@ -30,18 +38,13 @@ namespace messages {
             rapidjson::StringBuffer string_buffer;
             rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
 
-            writer.StartObject();
+            writer.StartArray();
             {
-                writer.Key("columns");
-                writer.StartArray();
-                {
-                    for (const auto &column : columns) {
-                        serializeGdfColumnCpp(writer, const_cast<GpuData&>(column));
-                    }
+                for (const auto &column : columns) {
+                    serializeGdfColumnCpp(writer, const_cast<RalColumn&>(column));
                 }
-                writer.EndArray();
             }
-            writer.EndObject();
+            writer.EndArray();
 
             return std::string(string_buffer.GetString(), string_buffer.GetSize());
         }
@@ -51,26 +54,48 @@ namespace messages {
 
             std::size_t capacity = 0;
             for (const auto& column : columns) {
-                capacity += const_cast<GpuData&>(column).size();
+                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
+                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
             }
-            result.reserve(capacity);
+            result.resize(capacity);
 
+            std::size_t binary_pointer = 0;
             for (const auto& column : columns) {
-                GpuFunctions::CopyGpuToCpu(result, const_cast<GpuData&>(column));
+                GpuFunctions::copyGpuToCpu(binary_pointer, result, const_cast<RalColumn&>(column));
             }
 
             return result;
         }
 
+    public:
+        static std::shared_ptr<MessageType> make(const std::string& json, const std::string& binary) {
+            // Parse
+            rapidjson::Document document;
+            document.Parse(json.c_str());
+
+            // The gdf_column_cpp container
+            std::vector<RalColumn> columns;
+
+            // Make the deserialization
+            std::size_t binary_pointer = 0;
+            const auto& gpu_data_array = document.GetArray();
+            for (const auto& gpu_data : gpu_data_array) {
+                columns.emplace_back(deserializeRalColumn<RalColumn, CudfColumn, GpuFunctions>(binary_pointer, binary, gpu_data.GetObject()));
+            }
+
+            // Create the message
+            return std::make_shared<MessageType>(std::move(columns));
+        }
+
     private:
-        const std::vector<GpuData> columns;
+        const std::vector<RalColumn> columns;
 
     private:
         static const std::string MessageID;
     };
 
-    template <typename GpuData, typename GpuFunctions>
-    const std::string DataScatterMessage<GpuData, GpuFunctions>::MessageID {"DataScatterMessage"};
+    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+    const std::string DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID {"DataScatterMessage"};
 
 } // namespace messages
 } // namespace communication
