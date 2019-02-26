@@ -4,7 +4,7 @@
 #include <memory>
 #include <sstream>
 
-#include <blazingdb/communication/Message.h>
+#include <blazingdb/communication/messages/Message.h>
 
 namespace blazingdb {
 namespace communication {

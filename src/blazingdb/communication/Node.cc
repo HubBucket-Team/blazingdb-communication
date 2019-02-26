@@ -2,12 +2,11 @@
 
 using namespace blazingdb::communication;
 
-Node::Node(const std::shared_ptr<NodeToken>& nodeToken,
-           const std::shared_ptr<Address>& address)
-    : nodeToken_{nodeToken}, address_{address}, isAvailable_{true} {}
+Node::Node(const std::shared_ptr<Address>& address)
+    : address_{address}, isAvailable_{true} {}
 
 bool Node::operator==(const Node& rhs) const {
-  return nodeToken_->SameValueAs(*rhs.nodeToken_);
+  return address_->SameValueAs(*rhs.address_);
 }
 
 bool Node::isAvailable() const { return isAvailable_; }
@@ -18,12 +17,11 @@ void Node::serializeToJson(JsonSerializable::Writer& writer) const {
   writer.Key("node");
   writer.StartObject();
   {
-    nodeToken_->serializeToJson(writer);
     address_->serializeToJson(writer);
   }
   writer.EndObject();
 }
 
 Node Node::make(const rapidjson::Value::Object& object) {
-  return Node{NodeToken::Make(object), Address::Make(object)};
+  return Node{Address::Make(object)};
 }

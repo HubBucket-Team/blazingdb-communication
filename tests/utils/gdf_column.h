@@ -7,8 +7,8 @@
 namespace blazingdb {
 namespace test {
 
-    typedef unsigned char gdf_valid_type;
     typedef int gdf_size_type;
+    typedef unsigned char gdf_valid_type;
 
     enum gdf_dtype {
         GDF_invalid=0,
@@ -18,11 +18,6 @@ namespace test {
         GDF_INT64,
         GDF_FLOAT32,
         GDF_FLOAT64,
-        GDF_DATE32,
-        GDF_DATE64,
-        GDF_TIMESTAMP,
-        GDF_CATEGORY,
-        GDF_STRING,
         N_GDF_TYPES,
     };
 
@@ -48,12 +43,21 @@ namespace test {
         char*                 col_name;
     };
 
-    std::shared_ptr<gdf_column> build(std::string&& data,
-                           std::string&& valid,
-                           gdf_dtype dtype,
-                           gdf_size_type null_count,
-                           gdf_time_unit time_unit,
-                           std::string&& name);
+    std::size_t get_dtype_width(blazingdb::test::gdf_dtype type);
+
+    gdf_column* clone(gdf_column* input_column);
+
+    gdf_column* make(char* input_data,
+                     gdf_valid_type* input_valid,
+                     std::size_t input_size,
+                     gdf_dtype input_dtype,
+                     std::string input_name);
+
+    std::shared_ptr<gdf_column> build(std::size_t size,
+                                      gdf_dtype dtype,
+                                      gdf_size_type null_count,
+                                      gdf_time_unit time_unit,
+                                      std::string&& name);
 
     bool operator==(const gdf_column& lhs, const gdf_column& rhs);
 

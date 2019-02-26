@@ -2,16 +2,14 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_PARTITIONPIVOTSMESSAGE_H
 
 #include <vector>
-#include "src/blazingdb/communication/Message.h"
+#include "blazingdb/communication/messages/BaseComponentMessage.h"
 #include "blazingdb/communication/messages/DataPivot.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    using blazingdb::communication::Message;
-
-    class PartitionPivotsMessage : public Message {
+    class PartitionPivotsMessage : public BaseComponentMessage {
     public:
         PartitionPivotsMessage(const std::vector<DataPivot>& data);
 
@@ -24,7 +22,7 @@ namespace messages {
         const std::string serializeToBinary() const override;
 
     public:
-        static std::shared_ptr<PartitionPivotsMessage> make(const std::string& data);
+        static std::shared_ptr<PartitionPivotsMessage> make(const std::string& json, const std::string& binary);
 
     private:
         std::vector<DataPivot> data_pivot_array;

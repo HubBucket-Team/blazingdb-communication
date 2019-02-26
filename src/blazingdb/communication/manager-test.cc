@@ -20,9 +20,7 @@ TEST(TestManager, ConnectionAndGenerateContext) {
   std::unique_ptr<blazingdb::communication::network::Client> client =
       blazingdb::communication::network::Client::Make();
 
-  blazingdb::communication::Node node(
-      blazingdb::communication::NodeToken::Make("1.2.3.4", 1234),
-      blazingdb::communication::Address::Make("1.2.3.4", 1234));
+  blazingdb::communication::Node node(blazingdb::communication::Address::Make("1.2.3.4", 1234));
   // Create message
   blazingdb::communication::messages::NodeDataMessage nodeDatamessage(node);
 

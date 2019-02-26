@@ -6,6 +6,7 @@
 
 namespace blazingdb {
 namespace communication {
+namespace messages {
 
 class MessageToken : public JsonSerializable {
 public:
@@ -14,6 +15,7 @@ public:
   static std::unique_ptr<MessageToken> Make(const std::string& id);
 };  
 
+}  // namespace messages
 }  // namespace communication
 }  // namespace blazingdb
 

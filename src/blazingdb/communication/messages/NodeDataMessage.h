@@ -1,7 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_NODEDATAMESSAGE_H_
 #define BLAZINGDB_COMMUNICATION_NODEDATAMESSAGE_H_
 
-#include <blazingdb/communication/Message.h>
+#include <blazingdb/communication/messages/Message.h>
 #include <blazingdb/communication/Node.h>
 
 namespace blazingdb {

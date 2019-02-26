@@ -5,13 +5,12 @@ add_library (blazingdb-communication
   Context.cc
   Cluster.cc
   Manager.cc
-  Message.cc
-  MessageToken.cc
   network/Client.cc
   network/Server.cc
   Node.cc
-  NodeToken.cc
   Router.cc
+  messages/Message.cc
+  messages/MessageToken.cc
   messages/DataPivot.cpp
   messages/PartitionPivotsMessage.cpp
   messages/NodeDataMessage.cc

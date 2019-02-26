@@ -1,16 +1,13 @@
 #include "blazingdb/communication/messages/PartitionPivotsMessage.h"
-#include <rapidjson/writer.h>
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    using blazingdb::communication::MessageToken;
-
     const std::string PartitionPivotsMessage::MessageID {"PartitionPivotsMessage"};
 
     PartitionPivotsMessage::PartitionPivotsMessage(const std::vector<DataPivot>& data)
-    : Message(MessageToken::Make(MessageID)),
+    : BaseComponentMessage(MessageID),
       data_pivot_array{data}
     { }
 
@@ -19,8 +16,8 @@ namespace messages {
     }
 
     const std::string PartitionPivotsMessage::serializeToJson() const {
-        rapidjson::StringBuffer string_buffer;
-        rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+        BaseComponentMessage::StringBuffer stringBuffer;
+        BaseComponentMessage::Writer writer(stringBuffer);
 
         writer.StartArray();
         {
@@ -30,16 +27,16 @@ namespace messages {
         }
         writer.EndArray();
 
-        return std::string(string_buffer.GetString(), string_buffer.GetSize());
+        return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
     }
 
     const std::string PartitionPivotsMessage::serializeToBinary() const {
         return std::string();
     }
 
-    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::make(const std::string& data) {
+    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::make(const std::string& json, const std::string& binary) {
         rapidjson::Document document;
-        document.Parse(data.c_str());
+        document.Parse(json.c_str());
 
         std::vector<DataPivot> data_pivot_array;
 

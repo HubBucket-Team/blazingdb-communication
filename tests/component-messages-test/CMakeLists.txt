@@ -7,10 +7,9 @@ set(test_sources
     ${CMAKE_SOURCE_DIR}/tests/utils/gdf_column.cpp
     ${CMAKE_SOURCE_DIR}/tests/utils/gdf_column_cpp.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/Address.cc
-    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/Message.cc
-    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/MessageToken.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/Node.cc
-    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/NodeToken.cc
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/Message.cc
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/MessageToken.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/DataPivot.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/PartitionPivotsMessage.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/NodeDataMessage.cc

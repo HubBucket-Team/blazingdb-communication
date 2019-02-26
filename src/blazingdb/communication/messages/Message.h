@@ -3,11 +3,12 @@
 
 #include <memory>
 
-#include <blazingdb/communication/MessageToken.h>
+#include <blazingdb/communication/messages/MessageToken.h>
 #include <blazingdb/communication/shared/Entity.h>
 
 namespace blazingdb {
 namespace communication {
+namespace messages {
 
 class Message {
 public:
@@ -22,6 +23,7 @@ private:
   const std::unique_ptr<MessageToken> messageToken_;
 };
 
+}  // namespace messages
 }  // namespace communication
 }  // namespace blazingdb
 

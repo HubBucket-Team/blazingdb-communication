@@ -4,6 +4,10 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
+    DataPivot::DataPivot(const Node& node, std::string&& min_range, std::string&& max_range)
+    : node {node}, min_range{min_range}, max_range{max_range}
+    { }
+
     DataPivot::DataPivot(const Node& node, const std::string& min_range, const std::string& max_range)
     : node {node}, min_range{min_range}, max_range{max_range}
     { }
@@ -21,8 +25,7 @@ namespace messages {
     }
 
     DataPivot DataPivot::make(rapidjson::Value::Object&& object) {
-        // TODO: change hardcode data
-        Node node(NodeToken::Make("1.2.3.4", 1234), Address::Make("1.2.3.4", 1234));
+        Node node = Node::make(object["node"].GetObject());
 
         const auto& value_min_range = object["min_range"];
         std::string min_range(value_min_range.GetString(), value_min_range.GetStringLength());
