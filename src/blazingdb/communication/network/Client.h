@@ -4,7 +4,6 @@
 #include <exception>
 #include <memory>
 
-#include <blazingdb/communication/Buffer.h>
 #include <blazingdb/communication/messages/Message.h>
 #include <blazingdb/communication/Node.h>
 #include <blazingdb/communication/network/Status.h>
