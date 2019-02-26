@@ -44,35 +44,22 @@ include_directories(
     ${RAPIDJSON_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src)
 
-add_subdirectory(src)
-
-#target_link_libraries(blazingdb-communication
-#    ${X_STATIC_LIB}
-#)
-
 # Tests
 if(BUILD_TESTING)
     include(ConfigureGoogleTest)
 
     if(GTEST_FOUND)
         add_subdirectory(tests)
-
-        enable_testing ()
-        add_executable (blazingdb-communication-test EXCLUDE_FROM_ALL
-          src/blazingdb/communication/buffer-test.cc
-          src/blazingdb/communication/network/integration-server-client-test.cc
-        )
-        target_include_directories (blazingdb-communication-test
-          PUBLIC src
-          PUBLIC ${GTEST_INCLUDE_DIRS}
-          PUBLIC ${RAPIDJSON_INCLUDE_DIRS})
-        target_link_libraries (blazingdb-communication-test
-          GTest::GTest gmock_main gmock blazingdb-communication)
-        gtest_discover_tests(blazingdb-communication-test)
     else()
         message(AUTHOR_WARNING "Google C++ Testing Framework (Google Test) not found: automated tests are disabled.")
     endif()
 endif()
+
+add_subdirectory(src)
+
+#target_link_libraries(blazingdb-communication
+#    ${X_STATIC_LIB}
+#)
 
 # Print the project summary
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

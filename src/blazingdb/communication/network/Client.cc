@@ -54,7 +54,7 @@ public:
       std::shared_ptr<HttpClient::Response> response =
           httpClient.request("POST", "/message/" + endpoint, body, headers);
       return std::unique_ptr<Status>(new ConcreteStatus{response});
-    } catch (const boost::system::system_error &error) {
+    } catch (const boost::system::system_error &) {
       throw SendError(endpoint, data, buffer.size());
     }
   }
@@ -65,8 +65,23 @@ public:
                 message.serializeToBinary());
   }
 
-  void SendNodeData(std::string ip, uint16_t port, const Buffer &buffer) final {
+  std::unique_ptr<Status> SendNodeData(const std::string &ip,
+                                       const std::uint16_t port,
+                                       const Message &message) final {
+    const std::string serverPortPath = ip + ":" + std::to_string(port);
+    HttpClient httpClient{serverPortPath};
 
+    std::map<std::string, std::string> headers{
+        {"json_data", message.serializeToJson()}};
+
+    try {
+      std::shared_ptr<HttpClient::Response> response =
+          httpClient.request("POST", "/register_node", "", headers);
+      return std::unique_ptr<Status>(new ConcreteStatus{response});
+    } catch (const boost::system::system_error &) {
+      const std::string data = message.serializeToJson();
+      throw SendError("/register_node", data, data.size());
+    }
   }
 };
 }  // namespace

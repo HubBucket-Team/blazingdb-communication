@@ -1,14 +1,17 @@
 #include "Manager.h"
+
+#include <blazingdb/communication/messages/NodeDataMessage.h>
 #include <algorithm>
 #include <simple-web-server/server_http.hpp>
 
 namespace {
 using namespace blazingdb::communication;
+using namespace blazingdb::communication::messages;
 
 class ConcreteManager : public Manager {
 public:
   using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
-  
+
   ConcreteManager() = default;
 
   ConcreteManager(const std::vector<Node>& nodes) {
@@ -17,17 +20,24 @@ public:
     }
   }
 
-  void run() final {
+  void Run() final {
     httpServer_.config.port = 9000;
 
-    httpServer_.resource["^/registerNode$"]["POST"] =
-        [](std::shared_ptr<HttpServer::Response> response,
+    httpServer_.resource["^/register_node$"]["POST"] =
+        [this](std::shared_ptr<HttpServer::Response> response,
            std::shared_ptr<HttpServer::Request> request) {
-          const std::string content =
-              "EHLO from BlazingDB Communication Server  with \"" +
-              request->content.string() + "\"";
+          // std::unordered_multimap<std::string, std::string>
+          auto it = request->header.find("json_data");
 
-          // cluster_.addNode(node);
+          // if (request.header.cend() == it) {
+          //// TODO: raise exception
+          //}
+
+          const std::string& jsonData = it->second;
+          std::shared_ptr<NodeDataMessage> nodeDataMessage =
+              NodeDataMessage::make(jsonData, "");
+
+          this->cluster_.addNode(nodeDataMessage->node);
 
           *response << "HTTP/1.1 200 OK\r\nContent-Length: 0"
                     << "\r\n\r\n";
@@ -35,6 +45,10 @@ public:
 
     httpServer_.start();
   }
+
+  void Close() noexcept final { httpServer_.stop(); }
+
+  const Cluster& getCluster() const { return cluster_; };
 
   Context* generateContext(std::string logicalPlan,
                            std::vector<std::string> sourceDataFiles) final {
@@ -61,10 +75,10 @@ private:
 
 }  // namespace
 
-std::unique_ptr<Manager> Manager::make(){
+std::unique_ptr<Manager> Manager::Make() {
   return std::unique_ptr<Manager>{new ConcreteManager};
 }
 
-std::unique_ptr<Manager> Manager::make(const std::vector<Node>& nodes){
+std::unique_ptr<Manager> Manager::Make(const std::vector<Node>& nodes) {
   return std::unique_ptr<Manager>{new ConcreteManager{nodes}};
 }

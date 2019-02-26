@@ -116,7 +116,6 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
 
     EXPECT_EQ(12, message->pages());
     EXPECT_EQ("qwerty", message->model());
-
     mockFlag.Flag();
   });
 

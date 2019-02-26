@@ -3,6 +3,7 @@
 #include "blazingdb/communication/messages/DataScatterMessage.h"
 #include "blazingdb/communication/messages/PartitionPivotsMessage.h"
 #include "blazingdb/communication/messages/SampleToNodeMasterMessage.h"
+#include "blazingdb/communication/messages/NodeDataMessage.h"
 #include "blazingdb/communication/messages/Serializer.h"
 #include "tests/utils/gdf_column.h"
 #include "tests/utils/gdf_column_cpp.h"
@@ -207,4 +208,26 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
     ASSERT_EQ(pivots.size(), 1);
     ASSERT_EQ(pivots[0].getMinRange(), min_range_1);
     ASSERT_EQ(pivots[0].getMaxRange(), max_range_1);
+}
+
+
+TEST_F(QueryMessagesTest, NodeDataMessage) {
+    using Address = blazingdb::communication::Address;
+    using NodeToken = blazingdb::communication::NodeToken;
+
+    blazingdb::communication::Node node(NodeToken::Make("1.2.3.4", 1234),
+                                        Address::Make("1.2.3.4", 1234));
+    // Create message
+    using blazingdb::communication::messages::NodeDataMessage;
+    NodeDataMessage message(node);
+
+    // Serialize message
+    const std::string serialize_message = message.serializeToJson();
+    std::cout << serialize_message << std::endl;
+
+    // Deserialize message
+    std::shared_ptr<NodeDataMessage> deserialize_message = NodeDataMessage::make(serialize_message, "");
+
+    // Tests
+    // ASSERT_EQ(message.node == deserialize_message->node, true);
 }

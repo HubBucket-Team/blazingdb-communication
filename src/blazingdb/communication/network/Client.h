@@ -27,9 +27,9 @@ public:
                                        const std::string &endpoint,
                                        const Message &message) = 0;
 
-  virtual void SendNodeData(std::string ip, uint16_t port,
-                            const Buffer &buffer) /*const*/
-      = 0;
+  virtual std::unique_ptr<Status> SendNodeData(const std::string &ip,
+                                               const std::uint16_t port,
+                                               const Message &message) = 0;
 
   static std::unique_ptr<Client> Make();
 };

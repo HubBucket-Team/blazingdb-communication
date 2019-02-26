@@ -32,8 +32,8 @@ std::unique_ptr<NodeToken> NodeToken::Make(std::string ip, int port) {
   return std::unique_ptr<NodeToken>(new ConcreteNodeToken{ip, port});
 }
 
-std::unique_ptr<NodeToken> NodeToken::Make(rapidjson::Document& doc){
-  return std::unique_ptr<NodeToken>(new ConcreteNodeToken{doc["nodeTokenIp"].GetString(), doc["nodeTokenPort"].GetInt()});
+std::unique_ptr<NodeToken> NodeToken::Make(const rapidjson::Value::Object& object){
+  return std::unique_ptr<NodeToken>(new ConcreteNodeToken{object["nodeTokenIp"].GetString(), object["nodeTokenPort"].GetInt()});
 }
 
 }  // namespace communication
