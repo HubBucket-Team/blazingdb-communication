@@ -14,6 +14,7 @@ namespace network {
 
 namespace {
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+using messages::Message;
 
 class ConcreteStatus : public Status {
 public:

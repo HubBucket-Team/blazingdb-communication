@@ -143,11 +143,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Test data - create node
     using Address = blazingdb::communication::Address;
-    using NodeToken = blazingdb::communication::NodeToken;
-
-    blazingdb::communication::Node node(NodeToken::Make("1.2.3.4", 1234),
-                                        Address::Make("5.6.7.8", 9851));
-
+    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234));
 
     // Message alias
     using SampleToNodeMasterMessage = blazingdb::communication::messages::SampleToNodeMasterMessage<blazingdb::test::gdf_column_cpp,
@@ -182,13 +178,10 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
 TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
     using Address = blazingdb::communication::Address;
-    using NodeToken = blazingdb::communication::NodeToken;
 
-    blazingdb::communication::Node node_1(NodeToken::Make("1.2.3.4", 1234),
-                                          Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node node_1(Address::Make("1.2.3.4", 1234));
 
-//    blazingdb::communication::Node node_2(NodeToken::Make("5.6.7.8", 4564),
-//                                          Address::Make("5.6.7.8", 4564));
+//    blazingdb::communication::Node node_2(Address::Make("5.6.7.8", 4564));
 
     using blazingdb::communication::messages::DataPivot;
 
@@ -234,10 +227,8 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 
 TEST_F(ComponentMessagesTest, NodeDataMessage) {
     using Address = blazingdb::communication::Address;
-    using NodeToken = blazingdb::communication::NodeToken;
 
-    blazingdb::communication::Node node(NodeToken::Make("1.2.3.4", 1234),
-                                        Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234));
     // Create message
     using blazingdb::communication::messages::NodeDataMessage;
     NodeDataMessage message(node);

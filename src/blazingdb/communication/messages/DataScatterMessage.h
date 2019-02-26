@@ -3,14 +3,12 @@
 
 #include <vector>
 #include <rapidjson/writer.h>
-#include "blazingdb/communication/Message.h"
+#include "blazingdb/communication/messages/Message.h"
 #include "blazingdb/communication/messages/Serializer.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
-
-    using blazingdb::communication::Message;
 
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class DataScatterMessage : public Message {

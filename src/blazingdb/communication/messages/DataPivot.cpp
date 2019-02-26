@@ -22,7 +22,7 @@ namespace messages {
 
     DataPivot DataPivot::make(rapidjson::Value::Object&& object) {
         // TODO: change hardcode data
-        Node node(NodeToken::Make("1.2.3.4", 1234), Address::Make("1.2.3.4", 1234));
+        Node node(Address::Make("1.2.3.4", 1234));
 
         const auto& value_min_range = object["min_range"];
         std::string min_range(value_min_range.GetString(), value_min_range.GetStringLength());

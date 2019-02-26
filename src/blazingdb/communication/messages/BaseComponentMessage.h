@@ -3,13 +3,11 @@
 
 #include <string>
 #include <rapidjson/writer.h>
-#include "blazingdb/communication/Message.h"
+#include "blazingdb/communication/messages/Message.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
-
-    using blazingdb::communication::Message;
 
     class BaseComponentMessage : public Message {
     protected:

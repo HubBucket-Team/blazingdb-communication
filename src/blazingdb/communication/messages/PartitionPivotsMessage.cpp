@@ -5,8 +5,6 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    using blazingdb::communication::MessageToken;
-
     const std::string PartitionPivotsMessage::MessageID {"PartitionPivotsMessage"};
 
     PartitionPivotsMessage::PartitionPivotsMessage(const std::vector<DataPivot>& data)

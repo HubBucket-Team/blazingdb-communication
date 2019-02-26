@@ -4,6 +4,7 @@
 
 namespace blazingdb {
 namespace communication {
+namespace messages {
 
 class StringMessageToken : public MessageToken {
 public:
@@ -23,5 +24,6 @@ std::unique_ptr<MessageToken> MessageToken::Make(const std::string& id) {
   return std::unique_ptr<MessageToken>(new StringMessageToken{id});
 }
 
+}  // namespace messages
 }  // namespace communication
 }  // namespace blazingdb
