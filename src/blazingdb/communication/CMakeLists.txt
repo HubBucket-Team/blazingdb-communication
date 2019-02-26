@@ -54,6 +54,7 @@ add_custom_target (coverage
   COMMAND
     ${CMAKE_BINARY_DIR}/src/blazingdb/communication/blazingdb-communication-test
   COMMAND lcov -c -d ${CMAKE_BINARY_DIR}/src -o coverage.info
+  COMMAND lcov -r coverage.info '/usr*' '*boost*' '*build*' -o coverage.info
   COMMAND genhtml coverage.info -o ${CMAKE_BINARY_DIR}/coverage-html
 )
 add_dependencies (coverage blazingdb-communication-test)
