@@ -33,7 +33,7 @@ install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
   FILES_MATCHING PATTERN "*.h" PATTERN "*Internal.h" EXCLUDE
 )
 
-if (GTEST_FOUND)
+if (BLAZINGDB_COMMUNICATION_TESTS)
 set (TEST_FILES
   buffer-test.cc
   manager-test.cc
