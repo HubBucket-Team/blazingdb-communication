@@ -211,7 +211,7 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 }
 
 
-TEST_F(QueryMessagesTest, NodeDataMessage) {
+TEST_F(ComponentMessagesTest, NodeDataMessage) {
     using Address = blazingdb::communication::Address;
     using NodeToken = blazingdb::communication::NodeToken;
 
