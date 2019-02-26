@@ -30,6 +30,10 @@ std::shared_ptr<NodeDataMessage> NodeDataMessage::make(const std::string& jsonBu
                                                const std::string& binBuffer) {
   rapidjson::Document doc;
 
+  // if (!document.HasMember("node")) {
+  //// TODO: raise exception
+  //}
+
   std::unique_ptr<char[]> jsonChars(new char[jsonBuffer.size() + 1]);
   std::strcpy(jsonChars.get(), jsonBuffer.c_str());
   if (doc.ParseInsitu(jsonChars.get()).HasParseError()) {

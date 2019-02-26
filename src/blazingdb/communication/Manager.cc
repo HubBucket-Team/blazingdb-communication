@@ -26,7 +26,6 @@ public:
     httpServer_.resource["^/register_node$"]["POST"] =
         [this](std::shared_ptr<HttpServer::Response> response,
            std::shared_ptr<HttpServer::Request> request) {
-          // std::unordered_multimap<std::string, std::string>
           auto it = request->header.find("json_data");
 
           // if (request.header.cend() == it) {
