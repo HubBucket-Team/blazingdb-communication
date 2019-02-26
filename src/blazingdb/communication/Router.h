@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <blazingdb/communication/MessageToken.h>
+#include <blazingdb/communication/messages/MessageToken.h>
 #include <blazingdb/communication/shared/macros.h>
 
 namespace blazingdb {
@@ -13,7 +13,7 @@ class Router {
 public:
   ~Router();
 
-  virtual void Call(const MessageToken &messageToken) = 0;
+  virtual void Call(const messages::MessageToken &messageToken) = 0;
 
 protected:
   Router() = default;

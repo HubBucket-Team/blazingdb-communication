@@ -3,7 +3,7 @@
 #include "Server.h"
 #include "ServerFrame.h"
 
-#include <blazingdb/communication/Message.h>
+#include <blazingdb/communication/messages/Message.h>
 
 #include <chrono>
 #include <memory>
@@ -12,24 +12,18 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-class MockNodeToken : public blazingdb::communication::NodeToken {
-public:
-  MOCK_CONST_METHOD1(SameValueAs, bool(const NodeToken &));
-  MOCK_CONST_METHOD1(serializeToJson, void(JsonSerializable::Writer &));
-};
-
 class MockAddress : public blazingdb::communication::Address {
 public:
   MOCK_CONST_METHOD1(SameValueAs, bool(const Address &));
 };
 
-class MockMessage : public blazingdb::communication::Message {
+class MockMessage : public blazingdb::communication::messages::Message {
 public:
   MockMessage(
-      std::unique_ptr<blazingdb::communication::MessageToken> &&messageToken,
+      std::unique_ptr<blazingdb::communication::messages::MessageToken> &&messageToken,
       const std::size_t pages, const std::string &model)
       : Message{std::forward<
-            std::unique_ptr<blazingdb::communication::MessageToken>>(
+            std::unique_ptr<blazingdb::communication::messages::MessageToken>>(
             messageToken)},
         pages_{pages},
         model_{model} {}
@@ -45,8 +39,8 @@ public:
     EXPECT_EQ(expected_json, json_data);
     EXPECT_EQ(expected_binary, binary_data);
 
-    std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
-        blazingdb::communication::MessageToken::Make("sample");
+    std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
+        blazingdb::communication::messages::MessageToken::Make("sample");
     return std::make_shared<MockMessage>(std::move(messageToken), 12, "qwerty");
   }
 
@@ -74,8 +68,8 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // Create message
-  std::unique_ptr<blazingdb::communication::MessageToken> messageToken =
-      blazingdb::communication::MessageToken::Make("sample");
+  std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
+      blazingdb::communication::messages::MessageToken::Make("sample");
 
   MockMessage mockMessage{std::move(messageToken), 12, "qwerty"};
 
@@ -88,13 +82,10 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
       .WillOnce(testing::Return(binary_data));
 
   // Create node info
-  std::shared_ptr<blazingdb::communication::NodeToken> nodeToken =
-      std::make_shared<MockNodeToken>();
-
   std::shared_ptr<blazingdb::communication::Address> address =
       blazingdb::communication::Address::Make("localhost", 8000);
 
-  blazingdb::communication::Node node{std::move(nodeToken), std::move(address)};
+  blazingdb::communication::Node node{std::move(address)};
 
   // Send message
   std::unique_ptr<blazingdb::communication::network::Client> client =

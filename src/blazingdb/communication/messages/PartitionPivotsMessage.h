@@ -2,14 +2,12 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_PARTITIONPIVOTSMESSAGE_H
 
 #include <vector>
-#include "src/blazingdb/communication/Message.h"
+#include "src/blazingdb/communication/messages/Message.h"
 #include "blazingdb/communication/messages/DataPivot.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
-
-    using blazingdb::communication::Message;
 
     class PartitionPivotsMessage : public Message {
     public:
