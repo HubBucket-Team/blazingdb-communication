@@ -4,6 +4,7 @@
 #include <string>
 #include <rapidjson/writer.h>
 #include "blazingdb/communication/messages/Message.h"
+#include "blazingdb/communication/Node.h"
 
 namespace blazingdb {
 namespace communication {
@@ -11,6 +12,8 @@ namespace messages {
 
     class BaseComponentMessage : public Message {
     protected:
+        using Node = blazingdb::communication::Node;
+
         using StringBuffer = rapidjson::StringBuffer;
         using Writer = typename rapidjson::Writer<StringBuffer>;
 
@@ -21,7 +24,6 @@ namespace messages {
 
     protected:
         static Node makeNode(rapidjson::Value::Object&& object) {
-            using blazingdb::communication::Node;
             return Node::make(object);
         }
     };

@@ -177,51 +177,49 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
 
 TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
+
+    // Create Data - create nodes
     using Address = blazingdb::communication::Address;
-
     blazingdb::communication::Node node_1(Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node node_2(Address::Make("5.6.7.8", 4564));
+    blazingdb::communication::Node node_3(Address::Make("10.11.20.21", 2021));
 
-//    blazingdb::communication::Node node_2(Address::Make("5.6.7.8", 4564));
-
+    // Create Data - create pivots
     using blazingdb::communication::messages::DataPivot;
 
-    std::string min_range_1("1111");
-    std::string max_range_1("2222");
-    DataPivot data_pivot_1(node_1, min_range_1, max_range_1);
+    std::vector<DataPivot> pivots;
+    pivots.emplace_back(DataPivot(node_1, "1111", "2222"));
+    pivots.emplace_back(DataPivot(node_2, "3333", "4444"));
+    pivots.emplace_back(DataPivot(node_3, "5555", "6666"));
 
-//    std::string min_range_2("33");
-//    std::string max_range_2("44");
-//    DataPivot data_pivot_2(node_2, min_range_2, max_range_2);
-
-    std::vector<DataPivot> nodes;
-    nodes.emplace_back(data_pivot_1);
-    //nodes.emplace_back(data_pivot_2);
-
-//    {
-//        rapidjson::StringBuffer string_buffer;
-//        rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
-//
-//        node_1.serializeToJson(writer);
-//
-//        std::cout << std::string(string_buffer.GetString(), string_buffer.GetSize()) << std::endl;
-//    }
-
-    // Create message
+    // Message alias
     using PartitionPivotsMessage = blazingdb::communication::messages::PartitionPivotsMessage;
-    PartitionPivotsMessage message(nodes);
+
+    // Serialize data
+    std::string json_data;
+    std::string binary_data;
 
     // Serialize message
-    const std::string serialize_message = message.serializeToJson();
-    //std::cout << serialize_message << std::endl;
+    {
+        PartitionPivotsMessage message(pivots);
 
-    // Deserialize message
-    std::shared_ptr<PartitionPivotsMessage> deserialize_message = PartitionPivotsMessage::make(serialize_message);
+        json_data = message.serializeToJson();
+        binary_data = message.serializeToBinary();
+    }
 
-    // Tests
-    const auto& pivots = deserialize_message->getDataPivots();
-    ASSERT_EQ(pivots.size(), 1);
-    ASSERT_EQ(pivots[0].getMinRange(), min_range_1);
-    ASSERT_EQ(pivots[0].getMaxRange(), max_range_1);
+    // Deserialize message & test
+    {
+        std::shared_ptr<PartitionPivotsMessage> message = PartitionPivotsMessage::make(json_data, binary_data);
+
+        // Testing
+        ASSERT_EQ(message->getDataPivots().size(), pivots.size());
+        for (std::size_t k = 0; k < pivots.size(); ++k) {
+            const auto& message_pivot = message->getDataPivots()[k];
+            ASSERT_EQ(message_pivot.getMinRange(), pivots[k].getMinRange());
+            ASSERT_EQ(message_pivot.getMaxRange(), pivots[k].getMaxRange());
+            ASSERT_TRUE(message_pivot.getNode() == pivots[k].getNode());
+        }
+    }
 }
 
 
