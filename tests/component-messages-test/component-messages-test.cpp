@@ -4,7 +4,6 @@
 #include "blazingdb/communication/messages/PartitionPivotsMessage.h"
 #include "blazingdb/communication/messages/SampleToNodeMasterMessage.h"
 #include "blazingdb/communication/messages/NodeDataMessage.h"
-#include "blazingdb/communication/messages/Serializer.h"
 #include "tests/utils/gdf_column.h"
 #include "tests/utils/gdf_column_cpp.h"
 
@@ -21,7 +20,6 @@ struct ComponentMessagesTest : public testing::Test {
     void TearDown() override {
     }
 };
-
 
 struct GpuFunctions {
     using DType = blazingdb::test::gdf_dtype;
@@ -57,6 +55,7 @@ struct GpuFunctions {
 
 
 TEST_F(ComponentMessagesTest, DataScatterMessage) {
+    // Test data - create gdf_column_cpp data
     auto gdf_column_1 = blazingdb::test::build(8,
                                                blazingdb::test::GDF_INT16,
                                                4,
@@ -87,24 +86,32 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
     columns.emplace_back(gdf_column_cpp_1);
     columns.emplace_back(gdf_column_cpp_2);
 
+    // Message alias
     using DataScatterMessage = blazingdb::communication::messages::DataScatterMessage<blazingdb::test::gdf_column_cpp,
                                                                                       blazingdb::test::gdf_column,
                                                                                       GpuFunctions>;
 
+    // Serialize data
     std::string json_data;
     std::string binary_data;
+
+    // Serialize message
     {
         DataScatterMessage message(columns);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
     }
-    {
-        auto message = DataScatterMessage::make(json_data, binary_data);
-        const auto& columns = message->getColumns();
 
-        ASSERT_TRUE(columns[0] == gdf_column_cpp_1);
-        ASSERT_TRUE(columns[1] == gdf_column_cpp_2);
+    // Deserialize message & test
+    {
+        std::shared_ptr<DataScatterMessage> message = DataScatterMessage::make(json_data, binary_data);
+        const auto& message_columns = message->getColumns();
+
+        ASSERT_EQ(message_columns.size(), columns.size());
+        for (std::size_t k = 0; k < columns.size(); ++k) {
+            ASSERT_TRUE(message_columns[k] == columns[k]);
+        }
     }
 }
 

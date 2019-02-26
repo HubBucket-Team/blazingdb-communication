@@ -13,6 +13,8 @@ namespace messages {
     class SampleToNodeMasterMessage : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
     private:
         using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+
+    public:
         using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:

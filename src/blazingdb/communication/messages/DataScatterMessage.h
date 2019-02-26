@@ -4,25 +4,28 @@
 #include <vector>
 #include <rapidjson/writer.h>
 #include "blazingdb/communication/messages/Message.h"
-#include "blazingdb/communication/messages/Serializer.h"
+#include "blazingdb/communication/messages/GpuComponentMessage.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
 
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-    class DataScatterMessage : public Message {
+    class DataScatterMessage : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
     private:
+        using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+
+    public:
         using MessageType = DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
         DataScatterMessage(std::vector<RalColumn>&& columns)
-        : Message(MessageToken::Make(MessageID)),
+        : BaseClass(MessageID),
           columns{std::move(columns)}
         { }
 
         DataScatterMessage(const std::vector<RalColumn>& columns)
-        : Message(MessageToken::Make(MessageID)),
+        : BaseClass(MessageID),
           columns{columns}
         { }
 
@@ -33,36 +36,22 @@ namespace messages {
 
     public:
         const std::string serializeToJson() const override {
-            rapidjson::StringBuffer string_buffer;
-            rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+            typename BaseClass::StringBuffer stringBuffer;
+            typename BaseClass::Writer writer(stringBuffer);
 
             writer.StartArray();
             {
                 for (const auto &column : columns) {
-                    serializeGdfColumnCpp(writer, const_cast<RalColumn&>(column));
+                    BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(column));
                 }
             }
             writer.EndArray();
 
-            return std::string(string_buffer.GetString(), string_buffer.GetSize());
+            return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
         }
 
         const std::string serializeToBinary() const override {
-            std::string result;
-
-            std::size_t capacity = 0;
-            for (const auto& column : columns) {
-                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
-            }
-            result.resize(capacity);
-
-            std::size_t binary_pointer = 0;
-            for (const auto& column : columns) {
-                GpuFunctions::copyGpuToCpu(binary_pointer, result, const_cast<RalColumn&>(column));
-            }
-
-            return result;
+            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns));
         }
 
     public:
@@ -78,7 +67,7 @@ namespace messages {
             std::size_t binary_pointer = 0;
             const auto& gpu_data_array = document.GetArray();
             for (const auto& gpu_data : gpu_data_array) {
-                columns.emplace_back(deserializeRalColumn<RalColumn, CudfColumn, GpuFunctions>(binary_pointer, binary, gpu_data.GetObject()));
+                columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
             }
 
             // Create the message
