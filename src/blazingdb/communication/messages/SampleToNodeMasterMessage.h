@@ -2,22 +2,22 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_SAMPLETONODEMASTERMESSAGE_H
 
 #include <vector>
-#include <rapidjson/writer.h>
-#include "blazingdb/communication/Message.h"
 #include "blazingdb/communication/Node.h"
-#include "blazingdb/communication/messages/Serializer.h"
+#include "blazingdb/communication/messages/GpuComponentMessage.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    using blazingdb::communication::Message;
+    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+    class SampleToNodeMasterMessage : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
+    private:
+        using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+        using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
-    template <typename GpuData, typename GpuFunctions>
-    class SampleToNodeMasterMessage : public Message {
     public:
-        SampleToNodeMasterMessage(const Node& node, const std::vector<GpuData>& samples)
-        : Message(MessageToken::Make(MessageID)),
+        SampleToNodeMasterMessage(const Node& node, const std::vector<RalColumn>& samples)
+        : BaseClass(MessageID),
           node{node},
           samples{samples}
         { }
@@ -27,60 +27,72 @@ namespace messages {
             return node;
         }
 
-        const std::vector<GpuData>& getSamples() const {
+        const std::vector<RalColumn>& getSamples() const {
             return samples;
         }
 
     public:
         const std::string serializeToJson() const override {
-            rapidjson::StringBuffer string_buffer;
-            rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+            typename BaseClass::StringBuffer stringBuffer;
+            typename BaseClass::Writer writer(stringBuffer);
 
             writer.StartObject();
             {
-                writer.Key("node");
+                // Serialize Node
                 node.serializeToJson(writer);
 
+                // Serialize RalColumns
                 writer.Key("samples");
                 writer.StartArray();
                 {
-                    for (const auto &sample : samples) {
-                        serializeGdfColumnCpp(writer, const_cast<GpuData&>(sample));
+                    for (const auto& sample : samples) {
+                        BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(sample));
                     }
                 }
                 writer.EndArray();
             }
             writer.EndObject();
 
-            return std::string(string_buffer.GetString(), string_buffer.GetSize());
+            return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
         }
 
         const std::string serializeToBinary() const override {
-            std::string result;
+            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(samples));
+        }
 
-            std::size_t capacity = 0;
-            for (const auto& sample : samples) {
-                capacity += const_cast<GpuData&>(sample).size();
+    public:
+        static std::shared_ptr<MessageType> make(const std::string& json, const std::string& binary) {
+            // Parse
+            rapidjson::Document document;
+            document.Parse(json.c_str());
+
+            // The gdf_column_cpp container
+            std::vector<RalColumn> columns;
+
+            // Deserialize Node class
+            Node node = BaseClass::makeNode(document["node"].GetObject());
+
+            // Make the deserialization
+            std::size_t binary_pointer = 0;
+            const auto& gpu_data_array = document["samples"].GetArray();
+            for (const auto& gpu_data : gpu_data_array) {
+                columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
             }
-            result.reserve(capacity);
 
-            for (const auto& sample : samples) {
-                GpuFunctions::CopyGpuToCpu(result, const_cast<GpuData&>(sample));
-            }
-
-            return result;
+            // Create the message
+            return std::make_shared<MessageType>(node, std::move(columns));
         }
 
     private:
         const Node node;
-        const std::vector<GpuData> samples;
+        const std::vector<RalColumn> samples;
 
     private:
         static const std::string MessageID;
     };
 
-    template <typename GpuData, typename GpuFunctions>
-    const std::string SampleToNodeMasterMessage<GpuData, GpuFunctions>::MessageID {"SampleToNodeMasterMessage"};
+    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+    const std::string SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID {"SampleToNodeMasterMessage"};
 
 } // namespace messages
 } // namespace communication

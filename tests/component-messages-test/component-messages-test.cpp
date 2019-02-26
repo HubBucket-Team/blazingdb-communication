@@ -108,56 +108,77 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
     }
 }
 
-/*
-TEST_F(QueryMessagesTest, SampleToNodeMasterMessage) {
-    auto gdf_column_1 = blazingdb::test::build("data sample 1",
-                                               "vali sample 1",
+
+TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
+    // Test data - create samples
+    auto gdf_column_1 = blazingdb::test::build(16,
                                                blazingdb::test::GDF_INT64,
                                                12,
                                                blazingdb::test::TIME_UNIT_ms,
-                                               "column name sample 1");
+                                               "column name 1");
 
-    auto gdf_column_2 = blazingdb::test::build("data sample 2",
-                                               "vali sample 2",
+    auto gdf_column_2 = blazingdb::test::build(24,
                                                blazingdb::test::GDF_INT32,
-                                               35,
+                                               5,
                                                blazingdb::test::TIME_UNIT_s,
-                                               "column name sample 2");
+                                               "column name 2");
 
     auto gdf_column_cpp_1 = blazingdb::test::build(gdf_column_1.get(),
                                                    gdf_column_1->size,
-                                                   gdf_column_1->size,
+                                                   gdf_column_1->size * blazingdb::test::get_dtype_width(gdf_column_1->dtype),
                                                    "column name another 1",
                                                    true,
                                                    123);
 
     auto gdf_column_cpp_2 = blazingdb::test::build(gdf_column_2.get(),
                                                    gdf_column_2->size,
-                                                   gdf_column_2->size,
+                                                   gdf_column_2->size * blazingdb::test::get_dtype_width(gdf_column_2->dtype),
                                                    "column name another 2",
                                                    false,
                                                    3567);
-
-    using Address = blazingdb::communication::Address;
-    using NodeToken = blazingdb::communication::NodeToken;
-
-    blazingdb::communication::Node node(NodeToken::Make("1.2.3.4", 1234),
-                                        Address::Make("1.2.3.4", 1234));
 
     std::vector<blazingdb::test::gdf_column_cpp> samples;
     samples.emplace_back(gdf_column_cpp_1);
     samples.emplace_back(gdf_column_cpp_2);
 
-    using SampleToNodeMasterMessage = blazingdb::communication::messages::SampleToNodeMasterMessage<blazingdb::test::gdf_column_cpp, GpuFunctions>;
-    SampleToNodeMasterMessage message(node, samples);
+    // Test data - create node
+    using Address = blazingdb::communication::Address;
+    using NodeToken = blazingdb::communication::NodeToken;
 
-    auto ser = message.serializeToJson();
-    std::cout << ser << std::endl;
+    blazingdb::communication::Node node(NodeToken::Make("1.2.3.4", 1234),
+                                        Address::Make("5.6.7.8", 9851));
 
-    auto s = message.serializeToBinary();
-    std::cout << "|" << s << "|" << std::endl;
+
+    // Message alias
+    using SampleToNodeMasterMessage = blazingdb::communication::messages::SampleToNodeMasterMessage<blazingdb::test::gdf_column_cpp,
+                                                                                                    blazingdb::test::gdf_column,
+                                                                                                    GpuFunctions>;
+
+    // Serialize data
+    std::string json_data;
+    std::string binary_data;
+
+    // Serialize message
+    {
+        SampleToNodeMasterMessage message(node, samples);
+
+        json_data = message.serializeToJson();
+        binary_data = message.serializeToBinary();
+    }
+
+    // Deserialize message & test
+    {
+        std::shared_ptr<SampleToNodeMasterMessage> message = SampleToNodeMasterMessage::make(json_data, binary_data);
+
+        // Testing
+        ASSERT_EQ(message->getNode(), node);
+        ASSERT_EQ(message->getSamples().size(), samples.size());
+        for (std::size_t k = 0; k < samples.size(); ++k) {
+            ASSERT_TRUE(message->getSamples()[k] == samples[k]);
+        }
+    }
 }
-*/
+
 
 TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
     using Address = blazingdb::communication::Address;
