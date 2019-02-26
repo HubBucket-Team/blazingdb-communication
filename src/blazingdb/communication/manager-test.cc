@@ -38,6 +38,12 @@ TEST(TestManager, ConnectionAndGenerateContext) {
 
   EXPECT_EQ(manager->getCluster().getTotalNodes(), 1);
 
+  blazingdb::communication::Context *context =
+      manager->generateContext("plan", {"file"});
+
+  EXPECT_EQ("plan", context->getLogicalPlan());
+  EXPECT_EQ(std::vector<std::string>{"file"}, context->getDataFiles());
+
   // End
   manager->Close();
   managerRunThread.join();
