@@ -20,13 +20,15 @@ TEST(TestManager, ConnectionAndGenerateContext) {
   std::unique_ptr<blazingdb::communication::network::Client> client =
       blazingdb::communication::network::Client::Make();
 
-  blazingdb::communication::Node node(blazingdb::communication::Address::Make("1.2.3.4", 1234));
+  blazingdb::communication::Node node(
+      blazingdb::communication::Address::Make("1.2.3.4", 1234));
+
   // Create message
-  blazingdb::communication::messages::NodeDataMessage nodeDatamessage(node);
+  blazingdb::communication::messages::NodeDataMessage nodeDataMessage(node);
 
   try {
     const std::unique_ptr<blazingdb::communication::network::Status> status =
-        client->SendNodeData("localhost", 9000, nodeDatamessage);
+        client->SendNodeData("localhost", 9000, nodeDataMessage);
     EXPECT_TRUE(status->IsOk());
   } catch (const blazingdb::communication::network::Client::SendError &error) {
     FAIL() << error.what();
