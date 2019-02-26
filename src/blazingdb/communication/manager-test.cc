@@ -1,7 +1,7 @@
 #include "Manager.h"
+#include "blazingdb/communication/messages/NodeDataMessage.h"
 #include "network/Client.h"
 #include "network/ClientExceptions.h"
-#include "blazingdb/communication/messages/NodeDataMessage.h"
 
 #include <thread>
 

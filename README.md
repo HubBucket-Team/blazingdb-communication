@@ -3,17 +3,21 @@ blazingdb communication framework
 
 ## deps
 
-apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev
-
-
+```
+# apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev
+```
 
 ## Run tests
 
-> $ make blazingdb-communication-test
-> $ ./blazingdb-communication-test
+```
+$ make blazingdb-communication-test
+$ ./blazingdb-communication-test
+```
 
 ## Get coverage
 
-> $ make coverage
+```
+$ make coverage
+```
 
 Open _coverage-html/index.html_
