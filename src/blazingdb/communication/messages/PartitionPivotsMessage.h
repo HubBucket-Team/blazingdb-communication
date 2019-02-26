@@ -11,6 +11,9 @@ namespace messages {
 
     class PartitionPivotsMessage : public BaseComponentMessage {
     public:
+        using MessageType = PartitionPivotsMessage;
+
+    public:
         PartitionPivotsMessage(const std::vector<DataPivot>& data);
 
     public:
