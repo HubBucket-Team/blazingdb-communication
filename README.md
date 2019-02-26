@@ -11,7 +11,7 @@ blazingdb communication framework
 
 ```
 $ make blazingdb-communication-test
-$ ./blazingdb-communication-test
+$ ./src/blazingdb/communication/blazingdb-communication-test
 ```
 
 ## Get coverage
