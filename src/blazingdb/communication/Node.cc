@@ -25,3 +25,7 @@ void Node::serializeToJson(JsonSerializable::Writer& writer) const {
 Node Node::make(const rapidjson::Value::Object& object) {
   return Node{Address::Make(object)};
 }
+
+std::unique_ptr<Node> make(const std::string& ip, int16_t port){
+  return std::unique_ptr<Node>(new Node(Address::Make(ip, port)));
+}

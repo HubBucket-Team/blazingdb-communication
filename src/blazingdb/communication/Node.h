@@ -23,6 +23,7 @@ public:
   void serializeToJson(JsonSerializable::Writer& writer) const override;
 
   static Node make(const rapidjson::Value::Object& object);
+  static std::unique_ptr<Node> make(const std::string& ip, int16_t port);
 
 private:
   const std::shared_ptr<Address> address_;
