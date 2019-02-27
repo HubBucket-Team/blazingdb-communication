@@ -6,6 +6,11 @@ namespace messages {
 
     const std::string PartitionPivotsMessage::MessageID {"PartitionPivotsMessage"};
 
+    PartitionPivotsMessage::PartitionPivotsMessage(std::vector<DataPivot>&& data)
+    : BaseComponentMessage(MessageID),
+      data_pivot_array{std::move(data)}
+    { }
+
     PartitionPivotsMessage::PartitionPivotsMessage(const std::vector<DataPivot>& data)
     : BaseComponentMessage(MessageID),
       data_pivot_array{data}

@@ -18,6 +18,12 @@ namespace messages {
         using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
+        SampleToNodeMasterMessage(const Node& node, std::vector<RalColumn>&& samples)
+        : BaseClass(MessageID),
+          node{node},
+          samples{std::move(samples)}
+        { }
+
         SampleToNodeMasterMessage(const Node& node, const std::vector<RalColumn>& samples)
         : BaseClass(MessageID),
           node{node},

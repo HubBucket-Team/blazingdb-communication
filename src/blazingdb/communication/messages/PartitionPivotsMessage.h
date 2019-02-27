@@ -14,6 +14,8 @@ namespace messages {
         using MessageType = PartitionPivotsMessage;
 
     public:
+        PartitionPivotsMessage(std::vector<DataPivot>&& data);
+
         PartitionPivotsMessage(const std::vector<DataPivot>& data);
 
     public:
