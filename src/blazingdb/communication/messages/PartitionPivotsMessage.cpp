@@ -39,7 +39,7 @@ namespace messages {
         return std::string();
     }
 
-    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::make(const std::string& json, const std::string& binary) {
+    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::Make(const std::string& json, const std::string& binary) {
         rapidjson::Document document;
         document.Parse(json.c_str());
 

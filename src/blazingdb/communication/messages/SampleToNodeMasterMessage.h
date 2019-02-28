@@ -69,7 +69,7 @@ namespace messages {
         }
 
     public:
-        static std::shared_ptr<MessageType> make(const std::string& json, const std::string& binary) {
+        static std::shared_ptr<MessageType> Make(const std::string& json, const std::string& binary) {
             // Parse
             rapidjson::Document document;
             document.Parse(json.c_str());
