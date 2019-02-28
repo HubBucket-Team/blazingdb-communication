@@ -26,9 +26,13 @@ public:
                                        const std::string &endpoint,
                                        const messages::Message &message) = 0;
 
+    virtual std::unique_ptr<Status> send(const Node& node,
+                                         std::shared_ptr<messages::Message>& message) = 0;
+
   virtual std::unique_ptr<Status> SendNodeData(const std::string &ip,
                                                const std::uint16_t port,
                                                const messages::Message &message) = 0;
+
 
   static std::unique_ptr<Client> Make();
 };

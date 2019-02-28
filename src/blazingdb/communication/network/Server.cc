@@ -108,6 +108,14 @@ public:
           *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
         };
 
+    httpServer_.resource["^/message/SampleToNodeMasterMessage$"]["POST"] =
+        [this](std::shared_ptr<HttpServer::Response> response,
+               std::shared_ptr<HttpServer::Request> request) {
+            putRequest(request);
+
+            *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+        };
+
     httpServer_.start();
   }
 
