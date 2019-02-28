@@ -46,14 +46,11 @@ public:
 
     HttpClient httpClient{serverPortPath};
 
-    std::string body{reinterpret_cast<const char *>(buffer.data()),
-                     buffer.size()};
-
     std::map<std::string, std::string> headers{{"json_data", data}};
 
     try {
       std::shared_ptr<HttpClient::Response> response =
-          httpClient.request("POST", "/message/" + endpoint, body, headers);
+          httpClient.request("POST", "/message/" + endpoint, buffer, headers);
       return std::unique_ptr<Status>(new ConcreteStatus{response});
     } catch (const boost::system::system_error &) {
       throw SendError(endpoint, data, buffer.size());
