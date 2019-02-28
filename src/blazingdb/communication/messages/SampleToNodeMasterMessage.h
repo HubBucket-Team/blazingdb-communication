@@ -69,6 +69,10 @@ namespace messages {
         }
 
     public:
+        static const std::string getMessageID() {
+            return MessageID;
+        }
+
         static std::shared_ptr<MessageType> Make(const std::string& json, const std::string& binary) {
             // Parse
             rapidjson::Document document;

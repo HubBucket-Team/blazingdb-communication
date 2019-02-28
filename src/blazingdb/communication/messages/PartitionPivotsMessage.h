@@ -27,6 +27,8 @@ namespace messages {
         const std::string serializeToBinary() const override;
 
     public:
+        static const std::string getMessageID();
+
         static std::shared_ptr<PartitionPivotsMessage> Make(const std::string& json, const std::string& binary);
 
     private:

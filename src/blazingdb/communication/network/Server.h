@@ -12,6 +12,12 @@ namespace network {
 
 class Server {
 public:
+    enum class Methods {
+        Get,
+        Post
+    };
+
+public:
   Server() = default;
 
   template <class MessageType>
@@ -32,6 +38,9 @@ public:
       std::shared_ptr<Frame> &frame) = 0;
   virtual const std::string FrameBufferAsString(
       std::shared_ptr<Frame> &frame) = 0;
+
+public:
+    virtual void registerEndPoint(Server::Methods method, const std::string& end_point) = 0;
 };
 
 }  // namespace network
