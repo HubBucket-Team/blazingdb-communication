@@ -16,6 +16,11 @@ public:
     writer.String(token_.c_str());
   };
 
+public:
+    const std::string toString() const {
+        return token_;
+    }
+
 private:
   const std::string token_;
 };
