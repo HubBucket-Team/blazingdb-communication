@@ -14,7 +14,7 @@ public:
   explicit Cluster() = default;
   void addNode(const Node& node);
   size_t getTotalNodes() const;
-  std::vector<Node*> getAvailableNodes() const;
+  std::vector<Node*> getAvailableNodes(int clusterSize) const;
 
 private:
   std::vector<std::unique_ptr<Node>> nodes_;

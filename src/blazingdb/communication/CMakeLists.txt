@@ -1,6 +1,5 @@
 add_library (blazingdb-communication
   Address.cc
-  Buffer.cc
   ContextToken.cc
   Context.cc
   Cluster.cc
@@ -35,7 +34,6 @@ install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
 
 if (GTEST_FOUND)
 set (TEST_FILES
-  buffer-test.cc
   manager-test.cc
   network/integration-server-client-test.cc
 )

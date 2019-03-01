@@ -4,7 +4,6 @@
 #include <exception>
 #include <memory>
 
-#include <blazingdb/communication/Buffer.h>
 #include <blazingdb/communication/messages/Message.h>
 #include <blazingdb/communication/Node.h>
 #include <blazingdb/communication/network/Status.h>
@@ -27,9 +26,13 @@ public:
                                        const std::string &endpoint,
                                        const messages::Message &message) = 0;
 
+    virtual std::unique_ptr<Status> send(const Node& node,
+                                         std::shared_ptr<messages::Message>& message) = 0;
+
   virtual std::unique_ptr<Status> SendNodeData(const std::string &ip,
                                                const std::uint16_t port,
                                                const messages::Message &message) = 0;
+
 
   static std::unique_ptr<Client> Make();
 };

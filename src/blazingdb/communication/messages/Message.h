@@ -19,6 +19,9 @@ public:
   virtual const std::string serializeToJson() const = 0;
   virtual const std::string serializeToBinary() const = 0;
 
+public:
+    const std::string getTokenValue() const;
+
 private:
   const std::unique_ptr<MessageToken> messageToken_;
 };

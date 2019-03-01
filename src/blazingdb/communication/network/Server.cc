@@ -2,7 +2,9 @@
 #include "ServerFrame.h"
 
 #include <condition_variable>
+#include <string>
 #include <deque>
+#include <vector>
 #include <mutex>
 
 #include <simple-web-server/server_http.hpp>
@@ -108,6 +110,18 @@ public:
           *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
         };
 
+    auto function = [this](std::shared_ptr<HttpServer::Response> response,
+                           std::shared_ptr<HttpServer::Request> request) {
+        putRequest(request);
+        *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+    };
+
+    for (const auto& pair_end_point : end_points_) {
+        std::string method = getHttpMethod(pair_end_point.second);
+        std::string end_point{"^/message/" + pair_end_point.first + "$"};
+        httpServer_.resource[end_point][method] = function;
+    }
+
     httpServer_.start();
   }
 
@@ -120,6 +134,21 @@ public:
   const std::string FrameBufferAsString(std::shared_ptr<Frame> &frame) {
     return frame->BufferString();
   }
+
+public:
+    void registerEndPoint(Server::Methods method, const std::string& end_point) override {
+        end_points_.emplace_back(std::make_pair(end_point, method));
+    };
+
+private:
+    const std::string getHttpMethod(Server::Methods method) {
+        switch(method) {
+            case Server::Methods::Get:
+                return "GET";
+            case Server::Methods::Post:
+                return "POST";
+        }
+    }
 
 private:
   std::shared_ptr<HttpServer::Request> getRequestDeque() {
@@ -161,6 +190,9 @@ private:
   int ready{0};
   std::mutex condition_mutex_;
   std::condition_variable condition_variable_;
+
+private:
+    std::vector<std::pair<std::string, Server::Methods>> end_points_;
 };
 }  // namespace
 

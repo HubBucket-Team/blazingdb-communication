@@ -18,6 +18,12 @@ namespace messages {
         using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
+        SampleToNodeMasterMessage(const Node& node, std::vector<RalColumn>&& samples)
+        : BaseClass(MessageID),
+          node{node},
+          samples{std::move(samples)}
+        { }
+
         SampleToNodeMasterMessage(const Node& node, const std::vector<RalColumn>& samples)
         : BaseClass(MessageID),
           node{node},
@@ -63,7 +69,11 @@ namespace messages {
         }
 
     public:
-        static std::shared_ptr<MessageType> make(const std::string& json, const std::string& binary) {
+        static const std::string getMessageID() {
+            return MessageID;
+        }
+
+        static std::shared_ptr<MessageType> Make(const std::string& json, const std::string& binary) {
             // Parse
             rapidjson::Document document;
             document.Parse(json.c_str());

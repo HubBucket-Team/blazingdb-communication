@@ -13,6 +13,9 @@ public:
   virtual void serializeToJson(JsonSerializable::Writer& writer) const = 0;
 
   static std::unique_ptr<MessageToken> Make(const std::string& id);
+
+public:
+    virtual const std::string toString() const = 0;
 };  
 
 }  // namespace messages

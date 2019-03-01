@@ -105,7 +105,7 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
 
     // Deserialize message & test
     {
-        std::shared_ptr<DataScatterMessage> message = DataScatterMessage::make(json_data, binary_data);
+        std::shared_ptr<DataScatterMessage> message = DataScatterMessage::Make(json_data, binary_data);
         const auto& message_columns = message->getColumns();
 
         ASSERT_EQ(message_columns.size(), columns.size());
@@ -171,7 +171,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Deserialize message & test
     {
-        std::shared_ptr<SampleToNodeMasterMessage> message = SampleToNodeMasterMessage::make(json_data, binary_data);
+        std::shared_ptr<SampleToNodeMasterMessage> message = SampleToNodeMasterMessage::Make(json_data, binary_data);
 
         // Testing
         ASSERT_EQ(message->getNode(), node);
@@ -216,7 +216,7 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 
     // Deserialize message & test
     {
-        std::shared_ptr<PartitionPivotsMessage> message = PartitionPivotsMessage::make(json_data, binary_data);
+        std::shared_ptr<PartitionPivotsMessage> message = PartitionPivotsMessage::Make(json_data, binary_data);
 
         // Testing
         ASSERT_EQ(message->getDataPivots().size(), pivots.size());
@@ -243,7 +243,7 @@ TEST_F(ComponentMessagesTest, NodeDataMessage) {
     std::cout << serialize_message << std::endl;
 
     // Deserialize message
-    std::shared_ptr<NodeDataMessage> deserialize_message = NodeDataMessage::make(serialize_message, "");
+    std::shared_ptr<NodeDataMessage> deserialize_message = NodeDataMessage::Make(serialize_message, "");
 
     // Tests
     // ASSERT_EQ(message.node == deserialize_message->node, true);

@@ -6,6 +6,11 @@ namespace messages {
 
     const std::string PartitionPivotsMessage::MessageID {"PartitionPivotsMessage"};
 
+    PartitionPivotsMessage::PartitionPivotsMessage(std::vector<DataPivot>&& data)
+    : BaseComponentMessage(MessageID),
+      data_pivot_array{std::move(data)}
+    { }
+
     PartitionPivotsMessage::PartitionPivotsMessage(const std::vector<DataPivot>& data)
     : BaseComponentMessage(MessageID),
       data_pivot_array{data}
@@ -34,7 +39,11 @@ namespace messages {
         return std::string();
     }
 
-    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::make(const std::string& json, const std::string& binary) {
+    const std::string PartitionPivotsMessage::getMessageID() {
+        return MessageID;
+    }
+
+    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::Make(const std::string& json, const std::string& binary) {
         rapidjson::Document document;
         document.Parse(json.c_str());
 
