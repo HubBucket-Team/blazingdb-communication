@@ -2,6 +2,8 @@
 #define BLAZINGDB_COMMUNICATION_CONTEXT_H_
 
 #include <vector>
+
+#include <blazingdb/communication/Buffer.h>
 #include <blazingdb/communication/ContextToken.h>
 #include <blazingdb/communication/Node.h>
 

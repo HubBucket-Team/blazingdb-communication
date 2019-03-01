@@ -35,6 +35,7 @@ install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
 if (GTEST_FOUND)
 set (TEST_FILES
   manager-test.cc
+  node-test.cc
   network/integration-server-client-test.cc
 )
 enable_testing ()
