@@ -243,7 +243,7 @@ TEST_F(ComponentMessagesTest, NodeDataMessage) {
     std::cout << serialize_message << std::endl;
 
     // Deserialize message
-    std::shared_ptr<NodeDataMessage> deserialize_message = NodeDataMessage::make(serialize_message, "");
+    std::shared_ptr<NodeDataMessage> deserialize_message = NodeDataMessage::Make(serialize_message, "");
 
     // Tests
     // ASSERT_EQ(message.node == deserialize_message->node, true);

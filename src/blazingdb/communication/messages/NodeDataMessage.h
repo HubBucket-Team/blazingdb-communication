@@ -17,11 +17,14 @@ public:
   
   const Node node;
 
-  static std::shared_ptr<NodeDataMessage> make(const std::string& jsonBuffer, const std::string& binBuffer);
+  static std::shared_ptr<NodeDataMessage> Make(const std::string& jsonBuffer, const std::string& binBuffer);
+
+  private:
+    static const std::string MessageID;
 };
 
 }  // namespace messages
 }  // namespace communication
 }  // namespace blazingdb
 
-#endif
+#endif //BLAZINGDB_COMMUNICATION_NODEDATAMESSAGE_H_

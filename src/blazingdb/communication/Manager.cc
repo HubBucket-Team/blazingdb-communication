@@ -25,7 +25,7 @@ public:
 
     httpServer_.resource["^/register_node$"]["POST"] =
         [this](std::shared_ptr<HttpServer::Response> response,
-           std::shared_ptr<HttpServer::Request> request) {
+               std::shared_ptr<HttpServer::Request> request) {
           auto it = request->header.find("json_data");
 
           // if (request.header.cend() == it) {
@@ -34,7 +34,7 @@ public:
 
           const std::string& jsonData = it->second;
           std::shared_ptr<NodeDataMessage> nodeDataMessage =
-              NodeDataMessage::make(jsonData, "");
+              NodeDataMessage::Make(jsonData, "");
 
           this->cluster_.addNode(nodeDataMessage->node);
 
@@ -49,9 +49,8 @@ public:
 
   const Cluster& getCluster() const { return cluster_; };
 
-  Context* generateContext(std::string logicalPlan,
-                           std::vector<std::string> sourceDataFiles) final {
-    std::vector<Node*> availableNodes = cluster_.getAvailableNodes();
+  Context* generateContext(std::string logicalPlan, int clusterSize) final {
+    std::vector<Node*> availableNodes = cluster_.getAvailableNodes(clusterSize);
 
     // assert(availableNodes.size() > 1)
 
@@ -60,8 +59,8 @@ public:
                    std::back_inserter(taskNodes),
                    [](Node* n) -> Node { return *n; });
 
-    runningTasks_.push_back(std::unique_ptr<Context>{
-        new Context{taskNodes, taskNodes[0], logicalPlan, sourceDataFiles}});
+    runningTasks_.push_back(std::unique_ptr<Context>{new Context{
+        taskNodes, taskNodes[0], logicalPlan}});
 
     return runningTasks_.back().get();
   }

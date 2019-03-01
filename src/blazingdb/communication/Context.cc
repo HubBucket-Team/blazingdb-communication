@@ -1,15 +1,13 @@
-#include <algorithm>
 #include "Context.h"
+#include <algorithm>
 
 using namespace blazingdb::communication;
 
 Context::Context(const std::vector<Node> taskNodes, const Node& masterNode,
-                 const std::string logicalPlan,
-                 const std::vector<std::string> sourceDataFiles)
+                 const std::string logicalPlan)
     : taskNodes_{taskNodes},
       masterNode_{&masterNode},
-      logicalPlan_{logicalPlan},
-      sourceDataFiles_{sourceDataFiles} {}
+      logicalPlan_{logicalPlan} {}
 
 std::vector<Node> Context::getAllNodes() const { return taskNodes_; }
 
@@ -25,6 +23,4 @@ const Node& Context::getMasterNode() const { return *masterNode_; }
 
 std::string Context::getLogicalPlan() const { return logicalPlan_; }
 
-std::vector<std::string> Context::getDataFiles() const {
-  return sourceDataFiles_;
-}
+const ContextToken& Context::getContextToken() const { return *token_; }

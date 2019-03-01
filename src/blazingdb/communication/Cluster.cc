@@ -10,14 +10,15 @@ void Cluster::addNode(const Node& node) {
 
 size_t Cluster::getTotalNodes() const { return nodes_.size(); }
 
-std::vector<Node*> Cluster::getAvailableNodes() const {
+std::vector<Node*> Cluster::getAvailableNodes(int clusterSize) const {
   std::vector<Node*> availableNodes;
   auto copyIter = std::back_inserter(availableNodes);
   auto iterFirst = nodes_.begin();
   auto iterLast = nodes_.end();
-  while (iterFirst != iterLast) {
+  while (iterFirst != iterLast && clusterSize > 0) {
     if ((*iterFirst)->isAvailable()) *copyIter++ = iterFirst->get();
-    iterFirst++;
+    ++iterFirst;
+    --clusterSize;
   }
 
   return availableNodes;
