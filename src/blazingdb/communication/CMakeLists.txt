@@ -5,6 +5,7 @@ add_library (blazingdb-communication
   Cluster.cc
   Manager.cc
   network/Client.cc
+  network/MessageQueue.cpp
   network/Server.cc
   Node.cc
   Router.cc

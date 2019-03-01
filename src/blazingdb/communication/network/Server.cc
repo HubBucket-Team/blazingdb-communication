@@ -1,13 +1,14 @@
 #include "Server.h"
-#include "ServerFrame.h"
 
 #include <condition_variable>
 #include <string>
 #include <deque>
 #include <vector>
 #include <mutex>
+#include <shared_mutex>
 
 #include <simple-web-server/server_http.hpp>
+#include "blazingdb/communication/network/MessageQueue.h"
 
 namespace blazingdb {
 namespace communication {
@@ -16,184 +17,166 @@ namespace network {
 namespace {
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
-class ConcreteFrame : public Server::Frame {
-public:
-  // TODO: Improve unnecessary copy storing shared ptr for request
-  ConcreteFrame(const std::shared_ptr<HttpServer::Request> &request)
-      : request_{request} {}
-
-  const std::string &data() const final {
-    auto jsonDataIt = request_->header.find("json_data");
-
-    // TODO:
-    // if (request_->header.cend() == jsonDataIt()) {
-    // throw something for bad json header
-    // }
-
-    return jsonDataIt->second;
-  }
-
-  std::streambuf &buffer() /*const*/ { return *request_->content.rdbuf(); }
-
-private:
-  const std::shared_ptr<HttpServer::Request> request_;
-};
-
 class ConcreteServer : public Server {
-public:
-  std::shared_ptr<Frame> GetFrame() /*const*/ final {
-    wait();
-    std::shared_ptr<HttpServer::Request> request = getRequestDeque();
-    return std::make_shared<ConcreteFrame>(request);
-  }
-
-  std::vector<std::shared_ptr<Frame>> GetFrames(int quantity) {
-    std::vector<std::shared_ptr<Frame>> vector;
-    for (int k = 0; k < quantity; ++k) {
-      vector.emplace_back(GetFrame());
-    }
-    return vector;
-  }
-
-  void Run() final {
-    httpServer_.config.port = 8000;
-
-    httpServer_.resource["^/ehlo$"]["POST"] =
-        [](std::shared_ptr<HttpServer::Response> response,
-           std::shared_ptr<HttpServer::Request> request) {
-          const std::string content =
-              "EHLO from BlazingDB Communication Server  with \"" +
-              request->content.string() + "\"";
-
-          *response << "HTTP/1.1 200 OK\r\nContent-Length: " << content.length()
-                    << "\r\n\r\n"
-                    << content;
-        };
-
-    httpServer_.resource["^/message/node_data$"]["POST"] =
-        [this](std::shared_ptr<HttpServer::Response> response,
-               std::shared_ptr<HttpServer::Request> request) {
-          putRequest(request);
-
-          *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        };
-
-    httpServer_.resource["^/message/sample$"]["POST"] =
-        [this](std::shared_ptr<HttpServer::Response> response,
-               std::shared_ptr<HttpServer::Request> request) {
-          putRequest(request);
-
-          *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        };
-
-    httpServer_.resource["^/message/pivots$"]["POST"] =
-        [this](std::shared_ptr<HttpServer::Response> response,
-               std::shared_ptr<HttpServer::Request> request) {
-          putRequest(request);
-
-          *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        };
-
-    httpServer_.resource["^/message/chunks$"]["POST"] =
-        [this](std::shared_ptr<HttpServer::Response> response,
-               std::shared_ptr<HttpServer::Request> request) {
-          putRequest(request);
-
-          *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        };
-
-    httpServer_.resource["^/message/execute$"]["POST"] =
-        [this](std::shared_ptr<HttpServer::Response> response,
-               std::shared_ptr<HttpServer::Request> request) {
-          putRequest(request);
-
-          *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        };
-
-    auto function = [this](std::shared_ptr<HttpServer::Response> response,
-                           std::shared_ptr<HttpServer::Request> request) {
-        putRequest(request);
-        *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-    };
-
-    for (const auto& pair_end_point : end_points_) {
-        std::string method = getHttpMethod(pair_end_point.second);
-        std::string end_point{"^/message/" + pair_end_point.first + "$"};
-        httpServer_.resource[end_point][method] = function;
-    }
-
-    httpServer_.start();
-  }
-
-  void Close() noexcept final { httpServer_.stop(); }
-
-  const std::string &FrameDataAsString(std::shared_ptr<Frame> &frame) final {
-    return frame->data();
-  }
-
-  const std::string FrameBufferAsString(std::shared_ptr<Frame> &frame) {
-    return frame->BufferString();
-  }
+private:
 
 public:
-    void registerEndPoint(Server::Methods method, const std::string& end_point) override {
+    void registerEndPoint(const std::string& end_point, Server::Methods method) override {
         end_points_.emplace_back(std::make_pair(end_point, method));
     };
 
+    void registerDeserializer(const std::string& end_point, deserializerCallback deserializer) override {
+        deserializer_[end_point] = deserializer;
+    }
+
+public:
+    void registerContext(const TokenValue& context_token) override {
+        std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        context_messages_map_[context_token];
+    }
+
+    void deregisterContext(const TokenValue& context_token) override {
+        std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        const auto& context_message = context_messages_map_.find(context_token);
+        if (context_message != context_messages_map_.end()) {
+            context_messages_map_.erase(context_message);
+        }
+    }
+
+public:
+    std::shared_ptr<Message> getMessage(const TokenValue& context_token) override {
+        std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        auto& message_queue = context_messages_map_[context_token];
+        return message_queue.getMessage();
+    }
+
+    void putMessage(const TokenValue& context_token, std::shared_ptr<Message>& message) override {
+        std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        auto& message_queue = context_messages_map_[context_token];
+        message_queue.putMessage(message);
+    }
+
+public:
+    void Run(unsigned short port) override {
+        httpServer_.config.port = port;
+
+        auto function = [this](std::shared_ptr<HttpServer::Response> response,
+                               std::shared_ptr<HttpServer::Request> request) {
+            try {
+                // get message type
+                const auto& url = parseUrl(request->path);
+
+                // get message deserialize function
+                auto deserialize_function = getDeserializationFunction(url);
+
+                // get message data
+                const std::string json_data = request->header.find("json_data")->second;
+                const std::string binary_data = request->content.string();
+
+                // create message
+                auto message = deserialize_function(json_data, binary_data);
+                putMessage(/*TODO message->getTokenValue()*/ 10, message);
+
+                *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+            }
+            catch (const std::exception& exception) {
+                *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << strlen(exception.what()) << "\r\n\r\n"
+                          << exception.what();
+            }
+        };
+
+        for (const auto& pair_end_point : end_points_) {
+            std::string method = getHttpMethod(pair_end_point.second);
+            std::string end_point{"^" + std::string{message_url_prefix_} + pair_end_point.first + "$"};
+            httpServer_.resource[end_point][method] = function;
+        }
+
+        httpServer_.start();
+    }
+
+    void Close() noexcept final {
+        httpServer_.stop();
+    }
+
 private:
+    /**
+     * It obtains the endpoint of the HTTP request.
+     * It eliminates the 'message_url_prefix_' prefix.
+     *
+     * @param path  the url request input.
+     * @return      the endpoint without the message prefix.
+     */
+    const std::string parseUrl(const std::string& path) {
+        auto position = path.find(message_url_prefix_);
+        if (position == std::string::npos) {
+            throw std::runtime_error("endpoint not found: " + path);
+        }
+        return path.substr(std::strlen(message_url_prefix_));
+    }
+
+    /**
+     * It retrieves the deserialize message function, which is associated with an endpoint.
+     *
+     * @param endpoint  the endpoint is associated with the deserialization message function.
+     * @return          the std::function<const string&, const std::string&> used to deserialize message.
+     */
+    auto getDeserializationFunction(const std::string& endpoint) -> deserializerCallback {
+        const auto& iterator = deserializer_.find(endpoint);
+        if (iterator == deserializer_.end()) {
+            throw std::runtime_error("deserializer not found: " + endpoint);
+        }
+        return iterator->second;
+    }
+
+    /**
+     * It retrieve the string name of the HTTP Method.
+     *
+     * @param method  enum class of the HTTP method.
+     * @return        the string name of the HTTP method.
+     */
     const std::string getHttpMethod(Server::Methods method) {
         switch(method) {
-            case Server::Methods::Get:
-                return "GET";
             case Server::Methods::Post:
                 return "POST";
         }
     }
 
 private:
-  std::shared_ptr<HttpServer::Request> getRequestDeque() {
-    std::unique_lock<std::mutex> lock(requests_mutex_);
-    std::shared_ptr<HttpServer::Request> request = requests_.back();
-    requests_.pop_back();
-    return request;
-  }
+    /**
+     * Simple-Web-Server repository
+     * Defined as 'using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>'
+     */
+    HttpServer httpServer_;
 
-  void wait() {
-    std::unique_lock<std::mutex> lock(condition_mutex_);
-    while (!ready) {
-      condition_variable_.wait(lock);
-    }
-    ready--;
-  }
+    /**
+     * Defined in 'shared_mutex' header file.
+     * It allows access of multiple threads (shared) or only one thread (exclusive).
+     * It will be used to protect access to context_messages_map_.
+     */
+    std::shared_timed_mutex context_messages_mutex_;
 
-  void putRequest(const std::shared_ptr<HttpServer::Request> &request) {
-    putRequestsDeque(request);
-    notify();
-  }
-
-  void notify() {
-    std::unique_lock<std::mutex> lock(condition_mutex_);
-    ready++;
-    condition_variable_.notify_one();
-  }
-
-  void putRequestsDeque(const std::shared_ptr<HttpServer::Request> &request) {
-    std::unique_lock<std::mutex> lock(requests_mutex_);
-    requests_.push_front(request);
-  }
-
-  HttpServer httpServer_;
-
-  std::mutex requests_mutex_;
-  std::deque<std::shared_ptr<HttpServer::Request>> requests_;
-
-  int ready{0};
-  std::mutex condition_mutex_;
-  std::condition_variable condition_variable_;
+    /**
+     * It associate the context value with a message queue.
+     */
+    std::map<TokenValue, MessageQueue> context_messages_map_;
 
 private:
+    /**
+     * It associates the endpoint to a HTTP Method.
+     */
     std::vector<std::pair<std::string, Server::Methods>> end_points_;
+
+    /**
+     * It associate the endpoint with a unique deserialize message function.
+     */
+    std::map<std::string, std::function<std::shared_ptr<Message>(const std::string&, const std::string&)>> deserializer_;
+
+    /**
+     * It is used as a prefix in the url.
+     */
+    static constexpr const char* message_url_prefix_ = "/message/";
 };
+
 }  // namespace
 
 std::unique_ptr<Server> Server::Make() {

@@ -1,7 +1,6 @@
 #include "Client.h"
 #include "ClientExceptions.h"
 #include "Server.h"
-#include "ServerFrame.h"
 
 #include <blazingdb/communication/messages/Message.h>
 
@@ -31,8 +30,8 @@ public:
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
-  static std::shared_ptr<MockMessage> Make(const std::string &json_data,
-                                           const std::string &binary_data) {
+  static std::shared_ptr<Message> Make(const std::string &json_data,
+                                       const std::string &binary_data) {
     const std::string expected_json = "{\"pages\": 12, \"model\": \"qwerty\"}";
     const std::string expected_binary = "";
 
@@ -41,7 +40,7 @@ public:
 
     std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
         blazingdb::communication::messages::MessageToken::Make("sample");
-    return std::make_shared<MockMessage>(std::move(messageToken), 12, "qwerty");
+    return std::shared_ptr<Message>(new MockMessage(std::move(messageToken), 12, "qwerty"));
   }
 
   std::size_t pages() const { return pages_; }
@@ -59,12 +58,26 @@ public:
 };
 
 TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
+  // Alias
+  using Server= blazingdb::communication::network::Server;
+  using Message = blazingdb::communication::messages::Message;
+
+  // Create endpoint
+  const std::string endpoint {"sample"};
+
+  // Create ContextToken
+  Server::TokenValue context_token = 10;
+
+  // Create server
+  std::unique_ptr<Server> server = Server::Make();
+
+  // Configure server
+  server->registerEndPoint(endpoint, Server::Methods::Post);
+  server->registerContext(context_token);
+  server->registerDeserializer(endpoint, MockMessage::Make);
+
   // Run server
-  std::unique_ptr<blazingdb::communication::network::Server> server =
-      blazingdb::communication::network::Server::Make();
-
   std::thread serverRunThread([&server]() { server->Run(); });
-
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // Create message
@@ -92,7 +105,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
       blazingdb::communication::network::Client::Make();
   try {
     std::unique_ptr<blazingdb::communication::network::Status> status =
-        client->Send(node, "sample", mockMessage);
+        client->Send(node, endpoint, mockMessage);
     EXPECT_TRUE(status->IsOk());
   } catch (const blazingdb::communication::network::Client::SendError &e) {
     FAIL() << e.what();
@@ -102,11 +115,12 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   MockFlag mockFlag;
   EXPECT_CALL(mockFlag, Flag()).Times(1);
 
-  std::thread serverGetMessageThread([&server, &mockFlag]() {
-    std::shared_ptr<MockMessage> message = server->GetMessage<MockMessage>();
+  std::thread serverGetMessageThread([&server, &mockFlag, context_token]() {
+    std::shared_ptr<Message> message = server->getMessage(context_token);
 
-    EXPECT_EQ(12, message->pages());
-    EXPECT_EQ("qwerty", message->model());
+    auto mock_message = std::dynamic_pointer_cast<MockMessage>(message);
+    EXPECT_EQ(12, mock_message->pages());
+    EXPECT_EQ("qwerty", mock_message->model());
     mockFlag.Flag();
   });
 
