@@ -14,8 +14,12 @@ public:
     return token_ == concreteContextToken.token_;
   }
 
+  int getIntToken() const {
+    return token_;
+  };
+
   void serializeToJson(JsonSerializable::Writer& writer) const {
-    writer.Key("contextTokenPort");
+    writer.Key("contextToken");
     writer.Int(token_);
   };
 

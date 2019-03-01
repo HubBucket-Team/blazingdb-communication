@@ -60,7 +60,7 @@ public:
                    [](Node* n) -> Node { return *n; });
 
     runningTasks_.push_back(std::unique_ptr<Context>{new Context{
-        taskNodes, taskNodes[0], logicalPlan, std::vector<std::string>{}}});
+        taskNodes, taskNodes[0], logicalPlan}});
 
     return runningTasks_.back().get();
   }

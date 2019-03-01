@@ -11,20 +11,18 @@ namespace communication {
 class Context {
 public:
   explicit Context(const std::vector<Node> taskNodes, const Node& masterNode,
-                   const std::string logicalPlan,
-                   const std::vector<std::string> sourceDataFiles);
+                   const std::string logicalPlan);
   std::vector<Node> getAllNodes() const;
   std::vector<Node> getSiblingsNodes() const;
   const Node& getMasterNode() const;
   std::string getLogicalPlan() const;
-  std::vector<std::string> getDataFiles() const;
+  const ContextToken& getContextToken() const;
 
 private:
   const std::shared_ptr<ContextToken> token_;
   const std::vector<Node> taskNodes_;
   const Node* masterNode_;
   const std::string logicalPlan_;
-  const std::vector<std::string> sourceDataFiles_;
 };
 
 }  // namespace communication
