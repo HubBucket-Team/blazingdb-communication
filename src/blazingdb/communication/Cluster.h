@@ -14,10 +14,10 @@ public:
   explicit Cluster() = default;
   void addNode(const Node& node);
   size_t getTotalNodes() const;
-  std::vector<Node*> getAvailableNodes(int clusterSize) const;
+  std::vector<std::shared_ptr<Node>> getAvailableNodes(int clusterSize) const;
 
 private:
-  std::vector<std::unique_ptr<Node>> nodes_;
+  std::vector<std::shared_ptr<Node>> nodes_;
   std::mutex condition_mutex;
 };
 

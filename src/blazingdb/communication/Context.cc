@@ -3,19 +3,24 @@
 
 using namespace blazingdb::communication;
 
-Context::Context(const std::vector<Node> taskNodes, const Node& masterNode,
-                 const std::string logicalPlan)
+Context::Context(const std::vector<std::shared_ptr<Node>>& taskNodes,
+                 const std::shared_ptr<Node>& masterNode,
+                 const std::string& logicalPlan)
     : taskNodes_{taskNodes},
-      masterNode_{&masterNode},
+      masterNode_{masterNode},
       logicalPlan_{logicalPlan} {}
 
-std::vector<Node> Context::getAllNodes() const { return taskNodes_; }
+std::vector<std::shared_ptr<Node>> Context::getAllNodes() const {
+  return taskNodes_;
+}
 
-std::vector<Node> Context::getSiblingsNodes() const {
-  std::vector<Node> siblings;
-  std::copy_if(taskNodes_.begin(), taskNodes_.end(),
+std::vector<std::shared_ptr<Node>> Context::getSiblingsNodes() const {
+  std::vector<std::shared_ptr<Node>> siblings;
+  std::copy_if(taskNodes_.cbegin(), taskNodes_.cend(),
                std::back_inserter(siblings),
-               [this](Node n) { return !(n == *(this->masterNode_)); });
+               [this](const std::shared_ptr<Node>& n) {
+                 return !(*n == *(this->masterNode_));
+               });
   return siblings;
 }
 
@@ -24,3 +29,19 @@ const Node& Context::getMasterNode() const { return *masterNode_; }
 std::string Context::getLogicalPlan() const { return logicalPlan_; }
 
 const ContextToken& Context::getContextToken() const { return *token_; }
+
+int Context::getNodeIndex(const Node& node) const {
+  auto it = std::find_if(
+      taskNodes_.cbegin(), taskNodes_.cend(),
+      [node](const std::shared_ptr<Node>& n) { return *n == node; });
+
+  if (it == taskNodes_.cend()) {
+    return -1;
+  }
+
+  return std::distance(taskNodes_.cbegin(), it);
+}
+
+bool Context::isMasterNode(const Node& node) const {
+  return *masterNode_ == node;
+}

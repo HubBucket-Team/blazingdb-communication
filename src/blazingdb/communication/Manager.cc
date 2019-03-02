@@ -50,15 +50,9 @@ public:
   const Cluster& getCluster() const { return cluster_; };
 
   Context* generateContext(std::string logicalPlan, int clusterSize) final {
-    std::vector<Node*> availableNodes = cluster_.getAvailableNodes(clusterSize);
+    std::vector<std::shared_ptr<Node>> taskNodes = cluster_.getAvailableNodes(clusterSize);
 
     // assert(availableNodes.size() > 1)
-
-    std::vector<Node> taskNodes;
-    std::transform(availableNodes.begin(), availableNodes.end(),
-                   std::back_inserter(taskNodes),
-                   [](Node* n) -> Node { return *n; });
-
     runningTasks_.push_back(std::unique_ptr<Context>{new Context{
         taskNodes, taskNodes[0], logicalPlan}});
 
