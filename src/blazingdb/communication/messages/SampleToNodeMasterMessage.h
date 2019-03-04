@@ -18,14 +18,18 @@ namespace messages {
         using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
-        SampleToNodeMasterMessage(const Node& node, std::vector<RalColumn>&& samples)
-        : BaseClass(MessageID),
+        SampleToNodeMasterMessage(const ContextToken::TokenType& context_token,
+                                  const Node& node,
+                                  std::vector<RalColumn>&& samples)
+        : BaseClass(context_token, MessageID),
           node{node},
           samples{std::move(samples)}
         { }
 
-        SampleToNodeMasterMessage(const Node& node, const std::vector<RalColumn>& samples)
-        : BaseClass(MessageID),
+        SampleToNodeMasterMessage(const ContextToken::TokenType& context_token,
+                                  const Node& node,
+                                  const std::vector<RalColumn>& samples)
+        : BaseClass(context_token, MessageID),
           node{node},
           samples{samples}
         { }
@@ -46,6 +50,10 @@ namespace messages {
 
             writer.StartObject();
             {
+                // Serialize Message
+                writer.Key("message");
+                serializeMessage(writer, this);
+
                 // Serialize Node
                 node.serializeToJson(writer);
 
@@ -81,6 +89,9 @@ namespace messages {
             // The gdf_column_cpp container
             std::vector<RalColumn> columns;
 
+            // Get context token value;
+            const ContextToken::TokenType context_token = document["message"]["contextToken"].GetInt();
+
             // Deserialize Node class
             Node node = BaseClass::makeNode(document["node"].GetObject());
 
@@ -92,7 +103,7 @@ namespace messages {
             }
 
             // Create the message
-            return std::make_shared<MessageType>(node, std::move(columns));
+            return std::make_shared<MessageType>(context_token, node, std::move(columns));
         }
 
     private:

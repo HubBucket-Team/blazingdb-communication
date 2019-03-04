@@ -114,7 +114,7 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
         }
     }
 }
-
+*/
 
 TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     // Test data - create samples
@@ -152,10 +152,14 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     using Address = blazingdb::communication::Address;
     blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234));
 
-    // Message alias
+    // Make alias
+    using ContextToken = blazingdb::communication::ContextToken;
     using SampleToNodeMasterMessage = blazingdb::communication::messages::SampleToNodeMasterMessage<blazingdb::test::gdf_column_cpp,
                                                                                                     blazingdb::test::gdf_column,
                                                                                                     GpuFunctions>;
+
+    // Create context token
+    const ContextToken::TokenType context_token = 6574;
 
     // Serialize data
     std::string json_data;
@@ -163,7 +167,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Serialize message
     {
-        SampleToNodeMasterMessage message(node, samples);
+        SampleToNodeMasterMessage message(context_token, node, samples);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
@@ -173,15 +177,23 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     {
         std::shared_ptr<SampleToNodeMasterMessage> message = SampleToNodeMasterMessage::Make(json_data, binary_data);
 
-        // Testing
+        // Test context token
+        ASSERT_EQ(context_token, message->getContextTokenValue());
+
+        // Test message token
+        ASSERT_EQ(SampleToNodeMasterMessage::getMessageID(), message->getMessageTokenValue());
+
+        // Test node
         ASSERT_EQ(message->getNode(), node);
+
+        // Test samples
         ASSERT_EQ(message->getSamples().size(), samples.size());
         for (std::size_t k = 0; k < samples.size(); ++k) {
             ASSERT_TRUE(message->getSamples()[k] == samples[k]);
         }
     }
 }
-*/
+
 
 TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 
@@ -199,7 +211,7 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
     pivots.emplace_back(DataPivot(node_2, "3333", "4444"));
     pivots.emplace_back(DataPivot(node_3, "5555", "6666"));
 
-    // Message alias
+    // Make alias
     using ContextToken = blazingdb::communication::ContextToken;
     using PartitionPivotsMessage = blazingdb::communication::messages::PartitionPivotsMessage;
 
