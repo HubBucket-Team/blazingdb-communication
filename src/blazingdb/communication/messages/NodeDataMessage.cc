@@ -13,7 +13,7 @@ namespace messages {
 const std::string NodeDataMessage::MessageID {"NodeDataMessage"};
 
 NodeDataMessage::NodeDataMessage(const Node& node)
-    : Message{MessageToken::Make(MessageID)}, node{node} {}
+    : Message{MessageToken::Make(MessageID), /*TODO Require Revision*/ ContextToken::Make(0)}, node{node} {}
 
 const std::string NodeDataMessage::serializeToJson() const {
   rapidjson::StringBuffer stringBuffer;

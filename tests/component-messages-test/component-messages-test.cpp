@@ -262,7 +262,7 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
     }
 }
 
-/*
+
 TEST_F(ComponentMessagesTest, NodeDataMessage) {
     using Address = blazingdb::communication::Address;
 
@@ -281,4 +281,3 @@ TEST_F(ComponentMessagesTest, NodeDataMessage) {
     // Tests
     // ASSERT_EQ(message.node == deserialize_message->node, true);
 }
-*/
