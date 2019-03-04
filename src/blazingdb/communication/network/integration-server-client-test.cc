@@ -3,6 +3,7 @@
 #include "Server.h"
 
 #include <blazingdb/communication/messages/Message.h>
+#include <blazingdb/communication/ContextToken.h>
 
 #include <chrono>
 #include <memory>
@@ -10,6 +11,20 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+namespace {
+// Alias
+using Server= blazingdb::communication::network::Server;
+using Message = blazingdb::communication::messages::Message;
+using MessageToken = blazingdb::communication::messages::MessageToken;
+using ContextToken = blazingdb::communication::ContextToken;
+
+// Create endpoint
+const std::string endpoint {"sample"};
+
+// Create ContextToken
+const Server::ContextTokenValue context_token = 3465;
+}
 
 class MockAddress : public blazingdb::communication::Address {
 public:
@@ -19,11 +34,13 @@ public:
 class MockMessage : public blazingdb::communication::messages::Message {
 public:
   MockMessage(
+      std::unique_ptr<ContextToken>&& contextToken,
       std::unique_ptr<blazingdb::communication::messages::MessageToken> &&messageToken,
       const std::size_t pages, const std::string &model)
       : Message{std::forward<
             std::unique_ptr<blazingdb::communication::messages::MessageToken>>(
-            messageToken)},
+            messageToken),
+                std::move(contextToken)},
         pages_{pages},
         model_{model} {}
 
@@ -39,8 +56,9 @@ public:
     EXPECT_EQ(expected_binary, binary_data);
 
     std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
-        blazingdb::communication::messages::MessageToken::Make("sample");
-    return std::shared_ptr<Message>(new MockMessage(std::move(messageToken), 12, "qwerty"));
+        blazingdb::communication::messages::MessageToken::Make(endpoint);
+    std::unique_ptr<ContextToken> contextToken = ContextToken::Make(context_token);
+    return std::shared_ptr<Message>(new MockMessage(std::move(contextToken), std::move(messageToken), 12, "qwerty"));
   }
 
   std::size_t pages() const { return pages_; }
@@ -58,16 +76,6 @@ public:
 };
 
 TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
-  // Alias
-  using Server= blazingdb::communication::network::Server;
-  using Message = blazingdb::communication::messages::Message;
-
-  // Create endpoint
-  const std::string endpoint {"sample"};
-
-  // Create ContextToken
-  Server::TokenValue context_token = 10;
-
   // Create server
   std::unique_ptr<Server> server = Server::Make();
 
@@ -82,9 +90,12 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
 
   // Create message
   std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
-      blazingdb::communication::messages::MessageToken::Make("sample");
+      blazingdb::communication::messages::MessageToken::Make(endpoint);
 
-  MockMessage mockMessage{std::move(messageToken), 12, "qwerty"};
+  std::unique_ptr<blazingdb::communication::ContextToken> contextToken =
+      blazingdb::communication::ContextToken::Make(context_token);
+
+  MockMessage mockMessage{std::move(contextToken), std::move(messageToken), 12, "qwerty"};
 
   const std::string json_data = "{\"pages\": 12, \"model\": \"qwerty\"}";
   const std::string binary_data = "";
@@ -115,7 +126,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   MockFlag mockFlag;
   EXPECT_CALL(mockFlag, Flag()).Times(1);
 
-  std::thread serverGetMessageThread([&server, &mockFlag, context_token]() {
+  std::thread serverGetMessageThread([&server, &mockFlag]() {
     std::shared_ptr<Message> message = server->getMessage(context_token);
 
     auto mock_message = std::dynamic_pointer_cast<MockMessage>(message);

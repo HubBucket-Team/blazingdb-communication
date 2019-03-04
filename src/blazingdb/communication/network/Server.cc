@@ -18,8 +18,6 @@ namespace {
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
 class ConcreteServer : public Server {
-private:
-
 public:
     void registerEndPoint(const std::string& end_point, Server::Methods method) override {
         end_points_.emplace_back(std::make_pair(end_point, method));
@@ -30,12 +28,12 @@ public:
     }
 
 public:
-    void registerContext(const TokenValue& context_token) override {
+    void registerContext(const ContextTokenValue& context_token) override {
         std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         context_messages_map_[context_token];
     }
 
-    void deregisterContext(const TokenValue& context_token) override {
+    void deregisterContext(const ContextTokenValue& context_token) override {
         std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         const auto& context_message = context_messages_map_.find(context_token);
         if (context_message != context_messages_map_.end()) {
@@ -44,13 +42,13 @@ public:
     }
 
 public:
-    std::shared_ptr<Message> getMessage(const TokenValue& context_token) override {
+    std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token) override {
         std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         auto& message_queue = context_messages_map_[context_token];
         return message_queue.getMessage();
     }
 
-    void putMessage(const TokenValue& context_token, std::shared_ptr<Message>& message) override {
+    void putMessage(const ContextTokenValue& context_token, std::shared_ptr<Message>& message) override {
         std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         auto& message_queue = context_messages_map_[context_token];
         message_queue.putMessage(message);
@@ -75,11 +73,16 @@ public:
 
                 // create message
                 auto message = deserialize_function(json_data, binary_data);
-                putMessage(/*TODO message->getTokenValue()*/ 10, message);
+                putMessage(message->getContextTokenValue(), message);
 
+                // create HTTP response
                 *response << "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
             }
             catch (const std::exception& exception) {
+                // print error
+                std::cerr << "[ERROR] " << exception.what() << std::endl;
+
+                // create HTTP response
                 *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << strlen(exception.what()) << "\r\n\r\n"
                           << exception.what();
             }
@@ -158,7 +161,7 @@ private:
     /**
      * It associate the context value with a message queue.
      */
-    std::map<TokenValue, MessageQueue> context_messages_map_;
+    std::map<ContextTokenValue, MessageQueue> context_messages_map_;
 
 private:
     /**
@@ -169,7 +172,7 @@ private:
     /**
      * It associate the endpoint with a unique deserialize message function.
      */
-    std::map<std::string, std::function<std::shared_ptr<Message>(const std::string&, const std::string&)>> deserializer_;
+    std::map<std::string, deserializerCallback> deserializer_;
 
     /**
      * It is used as a prefix in the url.

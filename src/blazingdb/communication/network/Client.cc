@@ -73,7 +73,7 @@ public:
 
         std::map<std::string, std::string> headers{{"json_data", head_json}};
 
-        return sendPost(httpClient, message->getTokenValue(), headers, body_binary);
+        return sendPost(httpClient, message->getMessageTokenValue(), headers, body_binary);
     }
 
   std::unique_ptr<Status> SendNodeData(const std::string &ip,
