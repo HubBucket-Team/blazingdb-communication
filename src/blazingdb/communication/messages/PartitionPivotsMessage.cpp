@@ -6,13 +6,15 @@ namespace messages {
 
     const std::string PartitionPivotsMessage::MessageID {"PartitionPivotsMessage"};
 
-    PartitionPivotsMessage::PartitionPivotsMessage(std::vector<DataPivot>&& data)
-    : BaseComponentMessage(MessageID),
+    PartitionPivotsMessage::PartitionPivotsMessage(const ContextToken::TokenType& context_token,
+                                                   std::vector<DataPivot>&& data)
+    : BaseComponentMessage(context_token, MessageID),
       data_pivot_array{std::move(data)}
     { }
 
-    PartitionPivotsMessage::PartitionPivotsMessage(const std::vector<DataPivot>& data)
-    : BaseComponentMessage(MessageID),
+    PartitionPivotsMessage::PartitionPivotsMessage(const ContextToken::TokenType& context_token,
+                                                   const std::vector<DataPivot>& data)
+    : BaseComponentMessage(context_token, MessageID),
       data_pivot_array{data}
     { }
 
@@ -24,13 +26,21 @@ namespace messages {
         BaseComponentMessage::StringBuffer stringBuffer;
         BaseComponentMessage::Writer writer(stringBuffer);
 
-        writer.StartArray();
+        writer.StartObject();
         {
-            for (const auto &data_pivot : data_pivot_array) {
-                const_cast<DataPivot&>(data_pivot).serialize(writer);
+            writer.Key("message");
+            serializeMessage(writer, this);
+
+            writer.Key("pivots");
+            writer.StartArray();
+            {
+                for (const auto& data_pivot : data_pivot_array) {
+                    const_cast<DataPivot&>(data_pivot).serialize(writer);
+                }
             }
+            writer.EndArray();
         }
-        writer.EndArray();
+        writer.EndObject();
 
         return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
     }
@@ -44,17 +54,25 @@ namespace messages {
     }
 
     std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::Make(const std::string& json, const std::string& binary) {
+        // Parse json
         rapidjson::Document document;
         document.Parse(json.c_str());
 
-        std::vector<DataPivot> data_pivot_array;
+        // Get main object
+        const auto& object = document.GetObject();
 
-        const auto& pivots = document.GetArray();
+        // Get context token value;
+        ContextToken::TokenType context_token = object["message"]["contextToken"].GetInt();
+
+        // Get array pivots (payload)
+        std::vector<DataPivot> data_pivot_array;
+        const auto& pivots = object["pivots"].GetArray();
         for (auto& pivot : pivots) {
             data_pivot_array.emplace_back(DataPivot::make(pivot.GetObject()));
         }
 
-        return std::make_unique<PartitionPivotsMessage>(data_pivot_array);
+        // Create message
+        return std::make_unique<PartitionPivotsMessage>(context_token, data_pivot_array);
     }
 
 } // namespace messages

@@ -7,6 +7,7 @@ set(test_sources
     ${CMAKE_SOURCE_DIR}/tests/utils/gdf_column.cpp
     ${CMAKE_SOURCE_DIR}/tests/utils/gdf_column_cpp.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/Address.cc
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/ContextToken.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/Node.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/Message.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/MessageToken.cc

@@ -9,6 +9,9 @@ namespace communication {
 
 class ContextToken : public JsonSerializable {
 public:
+    using TokenType = int;
+
+public:
   ContextToken() = default;
 
   virtual bool SameValueAs(const ContextToken& rhs) const = 0;

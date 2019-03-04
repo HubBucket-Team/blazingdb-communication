@@ -10,6 +10,9 @@ namespace messages {
 
 class MessageToken : public JsonSerializable {
 public:
+    using TokenType = std::string;
+
+public:
   virtual void serializeToJson(JsonSerializable::Writer& writer) const = 0;
 
   static std::unique_ptr<MessageToken> Make(const std::string& id);
