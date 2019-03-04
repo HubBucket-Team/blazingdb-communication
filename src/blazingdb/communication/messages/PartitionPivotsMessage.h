@@ -14,9 +14,13 @@ namespace messages {
         using MessageType = PartitionPivotsMessage;
 
     public:
-        PartitionPivotsMessage(const ContextToken::TokenType& context_token, std::vector<DataPivot>&& data);
+        PartitionPivotsMessage(const ContextToken& context_token, std::vector<DataPivot>&& data);
 
-        PartitionPivotsMessage(const ContextToken::TokenType& context_token, const std::vector<DataPivot>& data);
+        PartitionPivotsMessage(const ContextToken& context_token, const std::vector<DataPivot>& data);
+
+        PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token, std::vector<DataPivot>&& data);
+
+        PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token, const std::vector<DataPivot>& data);
 
     public:
         const std::vector<DataPivot>& getDataPivots();

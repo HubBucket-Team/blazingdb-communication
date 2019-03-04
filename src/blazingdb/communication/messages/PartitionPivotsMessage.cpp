@@ -6,15 +6,27 @@ namespace messages {
 
     const std::string PartitionPivotsMessage::MessageID {"PartitionPivotsMessage"};
 
-    PartitionPivotsMessage::PartitionPivotsMessage(const ContextToken::TokenType& context_token,
+    PartitionPivotsMessage::PartitionPivotsMessage(const ContextToken& context_token,
                                                    std::vector<DataPivot>&& data)
     : BaseComponentMessage(context_token, MessageID),
       data_pivot_array{std::move(data)}
     { }
 
-    PartitionPivotsMessage::PartitionPivotsMessage(const ContextToken::TokenType& context_token,
+    PartitionPivotsMessage::PartitionPivotsMessage(const ContextToken& context_token,
                                                    const std::vector<DataPivot>& data)
     : BaseComponentMessage(context_token, MessageID),
+      data_pivot_array{data}
+    { }
+
+    PartitionPivotsMessage::PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token,
+                                                   std::vector<DataPivot>&& data)
+    : BaseComponentMessage(std::move(context_token), MessageID),
+      data_pivot_array{std::move(data)}
+    { }
+
+    PartitionPivotsMessage::PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token,
+                                                   const std::vector<DataPivot>& data)
+    : BaseComponentMessage(std::move(context_token), MessageID),
       data_pivot_array{data}
     { }
 
@@ -72,7 +84,7 @@ namespace messages {
         }
 
         // Create message
-        return std::make_unique<PartitionPivotsMessage>(context_token, data_pivot_array);
+        return std::make_unique<PartitionPivotsMessage>(ContextToken::Make(context_token), data_pivot_array);
     }
 
 } // namespace messages

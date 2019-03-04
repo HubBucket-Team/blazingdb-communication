@@ -101,7 +101,7 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
 
     // Serialize message
     {
-        DataScatterMessage message(context_token, columns);
+        DataScatterMessage message(ContextToken::Make(context_token), columns);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
@@ -178,7 +178,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Serialize message
     {
-        SampleToNodeMasterMessage message(context_token, node, samples);
+        SampleToNodeMasterMessage message(ContextToken::Make(context_token), node, samples);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
@@ -235,7 +235,7 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 
     // Serialize message
     {
-        PartitionPivotsMessage message(context_token, pivots);
+        PartitionPivotsMessage message(ContextToken::Make(context_token), pivots);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();

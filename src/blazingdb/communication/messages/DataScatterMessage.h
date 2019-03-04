@@ -19,13 +19,23 @@ namespace messages {
         using MessageType = DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
-        DataScatterMessage(const ContextToken::TokenType& context_token, std::vector<RalColumn>&& columns)
+        DataScatterMessage(const ContextToken& context_token, std::vector<RalColumn>&& columns)
         : BaseClass(context_token, MessageID),
           columns{std::move(columns)}
         { }
 
-        DataScatterMessage(const ContextToken::TokenType& context_token, const std::vector<RalColumn>& columns)
+        DataScatterMessage(const ContextToken& context_token, const std::vector<RalColumn>& columns)
         : BaseClass(context_token, MessageID),
+          columns{columns}
+        { }
+
+        DataScatterMessage(std::unique_ptr<ContextToken>&& context_token, std::vector<RalColumn>&& columns)
+        : BaseClass(std::move(context_token), MessageID),
+          columns{std::move(columns)}
+        { }
+
+        DataScatterMessage(std::unique_ptr<ContextToken>&& context_token, const std::vector<RalColumn>& columns)
+        : BaseClass(std::move(context_token), MessageID),
           columns{columns}
         { }
 
@@ -89,7 +99,7 @@ namespace messages {
             }
 
             // Create the message
-            return std::make_shared<MessageType>(context_token, std::move(columns));
+            return std::make_shared<MessageType>(ContextToken::Make(context_token), std::move(columns));
         }
 
     private:

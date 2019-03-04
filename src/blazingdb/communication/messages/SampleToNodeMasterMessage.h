@@ -18,7 +18,7 @@ namespace messages {
         using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
-        SampleToNodeMasterMessage(const ContextToken::TokenType& context_token,
+        SampleToNodeMasterMessage(const ContextToken& context_token,
                                   const Node& node,
                                   std::vector<RalColumn>&& samples)
         : BaseClass(context_token, MessageID),
@@ -26,10 +26,26 @@ namespace messages {
           samples{std::move(samples)}
         { }
 
-        SampleToNodeMasterMessage(const ContextToken::TokenType& context_token,
+        SampleToNodeMasterMessage(const ContextToken& context_token,
                                   const Node& node,
                                   const std::vector<RalColumn>& samples)
         : BaseClass(context_token, MessageID),
+          node{node},
+          samples{samples}
+        { }
+
+        SampleToNodeMasterMessage(std::unique_ptr<ContextToken>&& context_token,
+                                  const Node& node,
+                                  std::vector<RalColumn>&& samples)
+        : BaseClass(std::move(context_token), MessageID),
+          node{node},
+          samples{std::move(samples)}
+        { }
+
+        SampleToNodeMasterMessage(std::unique_ptr<ContextToken>&& context_token,
+                                  const Node& node,
+                                  const std::vector<RalColumn>& samples)
+        : BaseClass(std::move(context_token), MessageID),
           node{node},
           samples{samples}
         { }
@@ -103,7 +119,7 @@ namespace messages {
             }
 
             // Create the message
-            return std::make_shared<MessageType>(context_token, node, std::move(columns));
+            return std::make_shared<MessageType>(ContextToken::Make(context_token), node, std::move(columns));
         }
 
     private:
