@@ -119,7 +119,7 @@ namespace messages {
             }
 
             // Create the message
-            return std::shared_ptr<Message>(new MessageType(ContextToken::Make(context_token), node, std::move(columns)));
+            return std::make_shared<MessageType>(ContextToken::Make(context_token), node, std::move(columns));
         }
 
     private:

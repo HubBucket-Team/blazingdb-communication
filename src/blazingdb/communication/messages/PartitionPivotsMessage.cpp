@@ -84,7 +84,7 @@ namespace messages {
         }
 
         // Create message
-        return std::shared_ptr<Message>(new MessageType(ContextToken::Make(context_token), data_pivot_array));
+        return std::make_shared<MessageType>(ContextToken::Make(context_token), data_pivot_array);
     }
 
 } // namespace messages
