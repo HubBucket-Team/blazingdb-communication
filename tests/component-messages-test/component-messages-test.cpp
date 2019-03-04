@@ -53,7 +53,7 @@ struct GpuFunctions {
     }
 };
 
-/*
+
 TEST_F(ComponentMessagesTest, DataScatterMessage) {
     // Test data - create gdf_column_cpp data
     auto gdf_column_1 = blazingdb::test::build(8,
@@ -86,10 +86,14 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
     columns.emplace_back(gdf_column_cpp_1);
     columns.emplace_back(gdf_column_cpp_2);
 
-    // Message alias
+    // Make alias
+    using ContextToken = blazingdb::communication::ContextToken;
     using DataScatterMessage = blazingdb::communication::messages::DataScatterMessage<blazingdb::test::gdf_column_cpp,
                                                                                       blazingdb::test::gdf_column,
                                                                                       GpuFunctions>;
+
+    // Create context token
+    const ContextToken::TokenType context_token = 2437;
 
     // Serialize data
     std::string json_data;
@@ -97,7 +101,7 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
 
     // Serialize message
     {
-        DataScatterMessage message(columns);
+        DataScatterMessage message(context_token, columns);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
@@ -106,15 +110,22 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
     // Deserialize message & test
     {
         std::shared_ptr<DataScatterMessage> message = DataScatterMessage::Make(json_data, binary_data);
-        const auto& message_columns = message->getColumns();
 
+        // Test context token
+        ASSERT_EQ(context_token, message->getContextTokenValue());
+
+        // Test message token
+        ASSERT_EQ(DataScatterMessage::getMessageID(), message->getMessageTokenValue());
+
+        // Test columns
+        const auto& message_columns = message->getColumns();
         ASSERT_EQ(message_columns.size(), columns.size());
         for (std::size_t k = 0; k < columns.size(); ++k) {
             ASSERT_TRUE(message_columns[k] == columns[k]);
         }
     }
 }
-*/
+
 
 TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     // Test data - create samples

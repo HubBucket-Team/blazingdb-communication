@@ -19,13 +19,13 @@ namespace messages {
         using MessageType = DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
-        DataScatterMessage(std::vector<RalColumn>&& columns)
-        : BaseClass(MessageID),
+        DataScatterMessage(const ContextToken::TokenType& context_token, std::vector<RalColumn>&& columns)
+        : BaseClass(context_token, MessageID),
           columns{std::move(columns)}
         { }
 
-        DataScatterMessage(const std::vector<RalColumn>& columns)
-        : BaseClass(MessageID),
+        DataScatterMessage(const ContextToken::TokenType& context_token, const std::vector<RalColumn>& columns)
+        : BaseClass(context_token, MessageID),
           columns{columns}
         { }
 
@@ -39,13 +39,23 @@ namespace messages {
             typename BaseClass::StringBuffer stringBuffer;
             typename BaseClass::Writer writer(stringBuffer);
 
-            writer.StartArray();
+            writer.StartObject();
             {
-                for (const auto &column : columns) {
-                    BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(column));
+                // Serialize Message
+                writer.Key("message");
+                serializeMessage(writer, this);
+
+                // Serialize columns
+                writer.Key("columns");
+                writer.StartArray();
+                {
+                    for (const auto &column : columns) {
+                        BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(column));
+                    }
                 }
+                writer.EndArray();
             }
-            writer.EndArray();
+            writer.EndObject();
 
             return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
         }
@@ -60,22 +70,26 @@ namespace messages {
         }
 
         static std::shared_ptr<MessageType> Make(const std::string& json, const std::string& binary) {
-            // Parse
+            // Parse json
             rapidjson::Document document;
             document.Parse(json.c_str());
 
-            // The gdf_column_cpp container
-            std::vector<RalColumn> columns;
+            // Get main object
+            const auto& object = document.GetObject();
 
-            // Make the deserialization
+            // Get context token value;
+            ContextToken::TokenType context_token = object["message"]["contextToken"].GetInt();
+
+            // Get array columns (payload)
             std::size_t binary_pointer = 0;
-            const auto& gpu_data_array = document.GetArray();
+            std::vector<RalColumn> columns;
+            const auto& gpu_data_array = object["columns"].GetArray();
             for (const auto& gpu_data : gpu_data_array) {
                 columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
             }
 
             // Create the message
-            return std::make_shared<MessageType>(std::move(columns));
+            return std::make_shared<MessageType>(context_token, std::move(columns));
         }
 
     private:
