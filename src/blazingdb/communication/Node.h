@@ -24,7 +24,6 @@ public:
   void setAvailable(bool available);
 
   int unixSocketId() const;
-  std::string socketPath() const;
 
   void serializeToJson(JsonSerializable::Writer& writer) const override;
 

@@ -6,7 +6,8 @@ using namespace blazingdb::communication;
 Context::Context(const std::vector<std::shared_ptr<Node>>& taskNodes,
                  const std::shared_ptr<Node>& masterNode,
                  const std::string& logicalPlan)
-    : taskNodes_{taskNodes},
+    : token_{ContextToken::Make()},
+      taskNodes_{taskNodes},
       masterNode_{masterNode},
       logicalPlan_{logicalPlan} {}
 
@@ -33,7 +34,7 @@ const ContextToken& Context::getContextToken() const { return *token_; }
 int Context::getNodeIndex(const Node& node) const {
   auto it = std::find_if(
       taskNodes_.cbegin(), taskNodes_.cend(),
-      [node](const std::shared_ptr<Node>& n) { return *n == node; });
+      [&](const std::shared_ptr<Node>& n) { return *n == node; });
 
   if (it == taskNodes_.cend()) {
     return -1;

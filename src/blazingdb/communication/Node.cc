@@ -20,10 +20,6 @@ void Node::setAvailable(bool available) { isAvailable_ = available; }
 
 int Node::unixSocketId() const { return unixSocketId_; }
 
-std::string Node::socketPath() const {
-  return "/tmp/ral." + std::to_string(unixSocketId_) + ".socket";
-}
-
 void Node::serializeToJson(JsonSerializable::Writer& writer) const {
   writer.Key("node");
   writer.StartObject();
