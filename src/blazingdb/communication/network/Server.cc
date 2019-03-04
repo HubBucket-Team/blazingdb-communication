@@ -28,9 +28,22 @@ public:
     }
 
 public:
+    void registerContext(const ContextToken& context_token) override {
+        std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        context_messages_map_[context_token.getIntToken()];
+    }
+
     void registerContext(const ContextTokenValue& context_token) override {
         std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         context_messages_map_[context_token];
+    }
+
+    void deregisterContext(const ContextToken& context_token) override {
+        std::unique_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        const auto& context_message = context_messages_map_.find(context_token.getIntToken());
+        if (context_message != context_messages_map_.end()) {
+            context_messages_map_.erase(context_message);
+        }
     }
 
     void deregisterContext(const ContextTokenValue& context_token) override {

@@ -70,12 +70,28 @@ public:
 public:
     /**
      * It is used to create a new message queue.
+     * The new message queue will be related to the ContextToken.
+     * It uses a 'unique lock' with a 'shared_mutex' in order to ensure unique access to the whole structure.
+     * @param context_token  ContextToken class identifier.
+     */
+    virtual void registerContext(const ContextToken& context_token) = 0;
+
+    /**
+     * It is used to create a new message queue.
      * The new message queue will be related to the ContextTokenValue.
      * It uses a 'unique lock' with a 'shared_mutex' in order to ensure unique access to the whole structure.
      *
      * @param context_token  identifier for the message queue.
      */
     virtual void registerContext(const ContextTokenValue& context_token) = 0;
+
+    /**
+     * It is used to destroy a message queue related to the ContextToken.
+     * It uses a 'unique lock' with a shared_mutex in order to ensure unique access to the whole structure.
+     *
+     * @param context_token  ContextToken class identifier.
+     */
+    virtual void deregisterContext(const ContextToken& context_token) = 0;
 
     /**
      * It is used to destroy a message queue related to the ContextTokenValue.
