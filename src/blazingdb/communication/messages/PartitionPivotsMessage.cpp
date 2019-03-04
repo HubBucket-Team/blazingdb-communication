@@ -65,7 +65,7 @@ namespace messages {
         return MessageID;
     }
 
-    std::shared_ptr<PartitionPivotsMessage> PartitionPivotsMessage::Make(const std::string& json, const std::string& binary) {
+    std::shared_ptr<Message> PartitionPivotsMessage::Make(const std::string& json, const std::string& binary) {
         // Parse json
         rapidjson::Document document;
         document.Parse(json.c_str());
@@ -84,7 +84,7 @@ namespace messages {
         }
 
         // Create message
-        return std::make_unique<PartitionPivotsMessage>(ContextToken::Make(context_token), data_pivot_array);
+        return std::shared_ptr<Message>(new MessageType(ContextToken::Make(context_token), data_pivot_array));
     }
 
 } // namespace messages

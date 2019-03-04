@@ -79,7 +79,7 @@ namespace messages {
             return MessageID;
         }
 
-        static std::shared_ptr<MessageType> Make(const std::string& json, const std::string& binary) {
+        static std::shared_ptr<Message> Make(const std::string& json, const std::string& binary) {
             // Parse json
             rapidjson::Document document;
             document.Parse(json.c_str());
@@ -99,7 +99,7 @@ namespace messages {
             }
 
             // Create the message
-            return std::make_shared<MessageType>(ContextToken::Make(context_token), std::move(columns));
+            return std::shared_ptr<Message>(new MessageType(ContextToken::Make(context_token), std::move(columns)));
         }
 
     private:

@@ -109,7 +109,8 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
 
     // Deserialize message & test
     {
-        std::shared_ptr<DataScatterMessage> message = DataScatterMessage::Make(json_data, binary_data);
+        std::shared_ptr<DataScatterMessage> message = std::static_pointer_cast<DataScatterMessage>
+                (DataScatterMessage::Make(json_data, binary_data));
 
         // Test context token
         ASSERT_EQ(context_token, message->getContextTokenValue());
@@ -186,7 +187,8 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Deserialize message & test
     {
-        std::shared_ptr<SampleToNodeMasterMessage> message = SampleToNodeMasterMessage::Make(json_data, binary_data);
+        std::shared_ptr<SampleToNodeMasterMessage> message = std::static_pointer_cast<SampleToNodeMasterMessage>
+                (SampleToNodeMasterMessage::Make(json_data, binary_data));
 
         // Test context token
         ASSERT_EQ(context_token, message->getContextTokenValue());
@@ -243,7 +245,8 @@ TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 
     // Deserialize message & test
     {
-        std::shared_ptr<PartitionPivotsMessage> message = PartitionPivotsMessage::Make(json_data, binary_data);
+        std::shared_ptr<PartitionPivotsMessage> message = std::dynamic_pointer_cast<PartitionPivotsMessage>
+                (PartitionPivotsMessage::Make(json_data, binary_data));
 
         // Test context token
         ASSERT_EQ(context_token, message->getContextTokenValue());

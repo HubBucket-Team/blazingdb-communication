@@ -33,7 +33,7 @@ namespace messages {
     public:
         static const std::string getMessageID();
 
-        static std::shared_ptr<PartitionPivotsMessage> Make(const std::string& json, const std::string& binary);
+        static std::shared_ptr<Message> Make(const std::string& json, const std::string& binary);
 
     private:
         std::vector<DataPivot> data_pivot_array;
