@@ -120,6 +120,18 @@ public:
     /**
      * It retrieves the message that it is stored in the message queue.
      * In case that the message queue is empty and the function is called, the function will wait
+     * until the server receives a new message with the same ContextToken.
+     * Each message queue works independently, which means that the wait condition has no relationship
+     * between message queues. It uses a 'shared lock' with a 'shared mutex' for that purpose.
+     *
+     * @param context_token  identifier for the message queue using ContextToken.
+     * @return               a shared pointer of a base message class.
+     */
+    virtual std::shared_ptr<Message> getMessage(const ContextToken& context_token) = 0;
+
+    /**
+     * It retrieves the message that it is stored in the message queue.
+     * In case that the message queue is empty and the function is called, the function will wait
      * until the server receives a new message with the same ContextTokenValue.
      * Each message queue works independently, which means that the wait condition has no relationship
      * between message queues. It uses a 'shared lock' with a 'shared mutex' for that purpose.
@@ -128,6 +140,17 @@ public:
      * @return               a shared pointer of a base message class.
      */
     virtual std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token) = 0;
+
+    /**
+     * It stores the message in the message queue and it uses the ContextToken to select the queue.
+     * Each message queue works independently. Whether multiple threads want to access at the same time to
+     * different message queue, then all the threads put the message in the corresponding queue without
+     * wait or exclusion.
+     *
+     * @param context_token  identifier for the message queue using ContextToken.
+     * @param message        message that will be stored in the corresponding queue.
+     */
+    virtual void putMessage(const ContextToken& context_token, std::shared_ptr<Message>& message) = 0;
 
     /**
      * It stores the message in the message queue and it uses the ContextTokenValue to select the queue.

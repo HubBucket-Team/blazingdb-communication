@@ -55,10 +55,22 @@ public:
     }
 
 public:
+    std::shared_ptr<Message> getMessage(const ContextToken& context_token) override {
+        std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        auto& message_queue = context_messages_map_[context_token.getIntToken()];
+        return message_queue.getMessage();
+    }
+
     std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token) override {
         std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         auto& message_queue = context_messages_map_[context_token];
         return message_queue.getMessage();
+    }
+
+    void putMessage(const ContextToken& context_token, std::shared_ptr<Message>& message) override {
+        std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+        auto& message_queue = context_messages_map_[context_token.getIntToken()];
+        message_queue.putMessage(message);
     }
 
     void putMessage(const ContextTokenValue& context_token, std::shared_ptr<Message>& message) override {
