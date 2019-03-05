@@ -173,13 +173,16 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     // Create context token
     const ContextToken::TokenType context_token = 6574;
 
+    // Total data size
+    const std::uint64_t total_data_size = 7659;
+
     // Serialize data
     std::string json_data;
     std::string binary_data;
 
     // Serialize message
     {
-        SampleToNodeMasterMessage message(ContextToken::Make(context_token), node, samples);
+        SampleToNodeMasterMessage message(ContextToken::Make(context_token), node, total_data_size, samples);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
@@ -198,6 +201,9 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
         // Test node
         ASSERT_EQ(message->getNode(), node);
+
+        // Test total data size
+        ASSERT_EQ(message->getTotalDataSize(), total_data_size);
 
         // Test samples
         ASSERT_EQ(message->getSamples().size(), samples.size());

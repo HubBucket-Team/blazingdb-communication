@@ -20,39 +20,51 @@ namespace messages {
     public:
         SampleToNodeMasterMessage(const ContextToken& context_token,
                                   const Node& node,
+                                  std::uint64_t total_data_size,
                                   std::vector<RalColumn>&& samples)
         : BaseClass(context_token, MessageID),
           node{node},
+          total_data_size{total_data_size},
           samples{std::move(samples)}
         { }
 
         SampleToNodeMasterMessage(const ContextToken& context_token,
                                   const Node& node,
+                                  std::uint64_t total_data_size,
                                   const std::vector<RalColumn>& samples)
         : BaseClass(context_token, MessageID),
           node{node},
+          total_data_size{total_data_size},
           samples{samples}
         { }
 
         SampleToNodeMasterMessage(std::unique_ptr<ContextToken>&& context_token,
                                   const Node& node,
+                                  std::uint64_t total_data_size,
                                   std::vector<RalColumn>&& samples)
         : BaseClass(std::move(context_token), MessageID),
           node{node},
+          total_data_size{total_data_size},
           samples{std::move(samples)}
         { }
 
         SampleToNodeMasterMessage(std::unique_ptr<ContextToken>&& context_token,
                                   const Node& node,
+                                  std::uint64_t total_data_size,
                                   const std::vector<RalColumn>& samples)
         : BaseClass(std::move(context_token), MessageID),
           node{node},
+          total_data_size{total_data_size},
           samples{samples}
         { }
 
     public:
         const Node& getNode() const {
             return node;
+        }
+
+        const std::uint64_t getTotalDataSize() const {
+            return total_data_size;
         }
 
         const std::vector<RalColumn>& getSamples() const {
@@ -72,6 +84,10 @@ namespace messages {
 
                 // Serialize Node
                 node.serializeToJson(writer);
+
+                // Serialize total_data_size
+                writer.Key("total_data_size");
+                writer.Uint64(total_data_size);
 
                 // Serialize RalColumns
                 writer.Key("samples");
@@ -111,6 +127,9 @@ namespace messages {
             // Deserialize Node class
             Node node = BaseClass::makeNode(document["node"].GetObject());
 
+            // Deserialize total_data_size
+            std::uint64_t total_data_size = document["total_data_size"].GetUint64();
+
             // Make the deserialization
             std::size_t binary_pointer = 0;
             const auto& gpu_data_array = document["samples"].GetArray();
@@ -119,11 +138,12 @@ namespace messages {
             }
 
             // Create the message
-            return std::make_shared<MessageType>(ContextToken::Make(context_token), node, std::move(columns));
+            return std::make_shared<MessageType>(ContextToken::Make(context_token), node, total_data_size, std::move(columns));
         }
 
     private:
         const Node node;
+        const uint64_t total_data_size;
         const std::vector<RalColumn> samples;
 
     private:
