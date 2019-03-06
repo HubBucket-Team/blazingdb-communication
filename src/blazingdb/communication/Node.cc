@@ -2,6 +2,10 @@
 
 using namespace blazingdb::communication;
 
+Node::Node()
+: address_{}, isAvailable_{false}, unixSocketId_{0}
+{ }
+
 Node::Node(const std::shared_ptr<Address>& address)
     : address_{address}, isAvailable_{true}, unixSocketId_{0} {}
 
@@ -33,6 +37,10 @@ void Node::serializeToJson(JsonSerializable::Writer& writer) const {
 
 Node Node::make(const rapidjson::Value::Object& object) {
   return Node{object["unixSocketId"].GetInt(), Address::Make(object)};
+}
+
+std::unique_ptr<Node> Node::makeUnique(const rapidjson::Value::Object& object) {
+    return std::make_unique<Node>(object["unixSocketId"].GetInt(), Address::Make(object));
 }
 
 std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip,

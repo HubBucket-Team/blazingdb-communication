@@ -52,7 +52,6 @@ namespace messages {
             writer.StartObject();
             {
                 // Serialize Message
-                writer.Key("message");
                 serializeMessage(writer, this);
 
                 // Serialize columns

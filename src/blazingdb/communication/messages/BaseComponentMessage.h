@@ -18,6 +18,13 @@ namespace messages {
         using Writer = typename rapidjson::Writer<StringBuffer>;
 
     protected:
+        BaseComponentMessage(std::unique_ptr<MessageToken>&& message_token,
+                             std::unique_ptr<ContextToken>&& context_token,
+                             const Node& sender_node)
+        : Message(std::move(message_token), std::move(context_token), sender_node)
+        { }
+
+    protected:
         BaseComponentMessage(std::unique_ptr<ContextToken>&& context_token, const MessageToken::TokenType& message_token)
         : Message(MessageToken::Make(message_token), std::move(context_token))
         { }

@@ -40,7 +40,6 @@ namespace messages {
 
         writer.StartObject();
         {
-            writer.Key("message");
             serializeMessage(writer, this);
 
             writer.Key("pivots");

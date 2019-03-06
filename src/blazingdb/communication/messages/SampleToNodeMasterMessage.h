@@ -63,7 +63,7 @@ namespace messages {
             return node;
         }
 
-        const std::uint64_t getTotalDataSize() const {
+        std::uint64_t getTotalDataSize() const {
             return total_data_size;
         }
 
@@ -79,7 +79,6 @@ namespace messages {
             writer.StartObject();
             {
                 // Serialize Message
-                writer.Key("message");
                 serializeMessage(writer, this);
 
                 // Serialize Node

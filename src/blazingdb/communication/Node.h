@@ -13,6 +13,7 @@ namespace communication {
 
 class Node : public JsonSerializable {
 public:
+  Node();
   explicit Node(const std::shared_ptr<Address>& address);
   explicit Node(int unixSocketId, const std::shared_ptr<Address>& address);
   Node(const Node& other) = default;
@@ -28,6 +29,8 @@ public:
   void serializeToJson(JsonSerializable::Writer& writer) const override;
 
   static Node make(const rapidjson::Value::Object& object);
+  static std::unique_ptr<Node> makeUnique(const rapidjson::Value::Object& object);
+
   static std::unique_ptr<Node> make(int unixSocketId, const std::string& ip,
                                     int16_t port);
 

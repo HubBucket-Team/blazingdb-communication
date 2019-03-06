@@ -10,6 +10,13 @@ namespace messages {
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class GpuComponentMessage : public BaseComponentMessage {
     protected:
+        GpuComponentMessage(std::unique_ptr<MessageToken>&& message_token,
+                            std::unique_ptr<ContextToken>&& context_token,
+                            const Node& sender_node)
+        : BaseComponentMessage(std::move(message_token), std::move(context_token), sender_node)
+        { }
+
+    protected:
         GpuComponentMessage(const ContextToken& context_token, const MessageToken::TokenType& message_token)
         : BaseComponentMessage(context_token, message_token)
         { }
