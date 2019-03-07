@@ -18,7 +18,7 @@ public:
                    const std::string& logicalPlan);
 
   std::vector<std::shared_ptr<Node>> getAllNodes() const;
-  std::vector<std::shared_ptr<Node>> getSiblingsNodes() const;
+  std::vector<std::shared_ptr<Node>> getWorkerNodes() const;
   const Node& getMasterNode() const;
   std::string getLogicalPlan() const;
   const ContextToken& getContextToken() const;

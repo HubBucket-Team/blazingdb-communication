@@ -15,7 +15,7 @@ std::vector<std::shared_ptr<Node>> Context::getAllNodes() const {
   return taskNodes_;
 }
 
-std::vector<std::shared_ptr<Node>> Context::getSiblingsNodes() const {
+std::vector<std::shared_ptr<Node>> Context::getWorkerNodes() const {
   std::vector<std::shared_ptr<Node>> siblings;
   std::copy_if(taskNodes_.cbegin(), taskNodes_.cend(),
                std::back_inserter(siblings),
