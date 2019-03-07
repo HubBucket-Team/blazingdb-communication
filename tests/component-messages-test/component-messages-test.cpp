@@ -214,6 +214,13 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
 
 
 TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
+    // Make alias
+    using ContextToken = blazingdb::communication::ContextToken;
+    using MessageToken = blazingdb::communication::messages::MessageToken;
+    using SampleToNodeMasterMessage = blazingdb::communication::messages::SampleToNodeMasterMessage<blazingdb::test::gdf_column_cpp,
+                                                                                                    blazingdb::test::gdf_column,
+                                                                                                    GpuFunctions>;
+
     // Test data - create samples
     auto gdf_column_1 = blazingdb::test::build(16,
                                                blazingdb::test::GDF_INT64,
@@ -245,21 +252,17 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     samples.emplace_back(gdf_column_cpp_1);
     samples.emplace_back(gdf_column_cpp_2);
 
-    // Test data - create node
+    // Test data - create sender node
     using Address = blazingdb::communication::Address;
-    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node sender_node(Address::Make("1.2.3.4", 1234));
 
-    // Make alias
-    using ContextToken = blazingdb::communication::ContextToken;
-    using SampleToNodeMasterMessage = blazingdb::communication::messages::SampleToNodeMasterMessage<blazingdb::test::gdf_column_cpp,
-                                                                                                    blazingdb::test::gdf_column,
-                                                                                                    GpuFunctions>;
+
 
     // Create context token
-    const ContextToken::TokenType context_token = 6574;
+    const ContextToken::TokenType context_token_value = 6574;
 
     // Total data size
-    const std::uint64_t total_data_size = 7659;
+    const std::uint64_t total_row_size = 7659;
 
     // Serialize data
     std::string json_data;
@@ -267,7 +270,9 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Serialize message
     {
-        SampleToNodeMasterMessage message(ContextToken::Make(context_token), node, total_data_size, samples);
+        std::unique_ptr<MessageToken> message_token = MessageToken::Make(SampleToNodeMasterMessage::getMessageID());
+        std::unique_ptr<ContextToken> context_token = ContextToken::Make(context_token_value);
+        SampleToNodeMasterMessage message(std::move(message_token), std::move(context_token), sender_node, total_row_size, samples);
 
         json_data = message.serializeToJson();
         binary_data = message.serializeToBinary();
@@ -279,16 +284,16 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
                 (SampleToNodeMasterMessage::Make(json_data, binary_data));
 
         // Test context token
-        ASSERT_EQ(context_token, message->getContextTokenValue());
+        ASSERT_EQ(message->getContextTokenValue(), context_token_value);
 
         // Test message token
-        ASSERT_EQ(SampleToNodeMasterMessage::getMessageID(), message->getMessageTokenValue());
+        ASSERT_EQ(message->getMessageTokenValue(), SampleToNodeMasterMessage::getMessageID());
 
         // Test node
-        ASSERT_EQ(message->getNode(), node);
+        ASSERT_EQ(message->getSenderNode(), sender_node);
 
         // Test total data size
-        ASSERT_EQ(message->getTotalDataSize(), total_data_size);
+        ASSERT_EQ(message->getTotalRowSize(), total_row_size);
 
         // Test samples
         ASSERT_EQ(message->getSamples().size(), samples.size());

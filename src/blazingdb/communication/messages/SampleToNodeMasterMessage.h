@@ -18,57 +18,33 @@ namespace messages {
         using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
     public:
-        SampleToNodeMasterMessage(const ContextToken& context_token,
-                                  const Node& node,
-                                  std::uint64_t total_data_size,
+        SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
+                                  std::unique_ptr<ContextToken>&& contextToken,
+                                  const Node& sender_node,
+                                  std::uint64_t total_row_size,
                                   std::vector<RalColumn>&& samples)
-        : BaseClass(context_token, MessageID),
-          node{node},
-          total_data_size{total_data_size},
-          samples{std::move(samples)}
+        : BaseClass (std::move(messageToken), std::move(contextToken), sender_node),
+          total_row_size_{total_row_size},
+          samples_{std::move(samples)}
         { }
 
-        SampleToNodeMasterMessage(const ContextToken& context_token,
-                                  const Node& node,
-                                  std::uint64_t total_data_size,
+        SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
+                                  std::unique_ptr<ContextToken>&& contextToken,
+                                  const Node& sender_node,
+                                  std::uint64_t total_row_size,
                                   const std::vector<RalColumn>& samples)
-        : BaseClass(context_token, MessageID),
-          node{node},
-          total_data_size{total_data_size},
-          samples{samples}
-        { }
-
-        SampleToNodeMasterMessage(std::unique_ptr<ContextToken>&& context_token,
-                                  const Node& node,
-                                  std::uint64_t total_data_size,
-                                  std::vector<RalColumn>&& samples)
-        : BaseClass(std::move(context_token), MessageID),
-          node{node},
-          total_data_size{total_data_size},
-          samples{std::move(samples)}
-        { }
-
-        SampleToNodeMasterMessage(std::unique_ptr<ContextToken>&& context_token,
-                                  const Node& node,
-                                  std::uint64_t total_data_size,
-                                  const std::vector<RalColumn>& samples)
-        : BaseClass(std::move(context_token), MessageID),
-          node{node},
-          total_data_size{total_data_size},
-          samples{samples}
+        : BaseClass (std::move(messageToken), std::move(contextToken), sender_node),
+          total_row_size_{total_row_size},
+          samples_{samples}
         { }
 
     public:
-        const Node& getNode() const {
-            return node;
-        }
-
-        std::uint64_t getTotalDataSize() const {
-            return total_data_size;
+        std::uint64_t getTotalRowSize() const {
+            return total_row_size_;
         }
 
         const std::vector<RalColumn>& getSamples() const {
-            return samples;
+            return samples_;
         }
 
     public:
@@ -81,18 +57,15 @@ namespace messages {
                 // Serialize Message
                 serializeMessage(writer, this);
 
-                // Serialize Node
-                node.serializeToJson(writer);
-
                 // Serialize total_data_size
-                writer.Key("total_data_size");
-                writer.Uint64(total_data_size);
+                writer.Key("total_row_size");
+                writer.Uint64(total_row_size_);
 
                 // Serialize RalColumns
                 writer.Key("samples");
                 writer.StartArray();
                 {
-                    for (const auto& sample : samples) {
+                    for (const auto& sample : samples_) {
                         BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(sample));
                     }
                 }
@@ -104,7 +77,7 @@ namespace messages {
         }
 
         const std::string serializeToBinary() const override {
-            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(samples));
+            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(samples_));
         }
 
     public:
@@ -113,23 +86,24 @@ namespace messages {
         }
 
         static std::shared_ptr<Message> Make(const std::string& json, const std::string& binary) {
-            // Parse
+            // Parse json
             rapidjson::Document document;
             document.Parse(json.c_str());
 
-            // The gdf_column_cpp container
+            // Get main object
+            const auto& object = document.GetObject();
+
+            // Get message values;
+            std::unique_ptr<Node> sender_node;
+            std::unique_ptr<MessageToken> messageToken;
+            std::unique_ptr<ContextToken> contextToken;
+            deserializeMessage(object["message"].GetObject(), messageToken, contextToken, sender_node);
+
+            // Get total row size
+            std::uint64_t total_row_size = document["total_row_size"].GetUint64();
+
+            // Get samples
             std::vector<RalColumn> columns;
-
-            // Get context token value;
-            const ContextToken::TokenType context_token = document["message"]["contextToken"].GetInt();
-
-            // Deserialize Node class
-            Node node = BaseClass::makeNode(document["node"].GetObject());
-
-            // Deserialize total_data_size
-            std::uint64_t total_data_size = document["total_data_size"].GetUint64();
-
-            // Make the deserialization
             std::size_t binary_pointer = 0;
             const auto& gpu_data_array = document["samples"].GetArray();
             for (const auto& gpu_data : gpu_data_array) {
@@ -137,13 +111,16 @@ namespace messages {
             }
 
             // Create the message
-            return std::make_shared<MessageType>(ContextToken::Make(context_token), node, total_data_size, std::move(columns));
+            return std::make_shared<MessageType>(std::move(messageToken),
+                                                 std::move(contextToken),
+                                                 *sender_node,
+                                                 total_row_size,
+                                                 std::move(columns));
         }
 
     private:
-        const Node node;
-        const uint64_t total_data_size;
-        const std::vector<RalColumn> samples;
+        const uint64_t total_row_size_;
+        const std::vector<RalColumn> samples_;
 
     private:
         static const std::string MessageID;
