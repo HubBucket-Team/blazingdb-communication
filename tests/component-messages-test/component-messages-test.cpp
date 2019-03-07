@@ -130,7 +130,7 @@ TEST_F(ComponentMessagesTest, ColumnDataMessage) {
         ASSERT_EQ(node, message->getSenderNode());
 
         // Test columns
-        const auto& message_columns = message->getColumns();
+        const auto message_columns = message->getColumns();
         ASSERT_EQ(message_columns.size(), columns.size());
         for (std::size_t k = 0; k < columns.size(); ++k) {
             ASSERT_TRUE(message_columns[k] == columns[k]);

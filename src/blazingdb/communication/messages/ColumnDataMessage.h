@@ -36,8 +36,8 @@ public:
     { }
 
 public:
-    const std::vector<RalColumn>& getColumns() const {
-        return columns;
+    std::vector<RalColumn> getColumns() {
+        return std::move(columns);
     }
 
 public:
@@ -101,7 +101,7 @@ public:
     }
 
 private:
-    const std::vector<RalColumn> columns;
+    std::vector<RalColumn> columns;
 
 private:
     static const std::string MessageID;
