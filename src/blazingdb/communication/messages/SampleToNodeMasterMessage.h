@@ -43,8 +43,8 @@ namespace messages {
             return total_row_size_;
         }
 
-        const std::vector<RalColumn>& getSamples() const {
-            return samples_;
+        std::vector<RalColumn> getSamples() {
+            return std::move(samples_);
         }
 
     public:
@@ -120,7 +120,7 @@ namespace messages {
 
     private:
         const uint64_t total_row_size_;
-        const std::vector<RalColumn> samples_;
+        std::vector<RalColumn> samples_;
 
     private:
         static const std::string MessageID;

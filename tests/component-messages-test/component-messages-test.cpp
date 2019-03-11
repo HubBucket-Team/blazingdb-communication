@@ -296,9 +296,10 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
         ASSERT_EQ(message->getTotalRowSize(), total_row_size);
 
         // Test samples
-        ASSERT_EQ(message->getSamples().size(), samples.size());
+        std::vector<blazingdb::test::gdf_column_cpp> message_samples = message->getSamples();
+        ASSERT_EQ(message_samples.size(), samples.size());
         for (std::size_t k = 0; k < samples.size(); ++k) {
-            ASSERT_TRUE(message->getSamples()[k] == samples[k]);
+            ASSERT_TRUE(message_samples[k] == samples[k]);
         }
     }
 }
