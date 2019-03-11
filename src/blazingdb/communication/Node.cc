@@ -48,6 +48,14 @@ std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip,
   return std::unique_ptr<Node>(new Node(unixSocketId, Address::Make(ip, port)));
 }
 
+std::shared_ptr<Node> Node::makeShared(int unixSocketId, std::string&& ip, int16_t port) {
+    return std::make_shared<Node>(unixSocketId, Address::Make(ip, port));
+}
+
+std::shared_ptr<Node> Node::makeShared(int unixSocketId, const std::string& ip, int16_t port) {
+    return std::make_shared<Node>(unixSocketId, Address::Make(ip, port));
+}
+
 #include "Address-Internal.h"
 
 #include <algorithm>
@@ -108,6 +116,10 @@ std::shared_ptr<Node> Node::Make(const std::shared_ptr<Address>& address) {
 
 std::shared_ptr<Node> Node::Make(const Buffer& buffer) {
   return std::make_shared<ConcreteNode>(buffer);
+}
+
+bool operator!=(const Node& lhs, const Node& rhs) {
+    return !(lhs.address()->SameValueAs(*rhs.address()));
 }
 
 }  // namespace communication

@@ -41,11 +41,18 @@ public:
   static std::shared_ptr<Node> Make(const std::shared_ptr<Address>&);
   static std::shared_ptr<Node> Make(const Buffer&);
 
+public:
+    static std::shared_ptr<Node> makeShared(int unixSocketId, std::string&& ip, int16_t port);
+
+    static std::shared_ptr<Node> makeShared(int unixSocketId, const std::string& ip, int16_t port);
+
 protected:
   const std::shared_ptr<Address> address_;
   const int unixSocketId_;  // For unix socket
   bool isAvailable_;
 };
+
+bool operator!=(const Node& lhs, const Node& rhs);
 
 }  // namespace communication
 }  // namespace blazingdb
