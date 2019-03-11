@@ -11,6 +11,10 @@ Context::Context(const std::vector<std::shared_ptr<Node>>& taskNodes,
       masterNode_{masterNode},
       logicalPlan_{logicalPlan} {}
 
+int Context::getTotalNodes() const{ 
+  return taskNodes_.size();
+}
+
 std::vector<std::shared_ptr<Node>> Context::getAllNodes() const {
   return taskNodes_;
 }

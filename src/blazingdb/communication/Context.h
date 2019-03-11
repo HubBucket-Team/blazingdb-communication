@@ -17,6 +17,7 @@ public:
                    const std::shared_ptr<Node>& masterNode,
                    const std::string& logicalPlan);
 
+  int getTotalNodes() const;
   std::vector<std::shared_ptr<Node>> getAllNodes() const;
   std::vector<std::shared_ptr<Node>> getWorkerNodes() const;
   const Node& getMasterNode() const;
