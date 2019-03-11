@@ -38,5 +38,14 @@ std::unique_ptr<ContextToken> ContextToken::Make(int token) {
   return std::unique_ptr<ContextToken>(new ConcreteContextToken{token});
 }
 
+bool operator==(const ContextToken& lhs, const ContextToken& rhs) {
+    return lhs.SameValueAs(rhs);
+}
+
+bool operator!=(const ContextToken& lhs, const ContextToken& rhs)
+{
+    return !(lhs.SameValueAs(rhs));
+}
+
 }  // namespace communication
 }  // namespace blazingdb
