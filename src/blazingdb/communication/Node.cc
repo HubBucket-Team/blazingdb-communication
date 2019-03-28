@@ -43,22 +43,10 @@ std::unique_ptr<Node> Node::makeUnique(const rapidjson::Value::Object& object) {
     return std::make_unique<Node>(object["unixSocketId"].GetInt(), Address::Make(object));
 }
 
-std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip,
-                                 int16_t port) {
-  return std::unique_ptr<Node>(new Node(unixSocketId, Address::Make(ip, port)));
-}
-
-std::shared_ptr<Node> Node::makeShared(int unixSocketId, std::string&& ip, int16_t port) {
-    return std::make_shared<Node>(unixSocketId, Address::Make(ip, port));
-}
-
-std::shared_ptr<Node> Node::makeShared(int unixSocketId, const std::string& ip, int16_t port) {
-    return std::make_shared<Node>(unixSocketId, Address::Make(ip, port));
-}
-
 #include "Address-Internal.h"
 
 #include <algorithm>
+#include <iostream>
 
 namespace blazingdb {
 namespace communication {
@@ -82,12 +70,18 @@ public:
   explicit ConcreteNode(const Buffer& buffer)
       : Node{ConcreteAddressFrom(buffer)} {}
 
+  explicit ConcreteNode(int unixSocketId, const std::shared_ptr<Address>& address)
+      : Node{unixSocketId, address} {}
+
   const std::shared_ptr<Buffer> ToBuffer() const noexcept {
     const internal::ConcreteAddress& concreteAddress =
         *static_cast<const internal::ConcreteAddress*>(address());
 
     const std::string nodeAsString =
         concreteAddress.ip() + "," + std::to_string(concreteAddress.port());
+
+
+    std::cout << nodeAsString << "\n";
 
     return std::make_shared<NodeBuffer>(std::move(nodeAsString));
   }
@@ -121,6 +115,25 @@ std::shared_ptr<Node> Node::Make(const Buffer& buffer) {
 bool operator!=(const Node& lhs, const Node& rhs) {
     return !(lhs.address()->SameValueAs(*rhs.address()));
 }
+
+std::shared_ptr<Node> Node::makeShared(int unixSocketId, std::string&& ip, int16_t port) {
+    return std::make_shared<ConcreteNode>(unixSocketId, Address::Make(ip, port));
+}
+
+std::shared_ptr<Node> Node::makeShared(int unixSocketId, const std::string& ip, int16_t port) {
+    return std::make_shared<ConcreteNode>(unixSocketId, Address::Make(ip, port));
+}
+
+std::shared_ptr<Node> Node::makeShared(const Node& node) {
+    const internal::ConcreteAddress& concreteAddress =
+        *static_cast<const internal::ConcreteAddress*>(node.address());
+    return std::make_shared<ConcreteNode>(node.unixSocketId(), Address::Make(concreteAddress.ip(), concreteAddress.port()));
+}
+
+std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip, int16_t port) {
+  return std::unique_ptr<Node>(new Node(unixSocketId, Address::Make(ip, port)));
+}
+
 
 }  // namespace communication
 }  // namespace blazingdb

@@ -46,6 +46,8 @@ public:
 
     static std::shared_ptr<Node> makeShared(int unixSocketId, const std::string& ip, int16_t port);
 
+    static std::shared_ptr<Node> makeShared(const Node& node);
+
 protected:
   const std::shared_ptr<Address> address_;
   const int unixSocketId_;  // For unix socket

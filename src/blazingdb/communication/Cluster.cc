@@ -7,7 +7,7 @@ using namespace blazingdb::communication;
 
 void Cluster::addNode(const Node& node) {
   std::unique_lock<std::mutex> lock(condition_mutex);
-  nodes_.push_back(std::shared_ptr<Node>(new Node(node)));
+  nodes_.push_back(Node::makeShared(node));
 
   // TODO: Delete this
   const internal::ConcreteAddress& concreteAddress =
