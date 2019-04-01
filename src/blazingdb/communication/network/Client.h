@@ -16,20 +16,20 @@ class Client {
 public:
   class SendError;
 
-  virtual std::unique_ptr<Status> Send(const Node &node,
+  virtual std::shared_ptr<Status> Send(const Node &node,
                                        const std::string &endpoint,
                                        const std::string &data,
                                        const std::string &buffer) /*const*/
       = 0;
 
-  virtual std::unique_ptr<Status> Send(const Node &node,
+  virtual std::shared_ptr<Status> Send(const Node &node,
                                        const std::string &endpoint,
                                        const messages::Message &message) = 0;
 
-    virtual std::unique_ptr<Status> send(const Node& node,
+    virtual std::shared_ptr<Status> send(const Node& node,
                                          std::shared_ptr<messages::Message>& message) = 0;
 
-  virtual std::unique_ptr<Status> SendNodeData(const std::string &ip,
+  virtual std::shared_ptr<Status> SendNodeData(const std::string &ip,
                                                const std::uint16_t port,
                                                const messages::Message &message) = 0;
 

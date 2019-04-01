@@ -20,7 +20,7 @@ public:
 
 public:
     ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
-                      std::unique_ptr<ContextToken>&& context_token,
+                      std::shared_ptr<ContextToken>&& context_token,
                       const Node& sender_node,
                       std::vector<RalColumn>&& columns)
     : BaseClass(std::move(message_token), std::move(context_token), sender_node),
@@ -28,7 +28,7 @@ public:
     { }
 
     ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
-                      std::unique_ptr<ContextToken>&& context_token,
+                      std::shared_ptr<ContextToken>&& context_token,
                       const Node& sender_node,
                       const std::vector<RalColumn>& columns)
     : BaseClass(std::move(message_token), std::move(context_token), sender_node),
@@ -85,7 +85,7 @@ public:
         // Get message values;
         std::unique_ptr<Node> node;
         std::unique_ptr<MessageToken> messageToken;
-        std::unique_ptr<ContextToken> contextToken;
+        std::shared_ptr<ContextToken> contextToken;
         deserializeMessage(object["message"].GetObject(), messageToken, contextToken, node);
 
         // Get array columns (payload)

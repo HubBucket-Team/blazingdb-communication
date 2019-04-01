@@ -18,13 +18,13 @@ namespace messages {
       data_pivot_array{data}
     { }
 
-    PartitionPivotsMessage::PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token,
+    PartitionPivotsMessage::PartitionPivotsMessage(std::shared_ptr<ContextToken>&& context_token,
                                                    std::vector<DataPivot>&& data)
     : BaseComponentMessage(std::move(context_token), MessageID),
       data_pivot_array{std::move(data)}
     { }
 
-    PartitionPivotsMessage::PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token,
+    PartitionPivotsMessage::PartitionPivotsMessage(std::shared_ptr<ContextToken>&& context_token,
                                                    const std::vector<DataPivot>& data)
     : BaseComponentMessage(std::move(context_token), MessageID),
       data_pivot_array{data}

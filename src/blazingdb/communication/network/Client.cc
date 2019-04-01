@@ -35,7 +35,7 @@ private:
 
 class ConcreteClient : public Client {
 public:
-  std::unique_ptr<Status> Send(const Node &node, const std::string &endpoint,
+  std::shared_ptr<Status> Send(const Node &node, const std::string &endpoint,
                                const std::string &data,
                                const std::string &buffer) /*const*/ final {
     const internal::ConcreteAddress *concreteAddress =
@@ -51,19 +51,19 @@ public:
     try {
       std::shared_ptr<HttpClient::Response> response =
           httpClient.request("POST", "/message/" + endpoint, buffer, headers);
-      return std::unique_ptr<Status>(new ConcreteStatus{response});
-    } catch (const boost::system::system_error &) {
-      throw SendError(endpoint, data, buffer.size());
+      return std::shared_ptr<Status>(new ConcreteStatus{response});
+    } catch (const std::exception& e) {
+      throw SendError(e.what(), endpoint, data, buffer.size());
     }
   }
 
-  std::unique_ptr<Status> Send(const Node &node, const std::string &endpoint,
+  std::shared_ptr<Status> Send(const Node &node, const std::string &endpoint,
                                const Message &message) final {
     return Send(node, endpoint, message.serializeToJson(),
                 message.serializeToBinary());
   }
 
-    std::unique_ptr<Status> send(const Node& node,
+  std::shared_ptr<Status> send(const Node& node,
                                  std::shared_ptr<messages::Message>& message) override {
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
@@ -76,7 +76,7 @@ public:
         return sendPost(httpClient, message->getMessageTokenValue(), headers, body_binary);
     }
 
-  std::unique_ptr<Status> SendNodeData(const std::string &ip,
+  std::shared_ptr<Status> SendNodeData(const std::string &ip,
                                        const std::uint16_t port,
                                        const Message &message) final {
     const std::string serverPortPath = ip + ":" + std::to_string(port);
@@ -88,10 +88,10 @@ public:
     try {
       std::shared_ptr<HttpClient::Response> response =
           httpClient.request("POST", "/register_node", "", headers);
-      return std::unique_ptr<Status>(new ConcreteStatus{response});
-    } catch (const boost::system::system_error &) {
+      return std::shared_ptr<Status>(new ConcreteStatus{response});
+    } catch (const std::exception& e) {
       const std::string data = message.serializeToJson();
-      throw SendError("/register_node", data, data.size());
+      throw SendError(e.what(), "/register_node", data, data.size());
     }
   }
 
@@ -100,17 +100,17 @@ public:
         return std::string{concreteAddress->ip() + ":" + std::to_string(concreteAddress->port())};
     }
 
-    std::unique_ptr<Status> sendPost(HttpClient& httpClient,
+    std::shared_ptr<Status> sendPost(HttpClient& httpClient,
                                      const std::string& endpoint,
                                      const std::map<std::string, std::string>& headers,
                                      const std::string& body) {
         try {
             std::shared_ptr<HttpClient::Response> response = httpClient.request("POST", "/message/" + endpoint, body, headers);
-            return std::unique_ptr<Status>(new ConcreteStatus{response});
+            return std::shared_ptr<Status>(new ConcreteStatus{response});
         }
-        catch (const boost::system::system_error &) {
+        catch (const std::exception& e) {
             const std::string& data = headers.at("json_data");
-            throw SendError("/exception", data, data.size());
+            throw SendError(e.what(), "/message/" + endpoint, data, data.size());
         }
     }
 };

@@ -108,7 +108,7 @@ TEST_F(ComponentMessagesTest, ColumnDataMessage) {
     // Serialize message
     {
         std::unique_ptr<MessageToken> message_token = MessageToken::Make(ColumnDataMessage::getMessageID());
-        std::unique_ptr<ContextToken> context_token = ContextToken::Make(context_token_value);
+        std::shared_ptr<ContextToken> context_token = ContextToken::Make(context_token_value);
         ColumnDataMessage message(std::move(message_token), std::move(context_token), node, columns);
 
         json_data = message.serializeToJson();
@@ -271,7 +271,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     // Serialize message
     {
         std::unique_ptr<MessageToken> message_token = MessageToken::Make(SampleToNodeMasterMessage::getMessageID());
-        std::unique_ptr<ContextToken> context_token = ContextToken::Make(context_token_value);
+        std::shared_ptr<ContextToken> context_token = ContextToken::Make(context_token_value);
         SampleToNodeMasterMessage message(std::move(message_token), std::move(context_token), sender_node, total_row_size, samples);
 
         json_data = message.serializeToJson();

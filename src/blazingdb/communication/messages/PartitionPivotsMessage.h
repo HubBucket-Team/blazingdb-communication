@@ -18,9 +18,9 @@ namespace messages {
 
         PartitionPivotsMessage(const ContextToken& context_token, const std::vector<DataPivot>& data);
 
-        PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token, std::vector<DataPivot>&& data);
+        PartitionPivotsMessage(std::shared_ptr<ContextToken>&& context_token, std::vector<DataPivot>&& data);
 
-        PartitionPivotsMessage(std::unique_ptr<ContextToken>&& context_token, const std::vector<DataPivot>& data);
+        PartitionPivotsMessage(std::shared_ptr<ContextToken>&& context_token, const std::vector<DataPivot>& data);
 
     public:
         const std::vector<DataPivot>& getDataPivots();

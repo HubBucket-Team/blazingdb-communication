@@ -5,13 +5,13 @@ namespace communication {
 namespace messages {
 
 Message::Message(std::unique_ptr<MessageToken> &&messageToken,
-                 std::unique_ptr<ContextToken> &&contextToken)
+                 std::shared_ptr<ContextToken> &&contextToken)
 : messageToken_{std::move(messageToken)},
   contextToken_{std::move(contextToken)}
 { }
 
 Message::Message(std::unique_ptr<MessageToken>&& messageToken,
-                 std::unique_ptr<ContextToken>&& contextToken,
+                 std::shared_ptr<ContextToken>&& contextToken,
                  const Node& sender_node)
 : messageToken_{std::move(messageToken)},
   contextToken_{std::move(contextToken)},

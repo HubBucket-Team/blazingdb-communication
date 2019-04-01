@@ -28,14 +28,14 @@ private:
 };
 }  // namespace
 
-std::unique_ptr<ContextToken> ContextToken::Make() {
+std::shared_ptr<ContextToken> ContextToken::Make() {
   static int counter = 0;
 
-  return std::unique_ptr<ContextToken>(new ConcreteContextToken{counter++});
+  return std::shared_ptr<ContextToken>(new ConcreteContextToken{counter++});
 }
 
-std::unique_ptr<ContextToken> ContextToken::Make(int token) {
-  return std::unique_ptr<ContextToken>(new ConcreteContextToken{token});
+std::shared_ptr<ContextToken> ContextToken::Make(int token) {
+  return std::shared_ptr<ContextToken>(new ConcreteContextToken{token});
 }
 
 bool operator==(const ContextToken& lhs, const ContextToken& rhs) {

@@ -13,10 +13,10 @@ namespace messages {
 class Message {
 public:
   explicit Message(std::unique_ptr<MessageToken> &&messageToken,
-                   std::unique_ptr<ContextToken> &&contextToken);
+                   std::shared_ptr<ContextToken> &&contextToken);
 
   explicit Message(std::unique_ptr<MessageToken>&& messageToken,
-                   std::unique_ptr<ContextToken>&& contextToken,
+                   std::shared_ptr<ContextToken>&& contextToken,
                    const Node& sender_node);
 
   virtual ~Message();
@@ -34,7 +34,7 @@ public:
 
 private:
   const std::unique_ptr<MessageToken> messageToken_;
-  const std::unique_ptr<ContextToken> contextToken_;
+  const std::shared_ptr<ContextToken> contextToken_;
 
 private:
     const blazingdb::communication::Node sender_node_;
@@ -47,7 +47,7 @@ private:
     template <typename Object>
     friend void deserializeMessage(Object& object,
                                    std::unique_ptr<MessageToken>& messageToken,
-                                   std::unique_ptr<ContextToken>& contextToken,
+                                   std::shared_ptr<ContextToken>& contextToken,
                                    Node& node);
 };
 
@@ -68,7 +68,7 @@ void serializeMessage(Writer& writer, const Message* message) {
 template <typename Object>
 void deserializeMessage(const Object& object,
                         std::unique_ptr<MessageToken>& messageToken,
-                        std::unique_ptr<ContextToken>& contextToken,
+                        std::shared_ptr<ContextToken>& contextToken,
                         std::unique_ptr<Node>& node) {
     // Get message token;
     const auto& message_token_value = object["messageToken"];

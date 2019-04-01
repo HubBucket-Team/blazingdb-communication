@@ -19,7 +19,7 @@ namespace messages {
 
     public:
         SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
-                                  std::unique_ptr<ContextToken>&& contextToken,
+                                  std::shared_ptr<ContextToken>&& contextToken,
                                   const Node& sender_node,
                                   std::uint64_t total_row_size,
                                   std::vector<RalColumn>&& samples)
@@ -29,7 +29,7 @@ namespace messages {
         { }
 
         SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
-                                  std::unique_ptr<ContextToken>&& contextToken,
+                                  std::shared_ptr<ContextToken>&& contextToken,
                                   const Node& sender_node,
                                   std::uint64_t total_row_size,
                                   const std::vector<RalColumn>& samples)
@@ -96,7 +96,7 @@ namespace messages {
             // Get message values;
             std::unique_ptr<Node> sender_node;
             std::unique_ptr<MessageToken> messageToken;
-            std::unique_ptr<ContextToken> contextToken;
+            std::shared_ptr<ContextToken> contextToken;
             deserializeMessage(object["message"].GetObject(), messageToken, contextToken, sender_node);
 
             // Get total row size

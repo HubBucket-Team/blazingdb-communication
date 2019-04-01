@@ -34,7 +34,7 @@ public:
 class MockMessage : public blazingdb::communication::messages::Message {
 public:
   MockMessage(
-      std::unique_ptr<ContextToken>&& contextToken,
+      std::shared_ptr<ContextToken>&& contextToken,
       std::unique_ptr<blazingdb::communication::messages::MessageToken> &&messageToken,
       const std::size_t pages, const std::string &model)
       : Message{std::forward<
@@ -57,7 +57,7 @@ public:
 
     std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
         blazingdb::communication::messages::MessageToken::Make(endpoint);
-    std::unique_ptr<ContextToken> contextToken = ContextToken::Make(context_token);
+    std::shared_ptr<ContextToken> contextToken = ContextToken::Make(context_token);
     return std::shared_ptr<Message>(new MockMessage(std::move(contextToken), std::move(messageToken), 12, "qwerty"));
   }
 

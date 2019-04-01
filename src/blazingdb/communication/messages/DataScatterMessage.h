@@ -29,12 +29,12 @@ namespace messages {
           columns{columns}
         { }
 
-        DataScatterMessage(std::unique_ptr<ContextToken>&& context_token, std::vector<RalColumn>&& columns)
+        DataScatterMessage(std::shared_ptr<ContextToken>&& context_token, std::vector<RalColumn>&& columns)
         : BaseClass(std::move(context_token), MessageID),
           columns{std::move(columns)}
         { }
 
-        DataScatterMessage(std::unique_ptr<ContextToken>&& context_token, const std::vector<RalColumn>& columns)
+        DataScatterMessage(std::shared_ptr<ContextToken>&& context_token, const std::vector<RalColumn>& columns)
         : BaseClass(std::move(context_token), MessageID),
           columns{columns}
         { }

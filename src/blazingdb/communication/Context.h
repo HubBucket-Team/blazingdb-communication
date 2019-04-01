@@ -17,6 +17,11 @@ public:
                    const std::shared_ptr<Node>& masterNode,
                    const std::string& logicalPlan);
 
+  explicit Context(const std::shared_ptr<ContextToken>& token,
+                   const std::vector<std::shared_ptr<Node>>& taskNodes,
+                   const std::shared_ptr<Node>& masterNode,
+                   const std::string& logicalPlan);
+
   int getTotalNodes() const;
   std::vector<std::shared_ptr<Node>> getAllNodes() const;
   std::vector<std::shared_ptr<Node>> getWorkerNodes() const;

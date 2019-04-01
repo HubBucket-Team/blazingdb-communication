@@ -17,9 +17,9 @@ public:
   virtual bool SameValueAs(const ContextToken& rhs) const = 0;
   virtual int getIntToken() const = 0;
   virtual void serializeToJson(JsonSerializable::Writer& writer) const = 0;
-  
-  static std::unique_ptr<ContextToken> Make();
-  static std::unique_ptr<ContextToken> Make(int token);
+
+  static std::shared_ptr<ContextToken> Make();
+  static std::shared_ptr<ContextToken> Make(int token);
 };
 
 // Not a good design related to ContextToken.
