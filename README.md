@@ -1,16 +1,23 @@
 # blazingdb-communication
 blazingdb communication framework
 
-## deps
-
-```
-# apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev
-```
+# Dependencies
+- General dependencies: https://github.com/BlazingDB/blazingdb-toolchain
 
 ## Build
 
 ```
-cmake -DBLAZINGDB_DEPENDENCIES_INSTALL_DIR=/foo/blazing-dependencies/ -DCMAKE_INSTALL_PREFIX:PATH=/bar/install ..
+cmake -DCMAKE_BUILD_TYPE=Debug \
+      -DBLAZINGDB_DEPENDENCIES_INSTALL_DIR=/foo/blazingsql/dependencies/ \
+      -DCMAKE_INSTALL_PREFIX:PATH=/foo/blazingdb_communication_install_dir/ \
+      ..
+```
+
+**NOTE:**
+If you want to build the dependencies using the old C++ ABI, add this cmake argument:
+
+```bash
+-DCXX_OLD_ABI=ON
 ```
 
 ## Run tests
