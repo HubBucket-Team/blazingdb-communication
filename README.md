@@ -7,6 +7,12 @@ blazingdb communication framework
 # apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev
 ```
 
+## Build
+
+```
+cmake -DBLAZINGDB_DEPENDENCIES_INSTALL_DIR=/foo/blazing-dependencies/ -DCMAKE_INSTALL_PREFIX:PATH=/bar/install ..
+```
+
 ## Run tests
 
 ```
