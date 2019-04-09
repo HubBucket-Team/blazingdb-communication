@@ -15,5 +15,5 @@ TEST(NodeTest, NodeCreationFromCreatedBuffer) {
   const std::shared_ptr<blazingdb::communication::Node> resultNode =
       blazingdb::communication::Node::Make(*buffer);
 
-  EXPECT_TRUE(*resultNode == *node);
+  EXPECT_EQ(*resultNode, *node);
 }
