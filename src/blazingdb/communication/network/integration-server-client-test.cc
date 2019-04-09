@@ -2,8 +2,8 @@
 #include "ClientExceptions.h"
 #include "Server.h"
 
-#include <blazingdb/communication/messages/Message.h>
 #include <blazingdb/communication/ContextToken.h>
+#include <blazingdb/communication/messages/Message.h>
 
 #include <chrono>
 #include <memory>
@@ -14,17 +14,17 @@
 
 namespace {
 // Alias
-using Server= blazingdb::communication::network::Server;
+using Server = blazingdb::communication::network::Server;
 using Message = blazingdb::communication::messages::Message;
 using MessageToken = blazingdb::communication::messages::MessageToken;
 using ContextToken = blazingdb::communication::ContextToken;
 
 // Create endpoint
-const std::string endpoint {"sample"};
+const std::string endpoint{"sample"};
 
 // Create ContextToken
 const Server::ContextTokenValue context_token = 3465;
-}
+}  // namespace
 
 class MockAddress : public blazingdb::communication::Address {
 public:
@@ -33,13 +33,13 @@ public:
 
 class MockMessage : public blazingdb::communication::messages::Message {
 public:
-  MockMessage(
-      std::shared_ptr<ContextToken>&& contextToken,
-      std::unique_ptr<blazingdb::communication::messages::MessageToken> &&messageToken,
-      const std::size_t pages, const std::string &model)
-      : Message{std::forward<
-            std::unique_ptr<blazingdb::communication::messages::MessageToken>>(
-            messageToken),
+  MockMessage(std::shared_ptr<ContextToken> &&contextToken,
+              std::unique_ptr<blazingdb::communication::messages::MessageToken>
+                  &&messageToken,
+              const std::size_t pages, const std::string &model)
+      : Message{std::forward<std::unique_ptr<
+                    blazingdb::communication::messages::MessageToken>>(
+                    messageToken),
                 std::move(contextToken)},
         pages_{pages},
         model_{model} {}
@@ -55,10 +55,13 @@ public:
     EXPECT_EQ(expected_json, json_data);
     EXPECT_EQ(expected_binary, binary_data);
 
-    std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
-        blazingdb::communication::messages::MessageToken::Make(endpoint);
-    std::shared_ptr<ContextToken> contextToken = ContextToken::Make(context_token);
-    return std::shared_ptr<Message>(new MockMessage(std::move(contextToken), std::move(messageToken), 12, "qwerty"));
+    std::unique_ptr<blazingdb::communication::messages::MessageToken>
+        messageToken =
+            blazingdb::communication::messages::MessageToken::Make(endpoint);
+    std::shared_ptr<ContextToken> contextToken =
+        ContextToken::Make(context_token);
+    return std::shared_ptr<Message>(new MockMessage(
+        std::move(contextToken), std::move(messageToken), 12, "qwerty"));
   }
 
   std::size_t pages() const { return pages_; }
@@ -89,13 +92,15 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // Create message
-  std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
-      blazingdb::communication::messages::MessageToken::Make(endpoint);
+  std::unique_ptr<blazingdb::communication::messages::MessageToken>
+      messageToken =
+          blazingdb::communication::messages::MessageToken::Make(endpoint);
 
-  std::unique_ptr<blazingdb::communication::ContextToken> contextToken =
+  std::shared_ptr<blazingdb::communication::ContextToken> contextToken =
       blazingdb::communication::ContextToken::Make(context_token);
 
-  MockMessage mockMessage{std::move(contextToken), std::move(messageToken), 12, "qwerty"};
+  MockMessage mockMessage{std::move(contextToken), std::move(messageToken), 12,
+                          "qwerty"};
 
   const std::string json_data = "{\"pages\": 12, \"model\": \"qwerty\"}";
   const std::string binary_data = "";
@@ -115,7 +120,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::unique_ptr<blazingdb::communication::network::Client> client =
       blazingdb::communication::network::Client::Make();
   try {
-    std::unique_ptr<blazingdb::communication::network::Status> status =
+    std::shared_ptr<blazingdb::communication::network::Status> status =
         client->Send(node, endpoint, mockMessage);
     EXPECT_TRUE(status->IsOk());
   } catch (const blazingdb::communication::network::Client::SendError &e) {
