@@ -11,19 +11,23 @@ target_link_directories (UCX::UCX
   INTERFACE ${UCX_INSTALL_DIR}/lib INTERFACE /usr/local/cuda/lib64)
 target_link_libraries (UCX::UCX INTERFACE uct ucs ucm cudart cuda)
 
-add_library (blazingdb-uc
-  Context.cpp
-)
-target_link_libraries (blazingdb-uc UCX::UCX)
+blazingdb_artifact (
+  TARGET
+    blazingdb-uc
 
-set (BLAZINGBD_UC_PUBLIC_HEADERS
-  Agent.hpp
-  Buffer.hpp
-  Context.hpp
-  Manager.hpp
-  Transport.hpp
-)
+  SOURCES
+    Context.cpp
 
-blazingdb_gtest (blazingdb-uc
-  context-test.cpp
+  LIBRARIES
+    UCX::UCX
+
+  PUBLIC_HEADERS
+    Agent.hpp
+    Buffer.hpp
+    Context.hpp
+    Manager.hpp
+    Transport.hpp
+
+  TESTS
+    context-test.cpp
 )

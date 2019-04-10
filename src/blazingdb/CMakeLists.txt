@@ -8,17 +8,37 @@ if (GTEST_FOUND)
     COMMAND genhtml coverage.info -o ${CMAKE_BINARY_DIR}/coverage-html)
 endif ()
 
-function (blazingdb_gtest LIBRARY)
-  if (GTEST_FOUND)
-    set (TARGET ${LIBRARY}-gtest)
-    add_executable (${TARGET} EXCLUDE_FROM_ALL ${ARGN})
-    target_include_directories (${TARGET} PUBLIC src)
-    target_compile_options (${TARGET}
+function (blazingdb_artifact)
+  set (OPTIONS OPTIONAL)
+  set (ONE_VALUE_ARGS TARGET)
+  set (MULTI_VALUE_ARGS SOURCES INCLUDES LIBRARIES PUBLIC_HEADERS TESTS)
+  cmake_parse_arguments (ARG "${OPTIONS}" "${ONE_VALUE_ARGS}"
+    "${MULTI_VALUE_ARGS}" ${ARGN})
+  if (ARG_UNPARSED_ARGUMENTS)
+    message (SEND_ERROR
+      "Error: unrecognized arguments: ${ARG_UNPARSED_ARGUMENTS}")
+  endif ()
+
+  add_library (${ARG_TARGET} ${ARG_SOURCES})
+
+  if (ARG_LIBRARIES)
+    target_link_libraries (${ARG_TARGET} ${ARG_LIBRARIES})
+  endif ()
+
+  if (ARG_INCLUDES)
+    target_include_directories (blazingdb-communication ${ARG_INCLUDES})
+  endif ()
+
+  if (GTEST_FOUND AND ARG_TESTS)
+    add_executable (${ARG_TARGET}-gtest EXCLUDE_FROM_ALL ${ARG_TESTS})
+    target_include_directories (${ARG_TARGET} PUBLIC src)
+    target_compile_options (${ARG_TARGET}
       PUBLIC -g -O0 -fprofile-arcs -ftest-coverage -fPIC)
-    target_link_libraries (${TARGET} ${LIBRARY}
+    target_link_libraries (${ARG_TARGET}-gtest ${ARG_TARGET}
       GTest::GTest GTest::Main gmock gmock_main gcov --coverage)
-    add_custom_target (${TARGET}-run COMMAND $<TARGET_FILE:${TARGET}>)
-    add_dependencies (coverage ${TARGET}-run)
+    add_custom_target (${ARG_TARGET}-gtest-run
+      COMMAND $<TARGET_FILE:${ARG_TARGET}-gtest>)
+    add_dependencies (coverage ${ARG_TARGET}-gtest-run)
   endif ()
 endfunction ()
 
