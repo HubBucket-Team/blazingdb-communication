@@ -1,37 +1,20 @@
 #ifndef BLAZINGDB_UC_INTERNAL_MANAGED_CONTEXT_HPP_
 #define BLAZINGDB_UC_INTERNAL_MANAGED_CONTEXT_HPP_
 
-#include <cassert>
-
 #include <blazingdb/uc/Context.hpp>
+
+#include <cassert>
 
 #include <ucs/async/async_fwd.h>
 #include <uct/api/uct.h>
 
-#include "ManagedAgent.hpp"
 #include "Resource.hpp"
-#include "macros.hpp"
+#include "agents/AddressableAgent.hpp"
+#include "agents/ManagedAgent.hpp"
 
 namespace blazingdb {
 namespace uc {
 namespace internal {
-
-class AddressableAgent : public Agent {
-public:
-  explicit AddressableAgent(const uct_md_attr_t &md_attr,
-                            const Manager &      manager)
-      : md_attr_{md_attr}, manager_{manager} {}
-
-  std::unique_ptr<Buffer>
-  Register(const void *const data, const std::size_t size) const
-      noexcept final {
-    return std::make_unique<RemoteBuffer>(data, size, md_attr_, manager_);
-  }
-
-private:
-  const uct_md_attr_t &md_attr_;
-  const Manager &      manager_;
-};
 
 class UC_NO_EXPORT ManagedContext : public Context {
 public:

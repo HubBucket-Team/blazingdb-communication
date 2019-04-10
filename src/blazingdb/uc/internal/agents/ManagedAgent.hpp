@@ -1,12 +1,12 @@
-#ifndef BLAZINGDB_UC_INTERNAL_MANAGED_AGENT_HPP_
-#define BLAZINGDB_UC_INTERNAL_MANAGED_AGENT_HPP_
+#ifndef BLAZINGDB_UC_INTERNAL_AGENTS_MANAGED_AGENT_HPP_
+#define BLAZINGDB_UC_INTERNAL_AGENTS_MANAGED_AGENT_HPP_
 
 #include <blazingdb/uc/Agent.hpp>
 
 #include <uct/api/uct.h>
 
-#include "buffers/AllocatedBuffer.hpp"
-#include "macros.hpp"
+#include "../buffers/AllocatedBuffer.hpp"
+#include "../macros.hpp"
 
 namespace blazingdb {
 namespace uc {
