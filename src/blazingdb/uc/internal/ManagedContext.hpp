@@ -12,8 +12,6 @@
 #include "Resource.hpp"
 #include "macros.hpp"
 
-#include "buffers.hpp"
-
 namespace blazingdb {
 namespace uc {
 namespace internal {

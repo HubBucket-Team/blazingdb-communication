@@ -70,4 +70,8 @@ TEST(API, Flow) {
 
   auto ownBuffer = own->Register(ownData, length);
   auto peerBuffer = own->Register(peerData, length);
+
+  auto transport = ownBuffer->Link(peerBuffer.get());
+
+  transport->Get();
 }

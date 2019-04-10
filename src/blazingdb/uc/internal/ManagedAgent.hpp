@@ -5,7 +5,7 @@
 
 #include <uct/api/uct.h>
 
-#include "buffers.hpp"
+#include "buffers/AllocatedBuffer.hpp"
 #include "macros.hpp"
 
 namespace blazingdb {
@@ -23,6 +23,8 @@ public:
     CHECK_UCS(uct_ep_create_connected(
         const_cast<uct_iface_h>(iface), &device_addr, &iface_addr, &ep_));
   }
+
+  ~ManagedAgent() final { uct_ep_destroy(ep_); }
 
   std::unique_ptr<Buffer>
   Register(const void* const data, const std::size_t size) const
