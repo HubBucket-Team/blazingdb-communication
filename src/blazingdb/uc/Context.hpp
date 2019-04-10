@@ -22,8 +22,8 @@ public:
   class Capability {
   public:
     const std::string memoryModel;
-    const std::string transportLayer;  // TODO: collection
-    const std::string deviceName;      // TODO: collection
+    const std::string transportLayer;  // should be a collection
+    const std::string deviceName;      // should be a collection
   };
 
   static std::vector<Capability> LookupCapabilities() noexcept;

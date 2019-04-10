@@ -26,9 +26,6 @@
 #define UC_NO_EXPORT __attribute__((visibility("hidden")))
 
 #define UC_CONCRETE(Kind)                                                      \
-public:                                                                        \
-  inline explicit Kind() = default;                                            \
-                                                                               \
 private:                                                                       \
   Kind(const Kind &) = delete;                                                 \
   Kind(const Kind &&) = delete;                                                \
@@ -36,5 +33,14 @@ private:                                                                       \
   void operator=(const Kind &&) = delete
 
 #define UC_STATIC_LOCAL(Kind, name) static const Kind &name = *new Kind
+
+#define UC_DTO(Kind)                                                           \
+  UC_CONCRETE(Kind);                                                           \
+                                                                               \
+public:                                                                        \
+  inline explicit Kind() = default;                                            \
+                                                                               \
+public:                                                                        \
+  inline ~Kind() = default
 
 #endif

@@ -24,7 +24,7 @@ public:
     return static_cast<const char *>(dev_name);
   }
 
-  UC_CONCRETE(CudaCopyResource);
+  UC_DTO(CudaCopyResource);
 };
 
 class UC_NO_EXPORT CudaIPCResource : public Resource {
@@ -44,7 +44,7 @@ public:
     return static_cast<const char *>(dev_name);
   }
 
-  UC_CONCRETE(CudaIPCResource);
+  UC_DTO(CudaIPCResource);
 };
 
 }  // namespace internal
