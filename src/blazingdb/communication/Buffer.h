@@ -11,8 +11,8 @@ public:
   explicit Buffer(const char *data, const std::size_t size)
       : data_{data}, size_{size} {}
 
-  const char *data() const noexcept { return data_; }
-  std::size_t size() const noexcept { return size_; }
+  virtual const char *data() const noexcept { return data_; }
+  virtual std::size_t size() const noexcept { return size_; }
 
 private:
   const char *data_;
