@@ -1,40 +1,44 @@
 #=============================================================================
-# Copyright 2018 BlazingDB, Inc.
-#     Copyright 2018 Percy Camilo Triveño Aucahuasi <percy@blazingdb.com>
+# Copyright 2019 BlazingDB, Inc.
+#     Copyright 2019 Percy Camilo Triveño Aucahuasi <percy@blazingdb.com>
 #=============================================================================
 
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 project(blazingdb-communication C CXX)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
+message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
 set(CMAKE_CUDA_STANDARD 14)
-set(CMAKE_CUDA_STANDARD_REQURIED ON)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 message(STATUS "Using C++ standard: c++${CMAKE_CXX_STANDARD}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-    option(CMAKE_CXX11_ABI "Enable the GLIBCXX11 ABI" ON)
-    if(CMAKE_CXX11_ABI)
-        message(STATUS "Enabling the GLIBCXX11 ABI")
-    else()
+    option(CXX_OLD_ABI "Disable the GLIBCXX11 ABI" OFF)
+    if(CXX_OLD_ABI)
         message(STATUS "Disabling the GLIBCXX11 ABI")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
         set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -D_GLIBCXX_USE_CXX11_ABI=0")
-    endif(CMAKE_CXX11_ABI)
+    else()
+        message(STATUS "Enabling the GLIBCXX11 ABI")
+    endif(CXX_OLD_ABI)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
-message(STATUS "CMAKE_MODULE_PATH:" "${CMAKE_MODULE_PATH}")
+# NOTE Import cmake modules from blazingdb-dependencies (Mandatory: First step!)
+include(ImportCMakeModules)
+include(ConfigureBlazingDBHostCompiler)
 
 # Include CMake modules
 include(FeatureSummary)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(CTest)
+
+# NOTE Configure dependencies (always include this one first)
+include(ConfigureBlazingDBDependencies)
 
 # NOTE Do not change the inclusion order
 # Configure dependencies
@@ -62,10 +66,6 @@ if(BUILD_TESTING)
 endif()
 
 add_subdirectory(src)
-
-#target_link_libraries(blazingdb-communication
-#    ${X_STATIC_LIB}
-#)
 
 # Print the project summary
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
