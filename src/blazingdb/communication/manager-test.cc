@@ -27,7 +27,7 @@ TEST(TestManager, ConnectionAndGenerateContext) {
   blazingdb::communication::messages::NodeDataMessage nodeDataMessage(node);
 
   try {
-    const std::unique_ptr<blazingdb::communication::network::Status> status =
+    const std::shared_ptr<blazingdb::communication::network::Status> status =
         client->SendNodeData("localhost", 9000, nodeDataMessage);
     EXPECT_TRUE(status->IsOk());
   } catch (const blazingdb::communication::network::Client::SendError &error) {

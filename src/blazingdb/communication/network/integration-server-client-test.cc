@@ -92,7 +92,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::unique_ptr<blazingdb::communication::messages::MessageToken> messageToken =
       blazingdb::communication::messages::MessageToken::Make(endpoint);
 
-  std::unique_ptr<blazingdb::communication::ContextToken> contextToken =
+  std::shared_ptr<blazingdb::communication::ContextToken> contextToken =
       blazingdb::communication::ContextToken::Make(context_token);
 
   MockMessage mockMessage{std::move(contextToken), std::move(messageToken), 12, "qwerty"};
@@ -112,10 +112,10 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   blazingdb::communication::Node node{std::move(address)};
 
   // Send message
-  std::unique_ptr<blazingdb::communication::network::Client> client =
+  std::shared_ptr<blazingdb::communication::network::Client> client =
       blazingdb::communication::network::Client::Make();
   try {
-    std::unique_ptr<blazingdb::communication::network::Status> status =
+    std::shared_ptr<blazingdb::communication::network::Status> status =
         client->Send(node, endpoint, mockMessage);
     EXPECT_TRUE(status->IsOk());
   } catch (const blazingdb::communication::network::Client::SendError &e) {
