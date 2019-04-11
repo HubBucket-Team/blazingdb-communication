@@ -40,14 +40,6 @@ namespace messages {
 
                 writer.Key("dtype_info");
                 writer.Uint(column->dtype_info.time_unit);
-
-                writer.Key("col_name");
-                if (column->col_name == nullptr) {
-                    writer.String("");
-                }
-                else {
-                    writer.String(column->col_name, std::strlen(column->col_name));
-                }
             }
             writer.EndObject();
         }
@@ -100,16 +92,6 @@ namespace messages {
 
             column.dtype_info = (typename GpuFunctions::DTypeInfo) { (typename GpuFunctions::TimeUnit)object["dtype_info"].GetUint() };
 
-            const auto& col_name = object["col_name"];
-            if (col_name.GetStringLength() == 0) {
-                column.col_name = nullptr;
-            }
-            else {
-                column.col_name = new char[col_name.GetStringLength() + 1];
-                std::strncpy(column.col_name, col_name.GetString(), col_name.GetStringLength());
-                column.col_name[col_name.GetStringLength()] = '\0';
-            }
-
             return column;
         }
 
@@ -149,9 +131,6 @@ namespace messages {
             ral_column.set_column_token(column_token);
             ral_column.get_gdf_column()->null_count = cudf_column.null_count;
             ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
-            if (cudf_column.col_name != nullptr) {
-                std::strcpy(ral_column.get_gdf_column()->col_name, cudf_column.col_name);
-            }
 
             return ral_column;
         }
