@@ -6,7 +6,8 @@ if (NOT DEFINED UCX_INSTALL_DIR)
 endif ()
 
 add_library (UCX::UCX INTERFACE IMPORTED)
-target_include_directories (UCX::UCX INTERFACE ${UCX_INSTALL_DIR}/include)
+target_include_directories (UCX::UCX
+  INTERFACE ${UCX_INSTALL_DIR}/include INTERFACE /usr/local/cuda/include)
 target_link_directories (UCX::UCX
   INTERFACE ${UCX_INSTALL_DIR}/lib INTERFACE /usr/local/cuda/lib64)
 target_link_libraries (UCX::UCX INTERFACE uct ucs ucm cudart cuda)
@@ -17,6 +18,7 @@ blazingdb_artifact (
 
   SOURCES
     Context.cpp
+    internal/buffers/RemoteBuffer.cpp
 
   LIBRARIES
     UCX::UCX
@@ -29,5 +31,6 @@ blazingdb_artifact (
     Transport.hpp
 
   TESTS
+    api-test.cpp
     context-test.cpp
 )
