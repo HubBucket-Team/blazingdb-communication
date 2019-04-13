@@ -26,8 +26,12 @@ public:
     assert(static_cast<void *>(mem()) != UCT_MEM_HANDLE_NULL);
   }
 
+  ~AllocatedBuffer() final { CHECK_UCS(uct_md_mem_dereg(md_, mem())); }
+
 private:
   const uct_md_h &md_;
+
+  UC_CONCRETE(AllocatedBuffer);
 };
 
 }  // namespace internal

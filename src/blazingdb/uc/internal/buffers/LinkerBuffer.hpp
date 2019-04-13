@@ -20,7 +20,8 @@ public:
   Link(Buffer *buffer) const final {
     auto remoteBuffer = dynamic_cast<RemoteBuffer *>(buffer);
     if (nullptr == remoteBuffer) {
-      throw std::runtime_error("Bad buffer");
+      throw std::runtime_error(
+          "Bad buffer. Use a buffer created by a peer agent");
     }
     remoteBuffer->Fetch(pointer(), mem());
     return std::make_unique<ZCopyTransport>(*this, *remoteBuffer, ep_);
