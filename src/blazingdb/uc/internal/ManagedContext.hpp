@@ -18,7 +18,7 @@ namespace internal {
 
 class UC_NO_EXPORT ManagedContext : public Context {
 public:
-  explicit ManagedContext(const Resource &resource, const Manager &manager)
+  explicit ManagedContext(const Resource &resource, const Trader &trader)
       : resource_{resource},
         md_config_{nullptr},
         md_{UCT_MEM_HANDLE_NULL},
@@ -29,7 +29,7 @@ public:
         iface_{nullptr},
         device_addr_{nullptr},
         iface_addr_{nullptr},
-        manager_{manager} {
+        trader_{trader} {
     CHECK_UCS(
         uct_md_config_read(resource.md_name(), nullptr, nullptr, &md_config_));
     CHECK_UCS(uct_md_open(resource.md_name(), md_config_, &md_));
@@ -80,7 +80,7 @@ public:
 
   std::unique_ptr<Agent>
   PeerAgent() const final {
-    return std::make_unique<AddressableAgent>(md_attr_, manager_);
+    return std::make_unique<AddressableAgent>(md_attr_, trader_);
   }
 
   ~ManagedContext() final {
@@ -114,7 +114,7 @@ private:
   uct_device_addr_t *device_addr_;
   uct_iface_addr_t * iface_addr_;
 
-  const Manager &manager_;
+  const Trader &trader_;
 
   UC_CONCRETE(ManagedContext);
 };
