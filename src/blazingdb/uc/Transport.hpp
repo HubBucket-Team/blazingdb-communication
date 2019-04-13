@@ -11,6 +11,7 @@ namespace uc {
 class Transport {
 public:
   virtual std::future<void> Get() = 0;
+  //virtual std::future<void> Put() = 0;
 
   UC_INTERFACE(Transport);
 };

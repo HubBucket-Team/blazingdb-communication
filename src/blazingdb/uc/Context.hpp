@@ -6,17 +6,23 @@
 #include <vector>
 
 #include <blazingdb/uc/Agent.hpp>
-#include <blazingdb/uc/Manager.hpp>
+#include <blazingdb/uc/Trader.hpp>
 
 namespace blazingdb {
 namespace uc {
 
 class Context {
 public:
-  virtual std::unique_ptr<Agent> OwnAgent() const = 0;   // local agent
-  virtual std::unique_ptr<Agent> PeerAgent() const = 0;  // remote agent
+  virtual std::unique_ptr<Agent>
+  OwnAgent() const = 0;  // local agent
+  virtual std::unique_ptr<Agent>
+  PeerAgent() const = 0;  // remote agent
 
-  static std::unique_ptr<Context> CudaIPC(const Manager &manager);
+  static std::unique_ptr<Context>
+  CudaIPC(const Trader &trader);
+
+  static std::unique_ptr<Context>
+  CudaCopy(const Trader &trader);
 
   // Note: list machine info about UCX valid interfaces
   class Capability {
@@ -26,7 +32,8 @@ public:
     const std::string deviceName;      // should be a collection
   };
 
-  static std::vector<Capability> LookupCapabilities() noexcept;
+  static std::vector<Capability>
+  LookupCapabilities() noexcept;
 
   UC_INTERFACE(Context);
 };
