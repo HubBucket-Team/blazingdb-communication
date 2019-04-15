@@ -31,6 +31,8 @@ blazingdb_artifact (
     Transport.hpp
 
   TESTS
-    api-test.cpp
+    api-common-test.cpp
+    api-processes-test.cpp
+    api-threads-test.cpp
     context-test.cpp
 )
