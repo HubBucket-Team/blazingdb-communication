@@ -2,10 +2,13 @@
 #define BLAZINGDB_UC_INTERNAL_MACROS_HPP_
 
 #include <iostream>
+#include <sstream>
 
-#define DOMAIN_ABORT(_message)                                                 \
+#define UC_ABORT(_message)                                                     \
   do {                                                                         \
-    std::cerr << __FILE__ << ": " << __LINE__ << std::endl;                    \
+    std::stringstream ss{std::ios_base::out | std::ios_base::in};              \
+    ss << __FILE__ << ": " << __LINE__ << std::endl;                           \
+    std::cerr << ss.str();                                                     \
     std::exit(-1);                                                             \
   } while (0)
 
@@ -13,7 +16,7 @@
   do {                                                                         \
     ucs_status_t _status = (_expr);                                            \
     if (UCS_OK != (_status)) {                                                 \
-      DOMAIN_ABORT(ucs_status_string(_status));                                \
+      UC_ABORT(ucs_status_string(_status));                                    \
     }                                                                          \
   } while (0)
 
@@ -23,11 +26,14 @@
 #undef UCT_INVALID_RKEY
 #define UCT_INVALID_RKEY static_cast<std::uintptr_t>(-1)
 
+#undef UCS_BIT
+#define UCS_BIT(i) (1UL << (i))
+
 #define UC_NO_EXPORT __attribute__((visibility("hidden")))
 
 #define UC_CONCRETE(Kind)                                                      \
 private:                                                                       \
-  Kind(const Kind &) = delete;                                                 \
+  Kind(const Kind &)  = delete;                                                \
   Kind(const Kind &&) = delete;                                                \
   void operator=(const Kind &) = delete;                                       \
   void operator=(const Kind &&) = delete
@@ -39,8 +45,6 @@ private:                                                                       \
                                                                                \
 public:                                                                        \
   inline explicit Kind() = default;                                            \
-                                                                               \
-public:                                                                        \
-  inline ~Kind() = default
+  inline ~Kind()         = default
 
 #endif

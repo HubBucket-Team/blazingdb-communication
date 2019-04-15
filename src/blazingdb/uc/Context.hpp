@@ -19,10 +19,10 @@ public:
   PeerAgent() const = 0;  // remote agent
 
   static std::unique_ptr<Context>
-  CudaIPC(const Trader &trader);
+  IPC(const Trader &trader);
 
   static std::unique_ptr<Context>
-  CudaCopy(const Trader &trader);
+  Copy(const Trader &trader);
 
   // Note: list machine info about UCX valid interfaces
   class Capability {

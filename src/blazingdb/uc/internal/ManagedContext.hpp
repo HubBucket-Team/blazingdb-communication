@@ -80,7 +80,7 @@ public:
 
   std::unique_ptr<Agent>
   PeerAgent() const final {
-    return std::make_unique<AddressableAgent>(md_attr_, trader_);
+    return std::make_unique<AddressableAgent>(md_, md_attr_, trader_);
   }
 
   ~ManagedContext() final {

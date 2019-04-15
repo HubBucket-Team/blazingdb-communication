@@ -13,16 +13,19 @@ namespace internal {
 
 class AddressableAgent : public Agent {
 public:
-  explicit AddressableAgent(const uct_md_attr_t &md_attr, const Trader &trader)
-      : md_attr_{md_attr}, trader_{trader} {}
+  explicit AddressableAgent(const uct_md_h &     md,
+                            const uct_md_attr_t &md_attr,
+                            const Trader &       trader)
+      : md_{md}, md_attr_{md_attr}, trader_{trader} {}
 
   std::unique_ptr<Buffer>
   Register(const void *const data, const std::size_t size) const
       noexcept final {
-    return std::make_unique<RemoteBuffer>(data, size, md_attr_, trader_);
+    return std::make_unique<RemoteBuffer>(data, size, md_, md_attr_, trader_);
   }
 
 private:
+  const uct_md_h &     md_;
   const uct_md_attr_t &md_attr_;
   const Trader &       trader_;
 };

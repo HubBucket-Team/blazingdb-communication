@@ -23,7 +23,7 @@ public:
 
   std::future<void>
   Get() final {
-    uct_iov_t iov{const_cast<void *>(sendingBuffer_.pointer()),
+    uct_iov_t iov{reinterpret_cast<void *>(receivingBuffer_.data()),
                   sendingBuffer_.size(),
                   sendingBuffer_.mem(),
                   0,
@@ -32,7 +32,7 @@ public:
     uct_ep_get_zcopy(ep_,
                      &iov,
                      1,
-                     sendingBuffer_.address(),
+                     receivingBuffer_.address(),
                      receivingBuffer_.rkey(),
                      &completion_);
 

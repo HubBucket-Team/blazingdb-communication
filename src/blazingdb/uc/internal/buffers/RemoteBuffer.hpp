@@ -4,9 +4,9 @@
 #include <blazingdb/uc/Buffer.hpp>
 #include <blazingdb/uc/Trader.hpp>
 
-#include "../macros.hpp"
+#include <uct/api/uct.h>
 
-#include <uct/api/uct_def.h>
+#include "../macros.hpp"
 
 namespace blazingdb {
 namespace uc {
@@ -16,6 +16,7 @@ class UC_NO_EXPORT RemoteBuffer : public Buffer {
 public:
   explicit RemoteBuffer(const void *         data,
                         std::size_t          size,
+                        const uct_md_h &     md,
                         const uct_md_attr_t &md_attr,
                         const Trader &       trader);
 
@@ -31,7 +32,7 @@ public:
 
   const uct_rkey_t &
   rkey() const noexcept {
-    return rkey_;
+    return key_bundle_.rkey;  // rkey_;
   }
 
   const std::uintptr_t &
@@ -39,12 +40,21 @@ public:
     return address_;
   }
 
+  std::uintptr_t
+  data() const noexcept {
+    return reinterpret_cast<std::uintptr_t>(data_);
+  }
+
 private:
   const void *const    data_;
   const std::size_t    size_;
+  const uct_md_h &     md_;
   const uct_md_attr_t &md_attr_;
   const Trader &       trader_;
 
+  uct_rkey_bundle_t key_bundle_;
+
+  uct_mem_h      mem_;
   uct_rkey_t     rkey_;
   std::uintptr_t address_;
 

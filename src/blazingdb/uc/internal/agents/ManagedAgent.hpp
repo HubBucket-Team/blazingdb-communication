@@ -29,7 +29,10 @@ public:
   std::unique_ptr<Buffer>
   Register(const void* const data, const std::size_t size) const
       noexcept final {
-    return std::make_unique<AllocatedBuffer>(md_, ep_, data, size);
+    //std::cout << ">>>     "
+              //<< (md_attr_.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))
+              //<< std::endl;
+    return std::make_unique<AllocatedBuffer>(md_, md_attr_, ep_, data, size);
   }
 
 private:
