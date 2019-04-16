@@ -6,7 +6,7 @@
 
 namespace gsl {
 template <class T, class = std::enable_if_t<std::is_pointer<T>::value>>
-using owner = T;
+using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
 }  // namespace gsl
 
 #define UC_ABORT(_message)                                                     \
