@@ -4,6 +4,11 @@
 #include <iostream>
 #include <sstream>
 
+namespace gsl {
+template <class T, class = std::enable_if_t<std::is_pointer<T>::value>>
+using owner = T;
+}  // namespace gsl
+
 #define UC_ABORT(_message)                                                     \
   do {                                                                         \
     std::stringstream ss{std::ios_base::out | std::ios_base::in};              \

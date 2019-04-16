@@ -28,7 +28,7 @@ public:
                           md,
                           nullptr},
         key_bundle_{reinterpret_cast<uct_rkey_t>(nullptr), nullptr, nullptr} {
-    if (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA)) {
+    if (0U != (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))) {
       CHECK_UCS(uct_md_mem_reg(md_,
                                const_cast<void *const>(address),
                                length,
@@ -37,7 +37,7 @@ public:
       assert(static_cast<void *>(mem()) != UCT_MEM_HANDLE_NULL);
     }
 
-    auto rkey_buffer = new std::uint8_t[md_attr.rkey_packed_size];
+    rkey_buffer = new std::uint8_t[md_attr.rkey_packed_size];
     assert(nullptr != rkey_buffer);
     CHECK_UCS(uct_md_mkey_pack(md_, mem(), rkey_buffer));
     CHECK_UCS(uct_rkey_unpack(rkey_buffer, &key_bundle_));
@@ -51,7 +51,8 @@ private:
   const uct_md_attr_t &  md_attr_;
   uct_allocated_memory_t allocated_memory_;
 
-  uct_rkey_bundle_t key_bundle_;
+  uct_rkey_bundle_t          key_bundle_;
+  gsl::owner<std::uint8_t *> rkey_buffer;
 
   UC_CONCRETE(AllocatedBuffer);
 };

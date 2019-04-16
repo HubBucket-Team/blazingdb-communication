@@ -112,13 +112,14 @@ RemoteBuffer::RemoteBuffer(const void *const    data,
       rkey_{reinterpret_cast<uct_rkey_t>(
           new std::uint8_t[md_attr.rkey_packed_size])},
       address_{reinterpret_cast<std::uintptr_t>(data)},
+      key_bundle_{reinterpret_cast<uct_rkey_t>(nullptr), nullptr, nullptr},
       allocated_memory_{const_cast<void *const>(data),
                         size,
                         UCT_ALLOC_METHOD_MD,
                         UCT_MD_MEM_TYPE_CUDA,
                         md,
                         nullptr} {
-  if (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA)) {
+  if (0U != (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))) {
     CHECK_UCS(uct_md_mem_reg(md_,
                              const_cast<void *const>(data),
                              size,
