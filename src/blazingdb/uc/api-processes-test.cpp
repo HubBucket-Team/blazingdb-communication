@@ -32,7 +32,8 @@ Exec(const std::string &  name,
   void *     data       = CreateData(length, seed, offset);
   int        pipedes[2] = {own_pipedes[0], peer_pipedes[1]};
   StubTrader trader{pipedes};
-  Client(name, trader, data);
+  auto       context = Context::IPC(trader);
+  Client(name, *context, data);
 }
 
 TEST(ApiTest, Processes) {

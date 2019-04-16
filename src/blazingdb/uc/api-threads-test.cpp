@@ -9,13 +9,13 @@ public:
 
   void
   OnRecording(Record *record) const noexcept {
-     auto ownSerialized = record->GetOwn();
-     promise_.set_value(ownSerialized.get());
+    auto ownSerialized = record->GetOwn();
+    promise_.set_value(ownSerialized.get());
 
-     future_.wait();
-     auto peerSerialized = future_.get();
+    future_.wait();
+    auto peerSerialized = future_.get();
 
-     record->SetPeer(peerSerialized->Data());
+    record->SetPeer(peerSerialized->Data());
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
@@ -37,11 +37,14 @@ TEST(ApiTest, Threads) {
   StubTrader ownTrader{ownPromise, peerFuture};
   StubTrader peerTrader{peerPromise, ownFuture};
 
+  auto ownContext  = Context::Copy(ownTrader);
+  auto peerContext = Context::Copy(peerTrader);
+
   auto ownData  = CreateData(length, ownSeed, ownOffset);
   auto peerData = CreateData(length, peerSeed, peerOffset);
 
-  std::thread ownThread{Client, "own", std::ref(ownTrader), ownData};
-  std::thread peerThread{Client, "peer", std::ref(peerTrader), peerData};
+  std::thread ownThread{Client, "own", std::ref(*ownContext), ownData};
+  std::thread peerThread{Client, "peer", std::ref(*peerContext), peerData};
 
   ownThread.join();
   peerThread.join();

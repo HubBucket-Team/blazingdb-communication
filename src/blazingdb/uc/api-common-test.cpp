@@ -57,13 +57,13 @@ CreateData(const std::size_t    size,
 }
 
 void
-Client(const std::string &name, const Trader &trader, const void *const data) {
+Client(const std::string &name,
+       const Context &    context,
+       const void *const  data) {
   void *twinData = CreateData(length, twinSeed, twinOffset);
 
-  auto context = Context::Copy(trader);
-
-  auto own  = context->OwnAgent();
-  auto peer = context->PeerAgent();
+  auto own  = context.OwnAgent();
+  auto peer = context.PeerAgent();
 
   auto ownBuffer  = own->Register(data, length);
   auto peerBuffer = peer->Register(twinData, length);
