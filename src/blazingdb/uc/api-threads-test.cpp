@@ -1,7 +1,5 @@
 #include "api-common-test.hpp"
 
-using namespace blazingdb::uc;
-
 namespace {
 class StubTrader : public Trader {
 public:
