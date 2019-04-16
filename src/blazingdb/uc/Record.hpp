@@ -9,6 +9,7 @@
 namespace blazingdb {
 namespace uc {
 
+/// \brief Object to get buffer serialized address and set its remote pair
 class Record {
 public:
   class Serialized {
@@ -22,14 +23,19 @@ public:
     UC_INTERFACE(Serialized);
   };
 
-  // You can use this as a relationship between an own record and a peer record
+  /// \brief Machine unique record identifier
+  ///
+  /// You can use this as a relationship between an own record and a peer record
   virtual std::uint64_t
   Identity() const noexcept = 0;
 
-  // Methods
+  /// \brief Current serialized buffer address
+  /// Send this to other record for connection between both buffers
   virtual std::unique_ptr<const Serialized>
   GetOwn() const noexcept = 0;
 
+  /// \brief Set remote buffer address
+  /// \param[in] bytes a array with serialized address bytes
   virtual void
   SetPeer(const void *bytes) noexcept = 0;
 
