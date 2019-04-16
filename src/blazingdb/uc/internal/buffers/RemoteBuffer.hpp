@@ -32,7 +32,7 @@ public:
 
   const uct_rkey_t &
   rkey() const noexcept {
-    return key_bundle_.rkey;  // rkey_;
+    return key_bundle_.rkey;
   }
 
   const std::uintptr_t &
@@ -52,11 +52,12 @@ private:
   const uct_md_attr_t &md_attr_;
   const Trader &       trader_;
 
-  uct_rkey_bundle_t key_bundle_;
-
   uct_mem_h      mem_;
   uct_rkey_t     rkey_;
   std::uintptr_t address_;
+
+  uct_rkey_bundle_t      key_bundle_;
+  uct_allocated_memory_t allocated_memory_;
 
   UC_CONCRETE(RemoteBuffer);
 };

@@ -1,5 +1,6 @@
 #include "api-common-test.hpp"
 
+namespace {
 class StubTrader : public Trader {
 public:
   inline StubTrader(const int (&pipedes)[2]) : pipedes_{pipedes} {}
@@ -19,6 +20,7 @@ public:
 private:
   const int (&pipedes_)[2];
 };
+}  // namespace
 
 static void
 Exec(const std::string &  name,

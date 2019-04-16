@@ -2,6 +2,7 @@
 
 using namespace blazingdb::uc;
 
+namespace {
 class StubTrader : public Trader {
 public:
   inline StubTrader(std::promise<const Record::Serialized *> &promise,
@@ -10,13 +11,13 @@ public:
 
   void
   OnRecording(Record *record) const noexcept {
-    auto ownSerialized = record->GetOwn();
-    promise_.set_value(ownSerialized.get());
+     auto ownSerialized = record->GetOwn();
+     promise_.set_value(ownSerialized.get());
 
-    future_.wait();
-    auto peerSerialized = future_.get();
+     future_.wait();
+     auto peerSerialized = future_.get();
 
-    record->SetPeer(peerSerialized->Data());
+     record->SetPeer(peerSerialized->Data());
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
@@ -25,6 +26,7 @@ private:
   std::promise<const Record::Serialized *> &promise_;
   std::future<const Record::Serialized *> & future_;
 };
+}  // namespace
 
 TEST(ApiTest, Threads) {
   cuInit(0);

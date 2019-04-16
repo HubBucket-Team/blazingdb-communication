@@ -19,9 +19,7 @@ public:
                              const std::size_t offset,
                              const void *const pointer)
         : size_{offset + sizeof(pointer)}, data_{new std::uint8_t[size_]} {
-      // if (UCT_MEM_HANDLE_NULL != mem) {
       std::memcpy(data_, reinterpret_cast<const void *>(rkey), offset);
-      //}
       std::memcpy(data_ + offset, &pointer, sizeof(pointer));
     }
 
@@ -113,7 +111,13 @@ RemoteBuffer::RemoteBuffer(const void *const    data,
       mem_{UCT_MEM_HANDLE_NULL},
       rkey_{reinterpret_cast<uct_rkey_t>(
           new std::uint8_t[md_attr.rkey_packed_size])},
-      address_{reinterpret_cast<std::uintptr_t>(data)} {
+      address_{reinterpret_cast<std::uintptr_t>(data)},
+      allocated_memory_{const_cast<void *const>(data),
+                        size,
+                        UCT_ALLOC_METHOD_MD,
+                        UCT_MD_MEM_TYPE_CUDA,
+                        md,
+                        nullptr} {
   if (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA)) {
     CHECK_UCS(uct_md_mem_reg(md_,
                              const_cast<void *const>(data),
@@ -122,12 +126,8 @@ RemoteBuffer::RemoteBuffer(const void *const    data,
                              &mem_));
     assert(static_cast<void *>(mem_) != UCT_MEM_HANDLE_NULL);
   }
-  // auto rkey_buffer = new std::uint8_t[md_attr.rkey_packed_size];
-  // assert(nullptr != rkey_buffer);
   auto rkey_buffer = reinterpret_cast<void *>(rkey_);
   CHECK_UCS(uct_md_mkey_pack(md_, mem_, rkey_buffer));
-  // CHECK_UCS(uct_rkey_unpack(rkey_buffer, &key_bundle_));
-  // delete[] rkey_buffer;
 }
 
 RemoteBuffer::~RemoteBuffer() {

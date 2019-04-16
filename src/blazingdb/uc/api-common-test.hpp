@@ -18,7 +18,7 @@ Print(const std::string &name, const void *data, const std::size_t size) {
 
   std::stringstream ss;
 
-  ss << ">>> [" << std::setw(4) << name << "]";
+  ss << ">>> [" << std::setw(9) << name << "]";
   for (std::size_t i = 0; i < size; i++) {
     ss << ' ' << std::setfill('0') << std::setw(3)
        << static_cast<std::uint32_t>(host[i]);
