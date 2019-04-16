@@ -24,7 +24,8 @@ public:
           "Bad buffer. Use a buffer created by a peer agent");
     }
     remoteBuffer->Fetch(pointer(), mem());
-    return std::make_unique<ZCopyTransport>(*this, *remoteBuffer, ep_);
+    return std::make_unique<ZCopyTransport>(
+        *this, *remoteBuffer, ep_, remoteBuffer->md_attr());
   }
 
 private:

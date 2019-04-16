@@ -45,6 +45,16 @@ public:
     return reinterpret_cast<std::uintptr_t>(data_);
   }
 
+  const uct_mem_h &
+  mem() const noexcept {
+    return mem_;
+  }
+
+  const uct_md_attr_t &
+  md_attr() const noexcept {
+    return md_attr_;
+  }
+
 private:
   const void *const    data_;
   const std::size_t    size_;

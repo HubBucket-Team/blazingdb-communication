@@ -77,7 +77,12 @@ public:
     const std::size_t size = md_attr_.rkey_packed_size;
     std::memcpy(reinterpret_cast<void *>(*rkey_), data, size);
     std::memcpy(address_, data + size, sizeof(*address_));
-    CHECK_UCS(uct_rkey_unpack(reinterpret_cast<void *>(*rkey_), &key_bundle_));
+    if (0U == (md_attr_.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))) {
+      CHECK_UCS(
+          uct_rkey_unpack(reinterpret_cast<void *>(*rkey_), &key_bundle_));
+    } else {
+      key_bundle_.rkey = *rkey_;
+    }
   }
 
 private:
@@ -128,9 +133,11 @@ RemoteBuffer::RemoteBuffer(const void *const    data,
                              UCT_MD_MEM_ACCESS_ALL,
                              &mem_));
     assert(static_cast<void *>(mem_) != UCT_MEM_HANDLE_NULL);
+    rkey_ = reinterpret_cast<uct_rkey_t>(mem_);
+  } else {
+    auto rkey_buffer = reinterpret_cast<void *>(rkey_);
+    CHECK_UCS(uct_md_mkey_pack(md_, mem_, rkey_buffer));
   }
-  auto rkey_buffer = reinterpret_cast<void *>(rkey_);
-  CHECK_UCS(uct_md_mkey_pack(md_, mem_, rkey_buffer));
 }
 
 RemoteBuffer::~RemoteBuffer() {

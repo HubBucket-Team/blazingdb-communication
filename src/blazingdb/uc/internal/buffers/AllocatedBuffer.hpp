@@ -35,13 +35,13 @@ public:
                                UCT_MD_MEM_ACCESS_ALL,
                                const_cast<void **>(&mem())));
       assert(static_cast<void *>(mem()) != UCT_MEM_HANDLE_NULL);
+    } else {
+      rkey_buffer = new std::uint8_t[md_attr.rkey_packed_size];
+      assert(nullptr != rkey_buffer);
+      CHECK_UCS(uct_md_mkey_pack(md_, mem(), rkey_buffer));
+      CHECK_UCS(uct_rkey_unpack(rkey_buffer, &key_bundle_));
+      delete[] rkey_buffer;
     }
-
-    rkey_buffer = new std::uint8_t[md_attr.rkey_packed_size];
-    assert(nullptr != rkey_buffer);
-    CHECK_UCS(uct_md_mkey_pack(md_, mem(), rkey_buffer));
-    CHECK_UCS(uct_rkey_unpack(rkey_buffer, &key_bundle_));
-    delete[] rkey_buffer;
   }
 
   ~AllocatedBuffer() final { CHECK_UCS(uct_md_mem_dereg(md_, mem())); }

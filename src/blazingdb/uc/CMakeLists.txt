@@ -21,6 +21,7 @@ blazingdb_artifact (
     internal/agents/AddressableAgent.cpp
     internal/agents/ManagedAgent.cpp
     internal/buffers/RemoteBuffer.cpp
+    internal/buffers/transports/ZCopyTransport.cpp
     internal/ManagedContext.cpp
 
   LIBRARIES

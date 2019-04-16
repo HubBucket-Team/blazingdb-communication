@@ -3,47 +3,32 @@
 
 #include <blazingdb/uc/Transport.hpp>
 
+#include <uct/api/uct.h>
+
 #include "../../macros.hpp"
-#include "../AccessibleBuffer.hpp"
-#include "../RemoteBuffer.hpp"
 
 namespace blazingdb {
 namespace uc {
 namespace internal {
+class AccessibleBuffer;
+class RemoteBuffer;
 
 class UC_NO_EXPORT ZCopyTransport : public Transport {
 public:
   explicit ZCopyTransport(const AccessibleBuffer &sendingBuffer,
                           const RemoteBuffer &    receivingBuffer,
-                          const uct_ep_h &        ep)
-      : completion_{nullptr, 0},
-        sendingBuffer_{sendingBuffer},
-        receivingBuffer_{receivingBuffer},
-        ep_{ep} {}
+                          const uct_ep_h &        ep,
+                          const uct_md_attr_t &   md_attr);
 
   std::future<void>
-  Get() final {
-    uct_iov_t iov{reinterpret_cast<void *>(receivingBuffer_.data()),
-                  sendingBuffer_.size(),
-                  sendingBuffer_.mem(),
-                  0,
-                  1};
-
-    uct_ep_get_zcopy(ep_,
-                     &iov,
-                     1,
-                     receivingBuffer_.address(),
-                     receivingBuffer_.rkey(),
-                     &completion_);
-
-    return std::future<void>{};
-  }
+  Get() final;
 
 private:
   uct_completion_t        completion_;
   const AccessibleBuffer &sendingBuffer_;
   const RemoteBuffer &    receivingBuffer_;
   const uct_ep_h &        ep_;
+  const uct_md_attr_t &   md_attr_;
 };
 
 }  // namespace internal
