@@ -18,7 +18,10 @@ blazingdb_artifact (
 
   SOURCES
     Context.cpp
+    internal/agents/AddressableAgent.cpp
+    internal/agents/ManagedAgent.cpp
     internal/buffers/RemoteBuffer.cpp
+    internal/ManagedContext.cpp
 
   LIBRARIES
     UCX::UCX

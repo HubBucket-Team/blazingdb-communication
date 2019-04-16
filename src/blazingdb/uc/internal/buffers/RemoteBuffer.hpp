@@ -2,7 +2,6 @@
 #define BLAZINGDB_UC_INTERNAL_BUFFERS_REMOTE_BUFFER_HPP_
 
 #include <blazingdb/uc/Buffer.hpp>
-#include <blazingdb/uc/Trader.hpp>
 
 #include <uct/api/uct.h>
 
@@ -10,6 +9,7 @@
 
 namespace blazingdb {
 namespace uc {
+class Trader;
 namespace internal {
 
 class UC_NO_EXPORT RemoteBuffer : public Buffer {

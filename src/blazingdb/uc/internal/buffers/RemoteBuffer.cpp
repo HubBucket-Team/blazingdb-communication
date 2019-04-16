@@ -1,5 +1,7 @@
 #include "RemoteBuffer.hpp"
 
+#include <blazingdb/uc/Trader.hpp>
+
 #include <cassert>
 #include <cstring>
 

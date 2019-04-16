@@ -5,24 +5,19 @@
 
 #include <uct/api/uct_def.h>
 
-#include "../buffers/RemoteBuffer.hpp"
-
 namespace blazingdb {
 namespace uc {
+class Trader;
 namespace internal {
 
 class AddressableAgent : public Agent {
 public:
   explicit AddressableAgent(const uct_md_h &     md,
                             const uct_md_attr_t &md_attr,
-                            const Trader &       trader)
-      : md_{md}, md_attr_{md_attr}, trader_{trader} {}
+                            const Trader &       trader);
 
   std::unique_ptr<Buffer>
-  Register(const void *const data, const std::size_t size) const
-      noexcept final {
-    return std::make_unique<RemoteBuffer>(data, size, md_, md_attr_, trader_);
-  }
+  Register(const void *const data, const std::size_t size) const noexcept final;
 
 private:
   const uct_md_h &     md_;
