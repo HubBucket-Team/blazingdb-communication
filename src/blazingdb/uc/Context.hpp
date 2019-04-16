@@ -15,9 +15,11 @@ class Context {
 public:
   virtual std::unique_ptr<Agent>
   OwnAgent() const = 0;  // local agent
+
   virtual std::unique_ptr<Agent>
   PeerAgent() const = 0;  // remote agent
 
+  // builders
   static std::unique_ptr<Context>
   IPC(const Trader &trader);
 

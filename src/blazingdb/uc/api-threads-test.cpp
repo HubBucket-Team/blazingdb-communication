@@ -26,6 +26,18 @@ private:
 };
 }  // namespace
 
+static std::thread
+Run(std::promise<const Record::Serialized *> &ownPromise,
+    std::future<const Record::Serialized *> & peerFuture,
+    const std::string &                       name,
+    const std::uint64_t                       seed,
+    const std::ptrdiff_t                      offset) {
+  auto &trader  = *new StubTrader{ownPromise, peerFuture};
+  auto &context = *Context::Copy(trader).release();
+  auto  data    = CreateData(length, seed, offset);
+  return std::thread{Client, std::ref(name), std::ref(context), data};
+}
+
 TEST(ApiTest, Threads) {
   cuInit(0);
   std::promise<const Record::Serialized *> ownPromise;
@@ -34,17 +46,10 @@ TEST(ApiTest, Threads) {
   auto ownFuture  = ownPromise.get_future();
   auto peerFuture = peerPromise.get_future();
 
-  StubTrader ownTrader{ownPromise, peerFuture};
-  StubTrader peerTrader{peerPromise, ownFuture};
-
-  auto ownContext  = Context::Copy(ownTrader);
-  auto peerContext = Context::Copy(peerTrader);
-
-  auto ownData  = CreateData(length, ownSeed, ownOffset);
-  auto peerData = CreateData(length, peerSeed, peerOffset);
-
-  std::thread ownThread{Client, "own", std::ref(*ownContext), ownData};
-  std::thread peerThread{Client, "peer", std::ref(*peerContext), peerData};
+  std::thread ownThread{
+      ::Run(ownPromise, peerFuture, "own", ownSeed, ownOffset)};
+  std::thread peerThread{
+      ::Run(peerPromise, ownFuture, "peer", peerSeed, peerOffset)};
 
   ownThread.join();
   peerThread.join();
