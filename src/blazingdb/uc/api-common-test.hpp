@@ -9,25 +9,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-static UC_INLINE void
-Print(const std::string &name, const void *data, const std::size_t size) {
-  std::uint8_t *host = new std::uint8_t[size];
-
-  cudaError_t cudaStatus = cudaMemcpy(host, data, size, cudaMemcpyDeviceToHost);
-  assert(cudaSuccess == cudaStatus);
-
-  std::stringstream ss;
-
-  ss << ">>> [" << std::setw(9) << name << "]";
-  for (std::size_t i = 0; i < size; i++) {
-    ss << ' ' << std::setfill('0') << std::setw(3)
-       << static_cast<std::uint32_t>(host[i]);
-  }
-  ss << std::endl;
-  std::cout << ss.str();
-
-  delete[] host;
-}
+void
+Print(const std::string &name, const void *data, const std::size_t size);
 
 static constexpr std::size_t    length     = 16;
 static constexpr std::uint64_t  ownSeed    = 0x1111111111111111lu;

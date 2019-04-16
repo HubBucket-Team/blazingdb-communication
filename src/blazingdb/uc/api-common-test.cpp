@@ -1,5 +1,25 @@
 #include "api-common-test.hpp"
 
+void
+Print(const std::string &name, const void *data, const std::size_t size) {
+  std::uint8_t *host = new std::uint8_t[size];
+
+  cudaError_t cudaStatus = cudaMemcpy(host, data, size, cudaMemcpyDeviceToHost);
+  assert(cudaSuccess == cudaStatus);
+
+  std::stringstream ss;
+
+  ss << ">>> [" << std::setw(9) << name << "]";
+  for (std::size_t i = 0; i < size; i++) {
+    ss << ' ' << std::setfill('0') << std::setw(3)
+       << static_cast<std::uint32_t>(host[i]);
+  }
+  ss << std::endl;
+  std::cout << ss.str();
+
+  delete[] host;
+}
+
 void *
 CreateData(const std::size_t    size,
            std::uint64_t        seed,
