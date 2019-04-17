@@ -38,7 +38,7 @@ Run(std::promise<const Record::Serialized *> &ownPromise,
   return std::thread{Client, std::ref(name), std::ref(context), data};
 }
 
-TEST(ApiTest, Threads) {
+TEST(ApiTest, ThreadsWithCopy) {
   cuInit(0);
   std::promise<const Record::Serialized *> ownPromise;
   std::promise<const Record::Serialized *> peerPromise;

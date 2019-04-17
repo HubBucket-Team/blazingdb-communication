@@ -7,14 +7,20 @@ namespace blazingdb {
 namespace uc {
 
 std::unique_ptr<Context>
+Context::Copy(const Trader &trader) {
+  UC_STATIC_LOCAL(internal::CudaCopyResource, resource);
+  return std::make_unique<internal::ManagedContext>(resource, trader);
+}
+
+std::unique_ptr<Context>
 Context::IPC(const Trader &trader) {
   UC_STATIC_LOCAL(internal::CudaIPCResource, resource);
   return std::make_unique<internal::ManagedContext>(resource, trader);
 }
 
 std::unique_ptr<Context>
-Context::Copy(const Trader &trader) {
-  UC_STATIC_LOCAL(internal::CudaCopyResource, resource);
+Context::GDR(const Trader &trader) {
+  UC_STATIC_LOCAL(internal::GDRCopyResource, resource);
   return std::make_unique<internal::ManagedContext>(resource, trader);
 }
 
