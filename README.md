@@ -7,17 +7,20 @@ blazingdb communication framework
 - ucx v1.5.0
 
 ## Dependencies building 
-apt-get update && apt-get install -y kmod git dh-autoreconf valgrind libnuma-dev
+`apt-get update && apt-get install -y kmod git dh-autoreconf valgrind libnuma-dev`
 
 gdropy:
+```
 git clone https://github.com/nvidia/gdrcopy
 git checkout v1.3
 make PREFIX=$PWD/prefix92 CUDA=/usr/local/cuda/ all install
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/:/tmp/gdrcopy/prefix92/lib64/
 ./validate
 ./copybw
+```
 
 Ucx:
+```
 git clone https://github.com/openucx/ucx
 git checkout v1.5.0
 ./autogen.sh
@@ -26,9 +29,10 @@ make -j8
 make install
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/:/tmp/ucx/prefix92/lib/
 ./prefix92/bin/ucx_info -d
+```
 
 ## with docker
-nvidia-docker run --rm --privileged --cap-add=ALL -ti -v /home/nfs/bd.wmalpica/ucx_demo/:/tmp/ -v /lib/modules:/lib/modules -v /usr/src:/usr/src nvidia/cuda:9.2-devel-ubuntu16.04 bash
+`nvidia-docker run --rm --privileged --cap-add=ALL -ti -v /home/nfs/bd.wmalpica/ucx_demo/:/tmp/ -v /lib/modules:/lib/modules -v /usr/src:/usr/src nvidia/cuda:9.2-devel-ubuntu16.04 bash`
 
 ## Build
 
