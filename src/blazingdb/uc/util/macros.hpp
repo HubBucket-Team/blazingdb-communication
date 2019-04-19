@@ -5,8 +5,8 @@
 #define UC_INLINE inline __attribute__((always_inline))
 #else
 #define UC_INLINE inline
-
 #endif
+
 #define UC_INTERFACE(Kind)                                                     \
 public:                                                                        \
   virtual ~Kind() = default;                                                   \
