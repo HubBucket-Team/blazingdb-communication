@@ -9,7 +9,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT LinkerBuffer : public AccessibleBuffer {
+class UC_NOEXPORT LinkerBuffer : public AccessibleBuffer {
 public:
   explicit LinkerBuffer(const void *const pointer,
                         const std::size_t size,

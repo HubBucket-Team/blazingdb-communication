@@ -13,7 +13,7 @@ namespace internal {
 class AccessibleBuffer;
 class RemoteBuffer;
 
-class UC_NO_EXPORT ZCopyTransport : public Transport {
+class UC_NOEXPORT ZCopyTransport : public Transport {
 public:
   explicit ZCopyTransport(const AccessibleBuffer &sendingBuffer,
                           const RemoteBuffer &    receivingBuffer,

@@ -11,7 +11,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT AllocatedBuffer : public LinkerBuffer {
+class UC_NOEXPORT AllocatedBuffer : public LinkerBuffer {
 public:
   explicit AllocatedBuffer(const uct_md_h &     md,
                            const uct_md_attr_t &md_attr,

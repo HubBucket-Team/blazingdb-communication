@@ -9,7 +9,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT ReferenceBuffer : public Buffer {
+class UC_NOEXPORT ReferenceBuffer : public Buffer {
 public:
   virtual const void*
   pointer() const noexcept = 0;

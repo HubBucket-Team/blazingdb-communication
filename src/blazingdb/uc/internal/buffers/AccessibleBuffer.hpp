@@ -9,7 +9,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT AccessibleBuffer : public ReferenceBuffer {
+class UC_NOEXPORT AccessibleBuffer : public ReferenceBuffer {
 public:
   explicit AccessibleBuffer(const void *const pointer, const std::size_t size)
       : mem_{UCT_MEM_HANDLE_NULL}, pointer_{pointer}, size_{size} {}
