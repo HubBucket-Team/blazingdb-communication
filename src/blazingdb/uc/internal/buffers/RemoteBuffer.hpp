@@ -12,7 +12,7 @@ namespace uc {
 class Trader;
 namespace internal {
 
-class UC_NO_EXPORT RemoteBuffer : public Buffer {
+class UC_NOEXPORT RemoteBuffer : public Buffer {
 public:
   explicit RemoteBuffer(const void *         data,
                         std::size_t          size,
