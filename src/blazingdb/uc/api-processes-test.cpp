@@ -34,9 +34,11 @@ Exec(ContextBuilder &&    builder,
      const std::string &  name,
      const std::uint64_t  seed,
      const std::ptrdiff_t offset,
+     const int            device,
      const int (&own_pipedes)[2],
      const int (&peer_pipedes)[2]) {
   cuInit(0);
+  cudaSetDevice(device);
   void *     data       = CreateData(length, seed, offset);
   int        pipedes[2] = {own_pipedes[0], peer_pipedes[1]};
   StubTrader trader{pipedes};
@@ -46,7 +48,7 @@ Exec(ContextBuilder &&    builder,
 
 template <class ContextBuilder>
 static void
-Test(ContextBuilder &&builder) {
+Test(ContextBuilder &&builder, int ownDevice, int peerDevice) {
   int own_pipedes[2];
   int peer_pipedes[2];
 
@@ -62,6 +64,7 @@ Test(ContextBuilder &&builder) {
          "own",
          ownSeed,
          ownOffset,
+         ownDevice,
          own_pipedes,
          peer_pipedes);
     int stat_loc;
@@ -73,12 +76,15 @@ Test(ContextBuilder &&builder) {
          "peer",
          peerSeed,
          peerOffset,
+         peerDevice,
          peer_pipedes,
          own_pipedes);
     std::exit(EXIT_SUCCESS);
   }
 }
 
-TEST(ApiTest, ProcessesWithIPC) { ::Test(Context::IPC); }
+TEST(ApiTest, ProcessesWithIPC) { ::Test(Context::IPC, 0, 0); }
 
-TEST(ApiTest, ProcessesWithGDR) { ::Test(Context::GDR); }
+TEST(ApiTest, ProcessesWithIPCOther) { ::Test(Context::IPC, 0, 1); }
+
+TEST(ApiTest, DISABLED_ProcessesWithGDR) { ::Test(Context::GDR, 0, 1); }

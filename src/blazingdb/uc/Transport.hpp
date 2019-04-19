@@ -8,10 +8,16 @@
 namespace blazingdb {
 namespace uc {
 
+/// \brief Relation between two buffers to transport their memory content
 class Transport {
 public:
-  virtual std::future<void> Get() = 0;
-  //virtual std::future<void> Put() = 0;
+  /// \brief Share memory from own to peer
+  virtual std::future<void>
+  Get() = 0;
+
+  /// \brief Share memory from peer to own
+  // virtual std::future<void>
+  // Put() = 0;
 
   UC_INTERFACE(Transport);
 };

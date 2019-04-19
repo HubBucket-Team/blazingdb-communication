@@ -11,7 +11,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT ManagedAgent : public Agent {
+class UC_NOEXPORT ManagedAgent : public Agent {
 public:
   explicit ManagedAgent(const uct_md_h&          md,
                         const uct_md_attr_t&     md_attr,

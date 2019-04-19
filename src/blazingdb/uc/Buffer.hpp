@@ -11,7 +11,8 @@ class Buffer {
 public:
   /// \brief Link with a remote buffer
   /// \param[in,out] buffer a remote buffer representation in own context
-  virtual std::unique_ptr<Transport> Link(Buffer* buffer) const = 0;
+  virtual std::unique_ptr<Transport>
+  Link(Buffer* buffer) const = 0;
 
   UC_INTERFACE(Buffer);
 };
