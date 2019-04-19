@@ -9,7 +9,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT Resource {
+class UC_NOEXPORT Resource {
 public:
   virtual const char *md_name() const noexcept = 0;
   virtual const char *tl_name() const noexcept = 0;

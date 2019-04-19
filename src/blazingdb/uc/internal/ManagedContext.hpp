@@ -13,7 +13,7 @@ namespace uc {
 namespace internal {
 class Resource;
 
-class UC_NO_EXPORT ManagedContext : public Context {
+class UC_NOEXPORT ManagedContext : public Context {
 public:
   explicit ManagedContext(const Resource &resource, const Trader &trader);
 

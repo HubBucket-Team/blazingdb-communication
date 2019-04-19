@@ -7,7 +7,7 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-class UC_NO_EXPORT CudaCopyResource : public Resource {
+class UC_NOEXPORT CudaCopyResource : public Resource {
 public:
   const char *
   md_name() const noexcept final {
@@ -30,7 +30,7 @@ public:
   UC_DTO(CudaCopyResource);
 };
 
-class UC_NO_EXPORT CudaIPCResource : public Resource {
+class UC_NOEXPORT CudaIPCResource : public Resource {
 public:
   const char *
   md_name() const noexcept final {
@@ -53,7 +53,7 @@ public:
   UC_DTO(CudaIPCResource);
 };
 
-class UC_NO_EXPORT GDRCopyResource : public Resource {
+class UC_NOEXPORT GDRCopyResource : public Resource {
 public:
   const char *
   md_name() const noexcept final {
