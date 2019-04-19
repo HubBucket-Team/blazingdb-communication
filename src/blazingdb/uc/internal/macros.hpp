@@ -40,6 +40,9 @@ using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
 #define UC_NORETURN __attribute__((__noreturn__))
 #define UC_PURE __attribute__((__pure__))
 
+#define uc_likely(x) __builtin_expect(x, 1)
+#define uc_unlikely(x) __builtin_expect(x, 0)
+
 #define UC_CONCRETE(Kind)                                                      \
 private:                                                                       \
   Kind(const Kind &)  = delete;                                                \

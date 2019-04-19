@@ -73,8 +73,9 @@ Client(const std::string &name,
 
   auto transport = ownBuffer->Link(peerBuffer.get());
 
-  transport->Get();
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  auto future = transport->Get();
+  future.wait();
+
   Print(name, data, length);
   Print(name + " twin", twinData, length);
 }

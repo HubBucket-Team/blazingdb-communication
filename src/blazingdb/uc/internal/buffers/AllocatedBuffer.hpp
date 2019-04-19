@@ -13,12 +13,15 @@ namespace internal {
 
 class UC_NOEXPORT AllocatedBuffer : public LinkerBuffer {
 public:
-  explicit AllocatedBuffer(const uct_md_h &     md,
-                           const uct_md_attr_t &md_attr,
-                           const uct_ep_h &     ep,
-                           const void *const    address,
-                           const std::size_t    length)
-      : LinkerBuffer{address, length, ep},
+  explicit AllocatedBuffer(const uct_md_h &           md,
+                           const uct_md_attr_t &      md_attr,
+                           const uct_ep_h &           ep,
+                           const void *const          address,
+                           const std::size_t          length,
+                           const ucs_async_context_t &async_context,
+                           const uct_worker_h &       worker,
+                           const uct_iface_h &        iface)
+      : LinkerBuffer{address, length, ep, async_context, worker, iface},
         md_{md},
         md_attr_{md_attr},
         allocated_memory_{const_cast<void *const>(address),

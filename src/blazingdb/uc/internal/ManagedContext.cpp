@@ -51,6 +51,8 @@ ManagedContext::ManagedContext(const Resource &resource, const Trader &trader)
 
   uct_iface_attr_t iface_attr;
   CHECK_UCS(uct_iface_query(iface_, &iface_attr));
+  uct_iface_progress_enable(iface_,
+                            UCT_PROGRESS_THREAD_SAFE | UCT_PROGRESS_RECV);
 
   device_addr_ = reinterpret_cast<uct_device_addr_t *>(
       new std::uint8_t[iface_attr.device_addr_len]);
@@ -80,8 +82,13 @@ ManagedContext::~ManagedContext() {
 
 std::unique_ptr<Agent>
 ManagedContext::OwnAgent() const {
-  return std::make_unique<ManagedAgent>(
-      md_, md_attr_, iface_, *device_addr_, *iface_addr_);
+  return std::make_unique<ManagedAgent>(md_,
+                                        md_attr_,
+                                        *async_context_,
+                                        worker_,
+                                        iface_,
+                                        *device_addr_,
+                                        *iface_addr_);
 }
 
 std::unique_ptr<Agent>

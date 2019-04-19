@@ -13,11 +13,13 @@ namespace internal {
 
 class UC_NOEXPORT ManagedAgent : public Agent {
 public:
-  explicit ManagedAgent(const uct_md_h&          md,
-                        const uct_md_attr_t&     md_attr,
-                        const uct_iface_h&       iface,
-                        const uct_device_addr_t& device_addr,
-                        const uct_iface_addr_t&  iface_addr);
+  explicit ManagedAgent(const uct_md_h&            md,
+                        const uct_md_attr_t&       md_attr,
+                        const ucs_async_context_t& async_context,
+                        const uct_worker_h&        worker,
+                        const uct_iface_h&         iface,
+                        const uct_device_addr_t&   device_addr,
+                        const uct_iface_addr_t&    iface_addr);
 
   ~ManagedAgent() final;
 
@@ -28,6 +30,10 @@ private:
   uct_ep_h             ep_;
   const uct_md_h&      md_;
   const uct_md_attr_t& md_attr_;
+
+  const ucs_async_context_t& async_context_;
+  const uct_worker_h&        worker_;
+  const uct_iface_h&         iface_;
 
   UC_CONCRETE(ManagedAgent);
 };
