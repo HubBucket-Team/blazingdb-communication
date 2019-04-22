@@ -29,6 +29,7 @@ public:
 
   // ----------------------------------------------------------------------
   // Builders
+  using Builder = std::unique_ptr<Context>(const Trader &);
 
   static std::unique_ptr<Context>
   Copy(const Trader &trader);

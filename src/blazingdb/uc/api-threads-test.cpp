@@ -53,4 +53,5 @@ TEST(ApiTest, ThreadsWithCopy) {
 
   ownThread.join();
   peerThread.join();
+  cudaDeviceReset();
 }
