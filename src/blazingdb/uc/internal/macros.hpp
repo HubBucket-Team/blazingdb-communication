@@ -59,4 +59,13 @@ public:                                                                        \
   inline explicit Kind() = default;                                            \
   inline ~Kind()         = default
 
+#define UC_MIXIN(Kind)                                                         \
+  UC_CONCRETE(Kind);                                                           \
+                                                                               \
+protected:                                                                     \
+  inline explicit Kind() = default;                                            \
+                                                                               \
+public:                                                                        \
+  inline ~Kind() = default
+
 #endif

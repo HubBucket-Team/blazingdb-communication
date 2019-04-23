@@ -25,7 +25,7 @@ class UC_NOEXPORT uc_async {
 public:
   ucs_async_mode_t       mode;
   volatile std::uint32_t quantity;
-  uc_queue               missed;
+  uc_queue               queue;
 };
 
 static UC_INLINE bool
@@ -36,7 +36,7 @@ QueueIsNotEmpty(const uc_queue *q) {
 static UC_INLINE void
 CheckMiss(const ucs_async_context_t &async_context) {
   auto async = reinterpret_cast<const uc_async *>(&async_context);
-  if (uc_unlikely(QueueIsNotEmpty(&async->missed))) {
+  if (uc_unlikely(QueueIsNotEmpty(&async->queue))) {
     __ucs_async_poll_missed(&const_cast<ucs_async_context_t &>(async_context));
   }
 }

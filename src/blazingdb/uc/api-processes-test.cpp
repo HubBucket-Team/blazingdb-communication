@@ -37,8 +37,6 @@ Exec(ContextBuilder &&    builder,
      const int            device,
      const int (&own_pipedes)[2],
      const int (&peer_pipedes)[2]) {
-  cudaDeviceReset();
-  cuInit(0);
   cudaSetDevice(device);
   void *     data       = CreateData(length, seed, offset);
   int        pipedes[2] = {own_pipedes[0], peer_pipedes[1]};
@@ -84,11 +82,12 @@ Test(ContextBuilder &&builder, int ownDevice, int peerDevice) {
   }
 }
 
-class ApiTest : public testing::TestWithParam<
-                    testing::tuple<typename std::decay<Context::Builder>::type,
-                                   std::pair<int, int>>> {};
+class ApiOnProcessesTest
+    : public testing::TestWithParam<
+          testing::tuple<typename std::decay<Context::Builder>::type,
+                         std::pair<int, int>>> {};
 
-TEST_P(ApiTest, ProcessesWithIPC) {
+TEST_P(ApiOnProcessesTest, WithIPC) {
   int ownDevice, peerDevice;
   std::tie(ownDevice, peerDevice) = testing::get<1>(GetParam());
   ::Test(std::move(testing::get<0>(GetParam())), ownDevice, peerDevice);
@@ -97,10 +96,10 @@ TEST_P(ApiTest, ProcessesWithIPC) {
 #define Value(x, y, z) testing::make_tuple(x, std::make_pair(y, z))
 
 INSTANTIATE_TEST_SUITE_P(OneGPU,
-                         ApiTest,
+                         ApiOnProcessesTest,
                          testing::Values(Value(Context::IPC, 0, 0)));
 
-INSTANTIATE_TEST_SUITE_P(DISABLED_TwoGPU,
-                         ApiTest,
+INSTANTIATE_TEST_SUITE_P(DISABLED_TwoGPUs,
+                         ApiOnProcessesTest,
                          testing::Values(Value(Context::IPC, 0, 1),
                                          Value(Context::GDR, 0, 1)));
