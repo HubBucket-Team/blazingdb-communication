@@ -9,7 +9,7 @@ if (GTEST_FOUND)
 endif ()
 
 function (blazingdb_artifact)
-  set (OPTIONS OPTIONAL)
+  set (OPTIONS OPTIONAL VIRTUAL)
   set (ONE_VALUE_ARGS TARGET)
   set (MULTI_VALUE_ARGS SOURCES INCLUDES LIBRARIES PUBLIC_HEADERS TESTS)
   cmake_parse_arguments (ARG "${OPTIONS}" "${ONE_VALUE_ARGS}"
@@ -19,7 +19,11 @@ function (blazingdb_artifact)
       "Error: unrecognized arguments: ${ARG_UNPARSED_ARGUMENTS}")
   endif ()
 
-  add_library (${ARG_TARGET} ${ARG_SOURCES})
+  if (${ARG_VIRTUAL})
+    set (TYPE OBJECT)
+  endif ()
+
+  add_library (${ARG_TARGET} ${TYPE} ${ARG_SOURCES})
 
   if (ARG_LIBRARIES)
     target_link_libraries (${ARG_TARGET} ${ARG_LIBRARIES})

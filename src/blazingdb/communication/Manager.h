@@ -14,19 +14,25 @@ class Manager {
 public:
   Manager() = default;
 
-  virtual void Run() = 0;
-  virtual void Close() noexcept = 0;
+  virtual void
+  Run() = 0;
 
-  virtual const Cluster& getCluster() const = 0;
-  virtual Context* generateContext(std::string logicalPlan, int clusterSize) = 0;
-  // void completedTask(int id);
+  virtual void
+  Close() noexcept = 0;
 
-  static std::unique_ptr<Manager> Make();
+  virtual const Cluster&
+  getCluster() const = 0;
 
-  static std::unique_ptr<Manager> Make(
-      const std::vector<Node>&
-          nodes);  // This is temporary, new nodes will be added in the http
-                   // server thread created in the listen method
+  virtual Context*
+  generateContext(std::string logicalPlan, int clusterSize) = 0;
+
+  static std::unique_ptr<Manager>
+  Make();
+
+  static std::unique_ptr<Manager>
+  Make(const std::vector<Node>&
+           nodes);  // This is temporary, new nodes will be added in the http
+                    // server thread created in the listen method
 };
 
 }  // namespace communication

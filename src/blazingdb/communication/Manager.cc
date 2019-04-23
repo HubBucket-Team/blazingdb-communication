@@ -15,24 +15,23 @@ public:
   ConcreteManager() = default;
 
   ConcreteManager(const std::vector<Node>& nodes) {
-    for (auto& n : nodes) {
-      cluster_.addNode(n);
-    }
+    for (auto& n : nodes) { cluster_.addNode(n); }
   }
 
-  void Run() final {
+  void
+  Run() final {
     httpServer_.config.port = 9000;
 
     httpServer_.resource["^/register_node$"]["POST"] =
         [this](std::shared_ptr<HttpServer::Response> response,
-               std::shared_ptr<HttpServer::Request> request) {
+               std::shared_ptr<HttpServer::Request>  request) {
           auto it = request->header.find("json_data");
 
           // if (request.header.cend() == it) {
           //// TODO: raise exception
           //}
 
-          const std::string& jsonData = it->second;
+          const std::string&               jsonData = it->second;
           std::shared_ptr<NodeDataMessage> nodeDataMessage =
               NodeDataMessage::Make(jsonData, "");
 
@@ -45,32 +44,42 @@ public:
     httpServer_.start();
   }
 
-  void Close() noexcept final { httpServer_.stop(); }
+  void
+  Close() noexcept final {
+    httpServer_.stop();
+  }
 
-  const Cluster& getCluster() const { return cluster_; };
+  const Cluster&
+  getCluster() const {
+    return cluster_;
+  };
 
-  Context* generateContext(std::string logicalPlan, int clusterSize) final {
-    std::vector<std::shared_ptr<Node>> taskNodes = cluster_.getAvailableNodes(clusterSize);
+  Context*
+  generateContext(std::string logicalPlan, int clusterSize) final {
+    std::vector<std::shared_ptr<Node>> taskNodes =
+        cluster_.getAvailableNodes(clusterSize);
 
     // assert(availableNodes.size() > 1)
-    runningTasks_.push_back(std::unique_ptr<Context>{new Context{
-        taskNodes, taskNodes[0], logicalPlan}});
+    runningTasks_.push_back(std::unique_ptr<Context>{
+        new Context{taskNodes, taskNodes[0], logicalPlan}});
 
     return runningTasks_.back().get();
   }
 
 private:
-  Cluster cluster_;
+  Cluster                               cluster_;
   std::vector<std::unique_ptr<Context>> runningTasks_;
-  HttpServer httpServer_;
+  HttpServer                            httpServer_;
 };
 
 }  // namespace
 
-std::unique_ptr<Manager> Manager::Make() {
+std::unique_ptr<Manager>
+Manager::Make() {
   return std::unique_ptr<Manager>{new ConcreteManager};
 }
 
-std::unique_ptr<Manager> Manager::Make(const std::vector<Node>& nodes) {
+std::unique_ptr<Manager>
+Manager::Make(const std::vector<Node>& nodes) {
   return std::unique_ptr<Manager>{new ConcreteManager{nodes}};
 }

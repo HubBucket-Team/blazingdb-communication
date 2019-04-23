@@ -15,7 +15,7 @@ target_link_libraries (UCX::UCX INTERFACE
   /usr/local/cuda/lib64/libcudart.so cuda)
 
 blazingdb_artifact (
-  TARGET
+  VIRTUAL TARGET
     blazingdb-uc
 
   SOURCES

@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(TestManager, ConnectionAndGenerateContext) {
+TEST(ManagerTest, ConnectionAndGenerateContext) {
   // Start manager
   std::unique_ptr<blazingdb::communication::Manager> manager =
       blazingdb::communication::Manager::Make();
