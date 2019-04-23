@@ -12,7 +12,7 @@ using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
 #define UC_ABORT(_message)                                                     \
   do {                                                                         \
     std::stringstream ss{std::ios_base::out | std::ios_base::in};              \
-    ss << __FILE__ << ':' << __LINE__ << ": " << _message << std::endl;        \
+    ss << __FILE__ << ':' << __LINE__ << ": " << (_message) << std::endl;      \
     std::cerr << ss.str();                                                     \
     std::exit(-1);                                                             \
   } while (0)
@@ -31,6 +31,7 @@ using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
 
 #undef UCS_BIT
 #define UCS_BIT(i) (1UL << (i))
+#define UC_BIT(i) (1UL << (i))
 
 #define UC_CONST const __attribute__((__const__))
 #ifndef UC_INLINE

@@ -28,12 +28,12 @@ public:
   uc_queue               queue;
 };
 
-static UC_INLINE bool
+UC_INLINE bool
 QueueIsNotEmpty(const uc_queue *q) {
   return q->producer != q->consumer;
 }
 
-static UC_INLINE void
+UC_INLINE void
 CheckMiss(const ucs_async_context_t &async_context) {
   auto async = reinterpret_cast<const uc_async *>(&async_context);
   if (uc_unlikely(QueueIsNotEmpty(&async->queue))) {
@@ -64,7 +64,7 @@ static UC_INLINE ucs_status_t
                        const RemoteBuffer &    receivingBuffer,
                        const uct_ep_h &        ep,
                        bool                    direction,
-                       uct_completion_t &      completion) {
+                       uct_completion_t *      completion) {
   if (direction) {
     uct_iov_t iov{const_cast<void *>(sendingBuffer.pointer()),
                   sendingBuffer.size(),
@@ -77,21 +77,21 @@ static UC_INLINE ucs_status_t
                             1,
                             receivingBuffer.data(),
                             receivingBuffer.rkey(),
-                            &completion);
-  } else {
-    uct_iov_t iov{reinterpret_cast<void *>(receivingBuffer.data()),
-                  sendingBuffer.size(),
-                  sendingBuffer.mem(),
-                  0,
-                  1};
-
-    return uct_ep_get_zcopy(ep,
-                            &iov,
-                            1,
-                            receivingBuffer.address(),
-                            receivingBuffer.rkey(),
-                            &completion);
+                            completion);
   }
+
+  uct_iov_t iov{reinterpret_cast<void *>(receivingBuffer.data()),
+                sendingBuffer.size(),
+                sendingBuffer.mem(),
+                0,
+                1};
+
+  return uct_ep_get_zcopy(ep,
+                          &iov,
+                          1,
+                          receivingBuffer.address(),
+                          receivingBuffer.rkey(),
+                          completion);
 }
 
 static void
@@ -119,7 +119,7 @@ ZCopyTransport::Get() {
                           ep_,
                           (0U != (md_attr_.cap.reg_mem_types &
                                   UCS_BIT(UCT_MD_MEM_TYPE_CUDA))),
-                          completion_));
+                          &completion_));
 }
 
 }  // namespace internal

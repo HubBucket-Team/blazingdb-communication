@@ -24,7 +24,7 @@ public:
   ~ManagedAgent() final;
 
   std::unique_ptr<Buffer>
-  Register(const void* const data, const std::size_t size) const noexcept final;
+  Register(const void* data, std::size_t size) const noexcept final;
 
 private:
   uct_ep_h             ep_;

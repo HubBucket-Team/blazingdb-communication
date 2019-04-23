@@ -35,6 +35,9 @@ public:
                                       kComponentOffset);
   }
 
+  explicit Offset() = delete;
+  ~Offset()         = delete;
+
 private:
   static constexpr std::ptrdiff_t kComponentOffset = UCT_MD_COMPONENT_NAME_MAX;
   static constexpr std::ptrdiff_t kIpcOffset       = CU_IPC_HANDLE_SIZE;
@@ -43,9 +46,6 @@ private:
   std::uint64_t base_;
   std::size_t   size_;
   std::uint32_t id_;
-
-  explicit Offset() = delete;
-  ~Offset()         = delete;
 
   UC_CONCRETE(Offset);
 };
@@ -77,7 +77,7 @@ RemotableRecord::SetPeer(const void *bytes) noexcept {
   const std::size_t size = md_attr_.rkey_packed_size;
   std::memcpy(reinterpret_cast<void *>(*rkey_), data, size);
   std::memcpy(address_, data + size, sizeof(*address_));
-  if (0U == (md_attr_.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))) {
+  if (0U == (md_attr_.cap.reg_mem_types & UC_BIT(UCT_MD_MEM_TYPE_CUDA))) {
     CHECK_UCS(uct_rkey_unpack(reinterpret_cast<void *>(*rkey_), &key_bundle_));
   } else {
     auto rkeyOffset = Offset::Make(*rkey_);

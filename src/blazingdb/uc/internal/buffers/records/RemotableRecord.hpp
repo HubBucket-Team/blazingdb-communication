@@ -19,8 +19,8 @@ public:
   class PlainSerialized : public Serialized {
   public:
     explicit PlainSerialized(const uct_rkey_t &rkey,
-                             const std::size_t offset,
-                             const void *const pointer);
+                             std::size_t       offset,
+                             const void *      pointer);
 
     ~PlainSerialized() final { delete[] data_; }
 
@@ -41,7 +41,7 @@ public:
     UC_CONCRETE(PlainSerialized);
   };
 
-  explicit RemotableRecord(const void *const    pointer,
+  explicit RemotableRecord(const void *         pointer,
                            const uct_mem_h &    mem,
                            const uct_md_attr_t &md_attr,
                            uct_rkey_t *         rkey,
