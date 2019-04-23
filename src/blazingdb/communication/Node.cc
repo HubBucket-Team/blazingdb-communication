@@ -2,13 +2,13 @@
 
 using namespace blazingdb::communication;
 
-Node::Node() : address_{}, isAvailable_{false}, unixSocketId_{0} {}
+Node::Node() : address_{}, unixSocketId_{0}, isAvailable_{false} {}
 
 Node::Node(const std::shared_ptr<Address>& address)
-    : address_{address}, isAvailable_{true}, unixSocketId_{0} {}
+    : address_{address}, unixSocketId_{0}, isAvailable_{true} {}
 
 Node::Node(int unixSocketId, const std::shared_ptr<Address>& address)
-    : address_{address}, isAvailable_{true}, unixSocketId_{unixSocketId} {}
+    : address_{address}, unixSocketId_{unixSocketId}, isAvailable_{true} {}
 
 bool
 Node::operator==(const Node& rhs) const {
@@ -61,7 +61,6 @@ Node::makeUnique(const rapidjson::Value::Object& object) {
 #include "Address-Internal.h"
 
 #include <algorithm>
-#include <iostream>
 
 namespace blazingdb {
 namespace communication {
@@ -105,8 +104,6 @@ public:
 
     const std::string nodeAsString =
         concreteAddress.ip() + "," + std::to_string(concreteAddress.port());
-
-    std::cout << nodeAsString << "\n";
 
     return std::make_shared<NodeBuffer>(std::move(nodeAsString));
   }

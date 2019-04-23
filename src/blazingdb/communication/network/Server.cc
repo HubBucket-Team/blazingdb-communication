@@ -58,6 +58,19 @@ public:
     std::shared_ptr<Message> getMessage(const ContextToken& context_token) override {
         std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
         auto& message_queue = context_messages_map_[context_token.getIntToken()];
+
+
+        //auto c = Context(node.address.trader());
+        //b1 = c.buffer();
+        //b2 = c.buffer();
+
+        //t = b1.Link(b2);
+
+        //auto future = t.Get()
+
+        //future.wait();
+
+
         return message_queue.getMessage();
     }
 
