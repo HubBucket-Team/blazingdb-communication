@@ -10,7 +10,7 @@ namespace internal {
 class ConcreteAddress : public Address {
 public:
   ConcreteAddress(const std::string &ip, const std::int16_t port)
-      : ip_{std::move(ip)}, port_{port} {}
+      : ip_{ip}, port_{port} {}
 
   bool
   SameValueAs(const Address &address) const final {
