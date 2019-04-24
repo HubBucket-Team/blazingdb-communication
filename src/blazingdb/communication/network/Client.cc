@@ -68,6 +68,21 @@ public:
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
 
+
+        //  concreteAddress = toConcrete(node.address)
+        //
+        //  serializeToBinary(node.address.trader())
+        //     c = Context(trader)
+        //     sender = c.OwnAgent()
+        //     receiver = c.PeerAgent()
+        //
+        //     sendBuf = sender.Register(MyPtr, MySize);
+        //     recvBuf = receiver.Register(nullptr, 0);
+        //
+        //     sendBuf.Link(recvBuf)
+        //
+        //     // send message
+
         const std::string head_json = message->serializeToJson();
         const std::string body_binary = message->serializeToBinary();
 
