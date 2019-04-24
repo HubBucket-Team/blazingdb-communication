@@ -2,6 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_ADDRESS_INTERNAL_H_
 
 #include "Address.h"
+#include "internal/Trader.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -9,15 +10,10 @@ namespace internal {
 
 class ConcreteAddress : public Address {
 public:
-  ConcreteAddress(const std::string &ip, const std::int16_t port)
-      : ip_{ip}, port_{port} {}
+  explicit ConcreteAddress(const std::string &ip, std::int16_t port);
 
   bool
-  SameValueAs(const Address &address) const final {
-    const ConcreteAddress &concreteAddress =
-        *static_cast<const ConcreteAddress *>(&address);
-    return (ip_ == concreteAddress.ip_) && (port_ == concreteAddress.port_);
-  }
+  SameValueAs(const Address &address) const final;
 
   const std::string &
   ip() const noexcept {
@@ -29,18 +25,18 @@ public:
     return port_;
   }
 
-  void
-  serializeToJson(JsonSerializable::Writer &writer) const {
-    writer.Key("addressIp");
-    writer.String(ip_.c_str());
+  const blazingdb::uc::Trader &
+  trader() const noexcept {
+    return trader_;
+  }
 
-    writer.Key("addressPort");
-    writer.Int(port_);
-  };
+  void
+  serializeToJson(JsonSerializable::Writer &writer) const;
 
 private:
   const std::string  ip_;
   const std::int16_t port_;
+  Trader             trader_;
 };
 
 }  // namespace internal

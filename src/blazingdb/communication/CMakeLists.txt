@@ -6,9 +6,11 @@ blazingdb_artifact (
 
   SOURCES
     Address.cc
+    Address-Internal.cc
     ContextToken.cc
     Context.cc
     Cluster.cc
+    internal/Trader.cpp
     Manager.cc
     network/Client.cc
     network/MessageQueue.cpp
@@ -26,6 +28,7 @@ blazingdb_artifact (
 
   LIBRARIES
     Boost::system
+    blazingdb-uc
 
   TESTS
     manager-test.cc

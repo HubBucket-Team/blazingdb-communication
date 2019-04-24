@@ -132,6 +132,10 @@ public:
             httpServer_.resource[end_point][method] = function;
         }
 
+        httpServer_.resource["^/trader$"]["POST"] =
+            [](std::shared_ptr<HttpServer::Response> response,
+               std::shared_ptr<HttpServer::Request>  request) {};
+
         httpServer_.start();
     }
 
