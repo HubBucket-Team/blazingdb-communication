@@ -59,6 +59,7 @@ public:
 
   std::shared_ptr<Status> Send(const Node &node, const std::string &endpoint,
                                const Message &message) final {
+    message.CreateRemoteBuffer(node);
     return Send(node, endpoint, message.serializeToJson(),
                 message.serializeToBinary());
   }
@@ -67,7 +68,6 @@ public:
                                  std::shared_ptr<messages::Message>& message) override {
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
-
 
         //  concreteAddress = toConcrete(node.address)
         //

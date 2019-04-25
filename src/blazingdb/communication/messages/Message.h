@@ -25,8 +25,12 @@ public:
   virtual const std::string serializeToJson() const = 0;
   virtual const std::string serializeToBinary() const = 0;
 
+  virtual void CreateRemoteBuffer(const Node &) const {
+    throw std::runtime_error("Message#createRemoteBuffer not implemented");
+  }
+
 public:
-    const ContextToken::TokenType getContextTokenValue() const;
+    ContextToken::TokenType getContextTokenValue() const;
 
     const MessageToken::TokenType getMessageTokenValue() const;
 

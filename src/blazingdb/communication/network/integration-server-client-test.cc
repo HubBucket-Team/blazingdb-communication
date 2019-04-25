@@ -2,22 +2,27 @@
 #include "ClientExceptions.h"
 #include "Server.h"
 
+#include <blazingdb/communication/Address-Internal.h>
 #include <blazingdb/communication/ContextToken.h>
 #include <blazingdb/communication/messages/Message.h>
+#include <blazingdb/uc/API.h>
 
 #include <chrono>
 #include <memory>
 #include <thread>
+
+#include <cuda_runtime.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace {
 // Alias
-using Server = blazingdb::communication::network::Server;
-using Message = blazingdb::communication::messages::Message;
+using Server       = blazingdb::communication::network::Server;
+using Message      = blazingdb::communication::messages::Message;
 using MessageToken = blazingdb::communication::messages::MessageToken;
 using ContextToken = blazingdb::communication::ContextToken;
+using Node         = blazingdb::communication::Node;
 
 // Create endpoint
 const std::string endpoint{"sample"};
@@ -35,8 +40,9 @@ class MockMessage : public blazingdb::communication::messages::Message {
 public:
   MockMessage(std::shared_ptr<ContextToken> &&contextToken,
               std::unique_ptr<blazingdb::communication::messages::MessageToken>
-                  &&messageToken,
-              const std::size_t pages, const std::string &model)
+                  &&             messageToken,
+              const std::size_t  pages,
+              const std::string &model)
       : Message{std::forward<std::unique_ptr<
                     blazingdb::communication::messages::MessageToken>>(
                     messageToken),
@@ -47,8 +53,49 @@ public:
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
-  static std::shared_ptr<Message> Make(const std::string &json_data,
-                                       const std::string &binary_data) {
+  void
+  CreateRemoteBuffer(const Node &node) const final {  // Run on Cliente::Send
+    auto &concreteAddress = *static_cast<
+        const blazingdb::communication::internal::ConcreteAddress *>(
+        node.address());
+
+    auto context = blazingdb::uc::Context::Copy(concreteAddress.trader());
+
+    auto ownAgent  = context->OwnAgent();
+    auto peerAgent = context->PeerAgent();
+
+    const std::size_t length = 100;
+
+    cudaError_t cudaError;
+
+    void *ownData;
+    void *peerData;
+
+    cudaError = cudaMalloc(&ownData, length);
+    ASSERT_EQ(cudaSuccess, cudaError);
+
+    cudaError = cudaMalloc(&peerData, length);
+    ASSERT_EQ(cudaSuccess, cudaError);
+
+    auto ownBuffer  = ownAgent->Register(ownData, length);
+    auto peerBuffer = peerAgent->Register(peerData, length);
+
+    auto transport = ownBuffer->Link(peerBuffer.get());
+  }
+
+  void GetRemoteBuffer () { // Run on Server::getMessage
+    // ... previous code
+    // future = transport.Get()
+    // future.wait()
+    // .
+    // .
+    // .
+    // Use data
+    // -> *peerData
+  }
+
+  static std::shared_ptr<Message>
+  Make(const std::string &json_data, const std::string &binary_data) {
     const std::string expected_json = "{\"pages\": 12, \"model\": \"qwerty\"}";
     const std::string expected_binary = "";
 
@@ -64,9 +111,15 @@ public:
         std::move(contextToken), std::move(messageToken), 12, "qwerty"));
   }
 
-  std::size_t pages() const { return pages_; }
+  std::size_t
+  pages() const {
+    return pages_;
+  }
 
-  const std::string model() const { return model_; }
+  const std::string
+  model() const {
+    return model_;
+  }
 
 private:
   const std::size_t pages_;
@@ -99,10 +152,10 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   std::shared_ptr<blazingdb::communication::ContextToken> contextToken =
       blazingdb::communication::ContextToken::Make(context_token);
 
-  MockMessage mockMessage{std::move(contextToken), std::move(messageToken), 12,
-                          "qwerty"};
+  MockMessage mockMessage{
+      std::move(contextToken), std::move(messageToken), 12, "qwerty"};
 
-  const std::string json_data = "{\"pages\": 12, \"model\": \"qwerty\"}";
+  const std::string json_data   = "{\"pages\": 12, \"model\": \"qwerty\"}";
   const std::string binary_data = "";
 
   EXPECT_CALL(mockMessage, serializeToJson)

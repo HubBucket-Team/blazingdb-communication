@@ -12,7 +12,7 @@ std::future<const void *>   peerFuture_;
 
 void
 Adquire() {
-  // delete peerPromise_;
+  delete peerPromise_;
   peerPromise_ = new std::promise<const void *>;
   peerFuture_  = peerPromise_->get_future();
 }

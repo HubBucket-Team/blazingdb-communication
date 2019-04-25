@@ -20,7 +20,7 @@ Message::Message(std::unique_ptr<MessageToken>&& messageToken,
 
 Message::~Message() = default;
 
-const ContextToken::TokenType Message::getContextTokenValue() const {
+ContextToken::TokenType Message::getContextTokenValue() const {
     return contextToken_->getIntToken();
 }
 
