@@ -1,4 +1,5 @@
 #include "Trader.hpp"
+#include "TraderLock.hpp"
 
 #include <ostream>
 
@@ -20,11 +21,10 @@ public:
   Client(const std::string &ip, const std::int16_t port)
       : httpClient_{ServerPortPath(ip, port)} {}
 
-  const void *
-  PeerDataFor(const std::unique_ptr<const Record::Serialized> &serialized) {
+  void
+  Send(const std::unique_ptr<const Record::Serialized> &serialized) {
     currentResponse_ = DoRequest(serialized);
     assert("200 OK" == currentResponse_->status_code);
-    return currentResponse_->content.rdbuf();
   }
 
 private:
@@ -62,11 +62,14 @@ private:
 
 void
 Trader::OnRecording(blazingdb::uc::Record *record) const noexcept {
-  Client                                    client{ip_, port_};
-  std::unique_ptr<const Record::Serialized> own = record->GetOwn();
+  Client client{ip_, port_};
 
-  const void *peerData = client.PeerDataFor(own);
-  record->SetPeer(peerData);
+  std::unique_ptr<const Record::Serialized> own = record->GetOwn();
+  client.Send(own);
+
+  auto data = TraderLock::WaitForPeerData();
+  record->SetPeer(data);
+  TraderLock::Adquire();
 }
 
 }  // namespace internal

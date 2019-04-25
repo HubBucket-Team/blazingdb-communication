@@ -11,6 +11,7 @@ blazingdb_artifact (
     Context.cc
     Cluster.cc
     internal/Trader.cpp
+    internal/TraderLock.cpp
     Manager.cc
     network/Client.cc
     network/MessageQueue.cpp
