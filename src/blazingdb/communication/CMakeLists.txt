@@ -35,6 +35,7 @@ blazingdb_artifact (
     manager-test.cc
     node-test.cc
     network/integration-server-client-test.cc
+    processes-test.cc
 )
 
 install (TARGETS blazingdb-communication
