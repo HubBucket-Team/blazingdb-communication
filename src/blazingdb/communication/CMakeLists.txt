@@ -29,8 +29,12 @@ install (TARGETS blazingdb-communication
   ARCHIVE DESTINATION lib
 )
 
+# TODO percy c.gonzales do not install internal headers
+#install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
+#  FILES_MATCHING PATTERN "*.h" PATTERN "*Internal.h" EXCLUDE
+#)
 install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
-  FILES_MATCHING PATTERN "*.h" PATTERN "*Internal.h" EXCLUDE
+  FILES_MATCHING PATTERN "*.h"
 )
 
 if (GTEST_FOUND)
