@@ -141,6 +141,8 @@ public:
      */
     virtual std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token) = 0;
 
+    virtual std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token, const Node &) = 0;
+
     /**
      * It stores the message in the message queue and it uses the ContextToken to select the queue.
      * Each message queue works independently. Whether multiple threads want to access at the same time to

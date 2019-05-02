@@ -92,6 +92,14 @@ public:
     return message_queue.getMessage();
   }
 
+  std::shared_ptr<Message>
+  getMessage(const ContextTokenValue& context_token, const Node &node) override {
+    Message::GetRemoteBuffer(node); // TODO(ucx): move call to message queue
+    std::shared_lock<std::shared_timed_mutex> lock(context_messages_mutex_);
+    auto& message_queue = context_messages_map_[context_token];
+    return message_queue.getMessage();
+  }
+
   void
   putMessage(const ContextToken&       context_token,
              std::shared_ptr<Message>& message) override {
@@ -150,11 +158,11 @@ public:
       httpServer_.resource[end_point][method] = function;
     }
 
-    internal::TraderLock::Adquire();
+    /*internal::TraderLock::Adquire();*/
     httpServer_.resource["^/trader$"]["POST"] =
         [](std::shared_ptr<HttpServer::Response> response,
            std::shared_ptr<HttpServer::Request>  request) {
-          void* data    = new std::uint8_t[200];
+          void* data    = new std::uint8_t[200];  // TODO(mem): Change this.
           auto  content = request->content.string();
           std::memcpy(data, content.data(), content.length());
           internal::TraderLock::ResolvePeerData(data);

@@ -55,7 +55,7 @@ public:
         const blazingdb::communication::internal::ConcreteAddress *>(
         node.address());
 
-    auto context = blazingdb::uc::Context::Copy(concreteAddress.trader());
+    auto context = blazingdb::uc::Context::IPC(concreteAddress.trader());
 
     auto ownAgent  = context->OwnAgent();
     auto peerAgent = context->PeerAgent();
@@ -68,19 +68,7 @@ public:
     auto ownBuffer  = ownAgent->Register(ownData, length);
     auto peerBuffer = peerAgent->Register(peerData, length);
 
-    auto transport = ownBuffer->Link(peerBuffer.get());
-  }
-
-  void
-  GetRemoteBuffer() {  // Run on Server::getMessage
-    // ... previous code
-    // future = transport.Get()
-    // future.wait()
-    // .
-    // .
-    // .
-    // Use data
-    // -> *peerData
+    ownBuffer->Link(peerBuffer.get());
   }
 };
 }  // namespace
@@ -90,12 +78,15 @@ ExecServer() {
   using namespace blazingdb::communication::messages;
   using namespace blazingdb::communication::network;
 
+  cuInit(0);
   std::unique_ptr<Server> server = Server::Make();
 
   std::thread serverThread{&Server::Run, server.get(), 8000};
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::this_thread::sleep_for(std::chrono::seconds(2));
 
-  std::shared_ptr<Message> message = server->getMessage(1243);
+  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001);
+  Node                     node{std::move(address)};
+  std::shared_ptr<Message> message = server->getMessage(1243, node);
 
   server->Close();
   serverThread.join();
@@ -107,6 +98,12 @@ ExecClient() {
   using namespace blazingdb::communication::messages;
   using namespace blazingdb::communication::network;
 
+  cuInit(0);
+  std::unique_ptr<Server> server = Server::Make();
+
+  std::thread serverThread{&Server::Run, server.get(), 8001};
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+
   std::unique_ptr<Client> client = Client::Make();
 
   std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8000);
@@ -116,10 +113,18 @@ ExecClient() {
   std::unique_ptr<MessageToken> messageToken = MessageToken::Make("id");
   MockMessage message{std::move(contextToken), std::move(messageToken)};
 
+  EXPECT_CALL(message, serializeToJson).WillOnce(testing::Return(""));
+  EXPECT_CALL(message, serializeToBinary).WillOnce(testing::Return(""));
+  testing::Mock::AllowLeak(&message);
+
   try {
     const std::shared_ptr<Status> status = client->Send(node, "id", message);
     EXPECT_TRUE(status->IsOk());
   } catch (const Client::SendError &e) { FAIL() << e.what(); }
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  server->Close();
+  serverThread.join();
 }
 
 TEST(DISABLED_ProcessesTest, TwoProcesses) {
@@ -127,7 +132,6 @@ TEST(DISABLED_ProcessesTest, TwoProcesses) {
   if (pid) {
     ExecServer();
   } else {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     ExecClient();
     std::exit(0);
   }

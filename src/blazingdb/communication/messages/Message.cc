@@ -1,5 +1,11 @@
 #include "Message.h"
 
+#include <iostream>
+#include "../internal/Trader.hpp"
+#include "../Address-Internal.h"
+#include <blazingdb/uc/API.h>
+#include <cuda_runtime_api.h>
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -30,6 +36,46 @@ const MessageToken::TokenType Message::getMessageTokenValue() const {
 
 const blazingdb::communication::Node& Message::getSenderNode() const {
     return sender_node_;
+}
+
+static const void *
+Malloc(const std::string &&payload) {
+  void *data;
+
+  cudaError_t cudaError;
+
+  cudaError = cudaMalloc(&data, payload.length());
+  assert(cudaSuccess == cudaError);
+
+  cudaError = cudaMemcpy(
+      data, payload.data(), payload.length(), cudaMemcpyHostToDevice);
+  assert(cudaSuccess == cudaError);
+
+  return data;
+}
+
+void
+Message::GetRemoteBuffer(const Node &node) {
+  auto &concreteAddress =
+      *static_cast<const blazingdb::communication::internal::ConcreteAddress *>(
+          node.address());
+
+  auto context = blazingdb::uc::Context::IPC(concreteAddress.trader());
+
+  auto ownAgent  = context->OwnAgent();
+  auto peerAgent = context->PeerAgent();
+
+  const std::size_t length = 100;
+
+  const void *ownData  = Malloc("ownText");
+  const void *peerData = Malloc("peerText");
+
+  auto ownBuffer  = ownAgent->Register(ownData, length);
+  auto peerBuffer = peerAgent->Register(peerData, length);
+
+  auto transport = ownBuffer->Link(peerBuffer.get());
+
+  auto future = transport->Get();
 }
 
 }  // namespace messages

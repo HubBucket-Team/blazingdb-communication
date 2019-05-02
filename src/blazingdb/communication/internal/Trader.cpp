@@ -1,6 +1,8 @@
 #include "Trader.hpp"
 #include "TraderLock.hpp"
 
+#include <cuda.h>
+#include <iostream>
 #include <ostream>
 
 #include <simple-web-server/client_http.hpp>
@@ -69,7 +71,6 @@ Trader::OnRecording(blazingdb::uc::Record *record) const noexcept {
 
   auto data = TraderLock::WaitForPeerData();
   record->SetPeer(data);
-  TraderLock::Adquire();
 }
 
 }  // namespace internal

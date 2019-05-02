@@ -1,3 +1,5 @@
+#pragma once
+
 #include <blazingdb/uc/Trader.hpp>
 
 namespace blazingdb {

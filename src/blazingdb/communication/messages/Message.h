@@ -2,8 +2,9 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGE_H_
 
 #include <memory>
-#include "blazingdb/communication/Node.h"
+
 #include "blazingdb/communication/ContextToken.h"
+#include "blazingdb/communication/Node.h"
 #include "blazingdb/communication/messages/MessageToken.h"
 
 namespace blazingdb {
@@ -26,8 +27,15 @@ public:
   virtual const std::string serializeToBinary() const = 0;
 
   virtual void CreateRemoteBuffer(const Node &) const {
-    throw std::runtime_error("Message#createRemoteBuffer not implemented");
+    throw std::runtime_error("Message#CreateRemoteBuffer not implemented");
   }
+
+  /*virtual void GetRemoteBuffer(const Node &) const {*/
+    /*throw std::runtime_error("Message#GetRemoteBuffer not implemented");*/
+  /*}*/
+
+  static void
+  GetRemoteBuffer(const Node& node);
 
 public:
     ContextToken::TokenType getContextTokenValue() const;

@@ -7,25 +7,28 @@ namespace internal {
 namespace TraderLock {
 using namespace blazingdb::uc;
 
-std::promise<const void *> *peerPromise_ = nullptr;
-std::future<const void *>   peerFuture_;
+static std::promise<const void *> peerPromise_;
+// static std::future<const void *>  peerFuture_;
 
 void
 Adquire() {
-  delete peerPromise_;
-  peerPromise_ = new std::promise<const void *>;
-  peerFuture_  = peerPromise_->get_future();
+  std::promise<const void *> statePromise;
+  peerPromise_ = std::move(statePromise);
+  /*peerFuture_  = peerPromise_.get_future();*/
 }
 
 void
 ResolvePeerData(const void *data) {
-  peerPromise_->set_value(data);
+  peerPromise_.set_value(data);
 }
 
 const void *
 WaitForPeerData() {
+  std::future<const void *> peerFuture_ = peerPromise_.get_future();
   peerFuture_.wait();
-  return peerFuture_.get();
+  const void *result = peerFuture_.get();
+  peerPromise_       = std::promise<const void *>{};
+  return result;
 }
 
 }  // namespace TraderLock
