@@ -117,15 +117,11 @@ TEST(ApiOnProcessesTest, Direct) {
   ASSERT_NE(-1, pid);
 
   static constexpr std::size_t length = 100;
+  static char                  barrier[length];
 
   if (pid) {
     std::uint8_t recordData[104];
     read(pipedes[0], recordData, 104);
-
-    // for (int i = 0; i < 70; i++) {
-    // std::cout << " " << +static_cast<const std::uint8_t *>(recordData)[0];
-    //}
-    // std::cout << std::endl;
 
     const void *data = CreateData(length, peerSeed, peerOffset);
 
@@ -142,8 +138,7 @@ TEST(ApiOnProcessesTest, Direct) {
 
     Print("peer", data, length);
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    // write(pipedes[1], nullptr, 0);
+    write(pipedes[1], barrier, length);
     std::exit(EXIT_SUCCESS);
   } else {
     const void *data = CreateData(length, ownSeed, ownOffset);
@@ -156,15 +151,8 @@ TEST(ApiOnProcessesTest, Direct) {
 
     auto serializedRecord = buffer->SerializedRecord();
 
-    // for (int i = 0; i < 70; i++) {
-    // std::cout << " "
-    //<< +static_cast<const std::uint8_t *>(
-    // serializedRecord->Data())[0];
-    //}
-    // std::cout << std::endl;
-
     write(pipedes[1], serializedRecord->Data(), serializedRecord->Size());
-    // read(pipedes[0], nullptr, 0);
-    std::this_thread::sleep_for(std::chrono::seconds(100));
+    read(pipedes[0], barrier, length);
+    std::this_thread::sleep_for(std::chrono::seconds(5));
   }
 }
