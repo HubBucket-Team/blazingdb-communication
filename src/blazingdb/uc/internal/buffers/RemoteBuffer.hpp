@@ -14,11 +14,15 @@ namespace internal {
 
 class UC_NOEXPORT RemoteBuffer : public Buffer {
 public:
-  explicit RemoteBuffer(const void *         data,
-                        std::size_t          size,
-                        const uct_md_h &     md,
-                        const uct_md_attr_t &md_attr,
-                        const Trader &       trader);
+  explicit RemoteBuffer(const void *               data,
+                        std::size_t                size,
+                        const uct_md_h &           md,
+                        const uct_md_attr_t &      md_attr,
+                        const Trader &             trader,
+                        const uct_ep_h &           ep,
+                        const ucs_async_context_t &async_context,
+                        const uct_worker_h &       worker,
+                        const uct_iface_h &        iface);
 
   ~RemoteBuffer() final;
 
@@ -26,6 +30,12 @@ public:
   Link(Buffer * /* buffer */) const final {
     throw std::runtime_error("Not implemented");
   }
+
+  std::unique_ptr<const Record::Serialized>
+  SerializedRecord() const noexcept final;
+
+  std::unique_ptr<Transport>
+  Link(const std::uint8_t *recordData) final;
 
   void
   Fetch(const void *pointer, const uct_mem_h &mem);
@@ -68,6 +78,11 @@ private:
 
   uct_rkey_bundle_t      key_bundle_;
   uct_allocated_memory_t allocated_memory_;
+
+  const uct_ep_h &           ep_;
+  const ucs_async_context_t &async_context_;
+  const uct_worker_h &       worker_;
+  const uct_iface_h &        iface_;
 
   UC_CONCRETE(RemoteBuffer);
 };

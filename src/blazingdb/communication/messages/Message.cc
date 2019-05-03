@@ -44,7 +44,7 @@ Malloc(const std::string &&payload) {
 
   cudaError_t cudaError;
 
-  cudaError = cudaMalloc(&data, payload.length());
+  cudaError = cudaMalloc(&data, payload.length() + 100);
   assert(cudaSuccess == cudaError);
 
   cudaError = cudaMemcpy(
@@ -76,6 +76,8 @@ Message::GetRemoteBuffer(const Node &node) {
   auto transport = ownBuffer->Link(peerBuffer.get());
 
   auto future = transport->Get();
+  future.wait();
+
 }
 
 }  // namespace messages

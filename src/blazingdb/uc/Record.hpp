@@ -24,7 +24,6 @@ public:
   };
 
   /// \brief Machine unique record identifier
-  ///
   /// You can use this as a relationship between an own record and a peer record
   virtual std::uint64_t
   Identity() const noexcept = 0;

@@ -36,8 +36,10 @@ public:
     return mem_;
   }
 
-private:
+protected:
   uct_mem_h         mem_;
+
+private:
   const void *const pointer_;
   const std::size_t size_;
 

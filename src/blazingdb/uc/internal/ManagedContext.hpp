@@ -43,6 +43,8 @@ private:
 
   const Trader &trader_;
 
+  uct_ep_h ep_;
+
   UC_CONCRETE(ManagedContext);
 };
 

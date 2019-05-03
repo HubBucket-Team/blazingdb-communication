@@ -1,8 +1,6 @@
 #include "Trader.hpp"
 #include "TraderLock.hpp"
 
-#include <cuda.h>
-#include <iostream>
 #include <ostream>
 
 #include <simple-web-server/client_http.hpp>

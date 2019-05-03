@@ -24,6 +24,21 @@ Context::GDR(const Trader &trader) {
   return std::make_unique<internal::ManagedContext>(resource, trader);
 }
 
+namespace {
+class VoidTrader : public Trader {
+public:
+  void
+  OnRecording(Record *) const noexcept final {}
+};
+}  // namespace
+
+std::unique_ptr<Context>
+Context::IPC() {
+  UC_STATIC_LOCAL(internal::CudaIPCResource, resource);
+  UC_STATIC_LOCAL(VoidTrader, trader);
+  return std::make_unique<internal::ManagedContext>(resource, trader);
+}
+
 std::vector<Context::Capability>
 Context::LookupCapabilities() noexcept {
   uct_md_resource_desc_t *md_resources;

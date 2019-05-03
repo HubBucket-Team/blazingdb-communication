@@ -40,6 +40,9 @@ public:
   static std::unique_ptr<Context>
   GDR(const Trader &trader);
 
+  static std::unique_ptr<Context>
+  IPC();
+
   // ----------------------------------------------------------------------
   // List machine info about UCX valid interfaces
 

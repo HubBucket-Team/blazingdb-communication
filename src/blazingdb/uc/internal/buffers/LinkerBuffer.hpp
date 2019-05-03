@@ -5,6 +5,8 @@
 #include "RemoteBuffer.hpp"
 #include "transports/ZCopyTransport.hpp"
 
+#include "../macros.hpp"
+
 namespace blazingdb {
 namespace uc {
 namespace internal {
@@ -38,6 +40,16 @@ public:
                                             async_context_,
                                             worker_,
                                             iface_);
+  }
+
+  std::unique_ptr<const Record::Serialized>
+  SerializedRecord() const noexcept final {
+    return nullptr;
+  }
+
+  std::unique_ptr<Transport> UC_NORETURN
+                             Link(const std::uint8_t *) final {
+    throw std::runtime_error("Not implemented");
   }
 
 private:

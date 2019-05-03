@@ -93,7 +93,9 @@ TEST_P(ApiOnProcessesTest, WithIPC) {
   ::Test(std::move(testing::get<0>(GetParam())), ownDevice, peerDevice);
 }
 
-#define Value(x, y, z) testing::make_tuple(x, std::make_pair(y, z))
+#define Value(x, y, z)                                                         \
+  testing::make_tuple<typename std::decay<Context::Builder>::type>(            \
+      x, std::make_pair(y, z))
 
 INSTANTIATE_TEST_SUITE_P(OneGPU,
                          ApiOnProcessesTest,
@@ -103,3 +105,66 @@ INSTANTIATE_TEST_SUITE_P(DISABLED_TwoGPUs,
                          ApiOnProcessesTest,
                          testing::Values(Value(Context::IPC, 0, 1),
                                          Value(Context::GDR, 0, 1)));
+
+TEST(ApiOnProcessesTest, Direct) {
+  using namespace blazingdb::uc;
+
+  int pipedes[2];
+  pipe(pipedes);
+
+  pid_t pid = fork();
+
+  ASSERT_NE(-1, pid);
+
+  static constexpr std::size_t length = 100;
+
+  if (pid) {
+    std::uint8_t recordData[104];
+    read(pipedes[0], recordData, 104);
+
+    // for (int i = 0; i < 70; i++) {
+    // std::cout << " " << +static_cast<const std::uint8_t *>(recordData)[0];
+    //}
+    // std::cout << std::endl;
+
+    const void *data = CreateData(length, peerSeed, peerOffset);
+
+    Print("peer", data, length);
+
+    auto context = Context::IPC();
+    auto agent   = context->PeerAgent();
+    auto buffer  = agent->Register(data, length);
+
+    auto transport = buffer->Link(recordData);
+
+    auto future = transport->Get();
+    future.wait();
+
+    Print("peer", data, length);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // write(pipedes[1], nullptr, 0);
+    std::exit(EXIT_SUCCESS);
+  } else {
+    const void *data = CreateData(length, ownSeed, ownOffset);
+
+    auto context = Context::IPC();
+    auto agent   = context->PeerAgent();
+    auto buffer  = agent->Register(data, length);
+
+    Print("own", data, length);
+
+    auto serializedRecord = buffer->SerializedRecord();
+
+    // for (int i = 0; i < 70; i++) {
+    // std::cout << " "
+    //<< +static_cast<const std::uint8_t *>(
+    // serializedRecord->Data())[0];
+    //}
+    // std::cout << std::endl;
+
+    write(pipedes[1], serializedRecord->Data(), serializedRecord->Size());
+    // read(pipedes[0], nullptr, 0);
+    std::this_thread::sleep_for(std::chrono::seconds(100));
+  }
+}

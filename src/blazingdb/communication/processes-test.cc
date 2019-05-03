@@ -18,7 +18,7 @@ Malloc(const std::string &&payload) {
 
   cudaError_t cudaError;
 
-  cudaError = cudaMalloc(&data, payload.length());
+  cudaError = cudaMalloc(&data, payload.length() + 100);
   assert(cudaSuccess == cudaError);
 
   cudaError = cudaMemcpy(
@@ -82,7 +82,7 @@ ExecServer() {
   std::unique_ptr<Server> server = Server::Make();
 
   std::thread serverThread{&Server::Run, server.get(), 8000};
-  std::this_thread::sleep_for(std::chrono::seconds(2));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001);
   Node                     node{std::move(address)};
@@ -102,7 +102,7 @@ ExecClient() {
   std::unique_ptr<Server> server = Server::Make();
 
   std::thread serverThread{&Server::Run, server.get(), 8001};
-  std::this_thread::sleep_for(std::chrono::seconds(2));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   std::unique_ptr<Client> client = Client::Make();
 

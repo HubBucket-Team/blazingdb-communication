@@ -47,6 +47,21 @@ public:
     }
   }
 
+  explicit AllocatedBuffer(const uct_md_h &           md,
+                           const uct_md_attr_t &      md_attr,
+                           const void *const          address,
+                           const std::size_t          length,
+                           const uct_ep_h &           ep,
+                           const ucs_async_context_t &async_context,
+                           const uct_worker_h &       worker,
+                           const uct_iface_h &        iface,
+                           uct_mem_h                  mem)
+      : LinkerBuffer{address, length, ep, async_context, worker, iface},
+        md_{md},
+        md_attr_{md_attr} {
+    mem_ = mem;
+  }
+
   ~AllocatedBuffer() final { CHECK_UCS(uct_md_mem_dereg(md_, mem())); }
 
 private:

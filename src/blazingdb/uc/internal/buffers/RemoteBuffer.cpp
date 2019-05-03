@@ -3,6 +3,8 @@
 #include <cassert>
 
 #include <blazingdb/uc/Trader.hpp>
+#include <blazingdb/uc/internal/buffers/AllocatedBuffer.hpp>
+#include <blazingdb/uc/internal/buffers/transports/ZCopyTransport.hpp>
 
 #include "records/RemotableRecord.hpp"
 
@@ -10,11 +12,16 @@ namespace blazingdb {
 namespace uc {
 namespace internal {
 
-RemoteBuffer::RemoteBuffer(const void *const    data,
-                           const std::size_t    size,
-                           const uct_md_h &     md,
-                           const uct_md_attr_t &md_attr,
-                           const Trader &       trader)
+RemoteBuffer::RemoteBuffer(const void *const          data,
+                           const std::size_t          size,
+                           const uct_md_h &           md,
+                           const uct_md_attr_t &      md_attr,
+                           const Trader &             trader,
+                           const uct_ep_h &           ep,
+                           const ucs_async_context_t &async_context,
+                           const uct_worker_h &       worker,
+                           const uct_iface_h &        iface)
+
     : data_{data},
       size_{size},
       md_{md},
@@ -30,7 +37,11 @@ RemoteBuffer::RemoteBuffer(const void *const    data,
                         UCT_ALLOC_METHOD_MD,
                         UCT_MD_MEM_TYPE_CUDA,
                         md,
-                        nullptr} {
+                        nullptr},
+      ep_{ep},
+      async_context_{async_context},
+      worker_{worker},
+      iface_{iface} {
   if (0U != (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))) {
     CHECK_UCS(uct_md_mem_reg(md_,
                              const_cast<void *const>(data),
@@ -46,6 +57,32 @@ RemoteBuffer::RemoteBuffer(const void *const    data,
 RemoteBuffer::~RemoteBuffer() {
   delete[] reinterpret_cast<std::uint8_t *>(rkey_);
   rkey_ = UCT_INVALID_RKEY;
+}
+
+std::unique_ptr<const Record::Serialized>
+RemoteBuffer::SerializedRecord() const noexcept {
+  RemotableRecord record{data_,
+                         mem_,
+                         md_attr_,
+                         const_cast<uct_rkey_t *>(&rkey_),
+                         const_cast<std::uintptr_t *>(&address_),
+                         const_cast<uct_rkey_bundle_t *>(&key_bundle_)};
+  return record.GetOwn();
+}
+
+std::unique_ptr<Transport>
+RemoteBuffer::Link(const std::uint8_t *recordData) {
+  RemotableRecord record{data_,
+                         mem_,
+                         md_attr_,
+                         const_cast<uct_rkey_t *>(&rkey_),
+                         const_cast<std::uintptr_t *>(&address_),
+                         const_cast<uct_rkey_bundle_t *>(&key_bundle_)};
+  record.SetPeer(recordData);
+  AllocatedBuffer *buffer = new AllocatedBuffer{
+      md_, md_attr_, data_, size_, ep_, async_context_, worker_, iface_, mem_};
+  return std::make_unique<ZCopyTransport>(
+      *buffer, *this, ep_, md_attr_, async_context_, worker_, iface_);
 }
 
 void
