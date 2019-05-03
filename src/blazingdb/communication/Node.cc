@@ -68,9 +68,11 @@ namespace communication {
 namespace {
 class NodeBuffer : public Buffer {
 public:
-  explicit NodeBuffer(const std::string&& nodeAsString)
-      : Buffer(nodeAsString.data(), nodeAsString.size()),
-        nodeAsString_{std::move(nodeAsString)} {}
+  explicit NodeBuffer(const std::string& nodeAsString)
+      :  nodeAsString_{nodeAsString} {
+        data_ = const_cast<char *>(nodeAsString_.data());
+        size_ = nodeAsString_.size();
+  }
 
   const char*
   data() const noexcept {

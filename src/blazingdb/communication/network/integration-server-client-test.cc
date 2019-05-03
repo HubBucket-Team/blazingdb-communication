@@ -170,7 +170,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   blazingdb::communication::Node node{std::move(address)};
 
   // Send message
-  std::unique_ptr<blazingdb::communication::network::Client> client =
+  std::shared_ptr<blazingdb::communication::network::Client> client =
       blazingdb::communication::network::Client::Make();
   try {
     std::shared_ptr<blazingdb::communication::network::Status> status =
