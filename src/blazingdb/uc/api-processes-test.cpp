@@ -116,21 +116,31 @@ TEST(ApiOnProcessesTest, Direct) {
 
   ASSERT_NE(-1, pid);
 
-  static constexpr std::size_t length = 100;
+  static constexpr std::size_t length = 20;
   static char                  barrier[length];
 
   if (pid) {
-    std::uint8_t recordData[104];
-    read(pipedes[0], recordData, 104);
+    const void *data = CreateData(length, ownSeed, ownOffset);
+    Print("own", data, length);
 
+    auto context = Context::IPC();
+    auto agent   = context->PeerAgent();
+    auto buffer  = agent->Register(data, length);
+
+    auto serializedRecord = buffer->SerializedRecord();
+
+    write(pipedes[1], serializedRecord->Data(), serializedRecord->Size());
+    read(pipedes[0], barrier, length);
+  } else {
     const void *data = CreateData(length, peerSeed, peerOffset);
-
     Print("peer", data, length);
 
     auto context = Context::IPC();
     auto agent   = context->PeerAgent();
     auto buffer  = agent->Register(data, length);
 
+    std::uint8_t recordData[104];
+    read(pipedes[0], recordData, 104);
     auto transport = buffer->Link(recordData);
 
     auto future = transport->Get();
@@ -140,19 +150,5 @@ TEST(ApiOnProcessesTest, Direct) {
 
     write(pipedes[1], barrier, length);
     std::exit(EXIT_SUCCESS);
-  } else {
-    const void *data = CreateData(length, ownSeed, ownOffset);
-
-    auto context = Context::IPC();
-    auto agent   = context->PeerAgent();
-    auto buffer  = agent->Register(data, length);
-
-    Print("own", data, length);
-
-    auto serializedRecord = buffer->SerializedRecord();
-
-    write(pipedes[1], serializedRecord->Data(), serializedRecord->Size());
-    read(pipedes[0], barrier, length);
-    std::this_thread::sleep_for(std::chrono::seconds(5));
   }
 }

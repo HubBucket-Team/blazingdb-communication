@@ -81,6 +81,8 @@ RemoteBuffer::Link(const std::uint8_t *recordData) {
   record.SetPeer(recordData);
   AllocatedBuffer *buffer = new AllocatedBuffer{
       md_, md_attr_, data_, size_, ep_, async_context_, worker_, iface_, mem_};
+  const_cast<uct_md_attr_t *>(&md_attr_)->cap.reg_mem_types =
+      ~UCS_BIT(UCT_MD_MEM_TYPE_CUDA);
   return std::make_unique<ZCopyTransport>(
       *buffer, *this, ep_, md_attr_, async_context_, worker_, iface_);
 }

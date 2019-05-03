@@ -26,31 +26,13 @@ public:
         iface_{iface} {}
 
   std::unique_ptr<Transport>
-  Link(Buffer *buffer) const final {
-    auto remoteBuffer = dynamic_cast<RemoteBuffer *>(buffer);
-    if (nullptr == remoteBuffer) {
-      throw std::runtime_error(
-          "Bad buffer. Use a buffer created by a peer agent");
-    }
-    remoteBuffer->Fetch(pointer(), mem());
-    return std::make_unique<ZCopyTransport>(*this,
-                                            *remoteBuffer,
-                                            ep_,
-                                            remoteBuffer->md_attr(),
-                                            async_context_,
-                                            worker_,
-                                            iface_);
-  }
+  Link(Buffer *buffer) const final;
 
   std::unique_ptr<const Record::Serialized>
-  SerializedRecord() const noexcept final {
-    return nullptr;
-  }
+  SerializedRecord() const noexcept final;
 
   std::unique_ptr<Transport> UC_NORETURN
-                             Link(const std::uint8_t *) final {
-    throw std::runtime_error("Not implemented");
-  }
+                             Link(const std::uint8_t *) final;
 
 private:
   const uct_ep_h &           ep_;
