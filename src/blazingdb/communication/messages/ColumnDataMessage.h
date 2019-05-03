@@ -6,6 +6,8 @@
 #include "blazingdb/communication/messages/Message.h"
 #include "blazingdb/communication/messages/GpuComponentMessage.h"
 
+#include <blazingdb/uc/Context.hpp>
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -67,6 +69,10 @@ public:
 
     const std::string serializeToBinary() const override {
         return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns));
+    }
+
+    const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const override {
+        return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns), agent);
     }
 
 public:
