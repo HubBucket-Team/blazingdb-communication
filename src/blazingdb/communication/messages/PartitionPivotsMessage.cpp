@@ -60,6 +60,11 @@ namespace messages {
         return std::string();
     }
 
+    const std::string PartitionPivotsMessage::serializeToBinary(const blazingdb::uc::Agent* agent) const {
+        return std::string();
+    }
+
+
     const std::string PartitionPivotsMessage::getMessageID() {
         return MessageID;
     }

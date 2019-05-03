@@ -3,6 +3,9 @@
 
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
 
+#include <blazingdb/uc/Context.hpp>
+#include <blazingdb/uc/UCPool.hpp>
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -50,6 +53,10 @@ namespace messages {
                 writer.Key("is_ipc");
                 writer.Bool(column.is_ipc());
 
+                const size_t buffer_descriptor_size = 104;
+                writer.Key("buffer_descriptor_size");
+                writer.Uint64(buffer_descriptor_size);
+
                 writer.Key("column_token");
                 writer.Uint64(column.get_column_token());
 
@@ -62,14 +69,15 @@ namespace messages {
             }
             writer.EndObject();
         }
-
+        
+        //todo: deprecate this
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
             std::string result;
 
             std::size_t capacity = 0;
             for (const auto& column : columns) {
                 capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
+                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column()); 
             }
             result.resize(capacity);
 
@@ -77,8 +85,26 @@ namespace messages {
             for (const auto& column : columns) {
                 GpuFunctions::copyGpuToCpu(binary_pointer, result, const_cast<RalColumn&>(column));
             }
-
             return result;
+        }
+        static std::string serializeToBinary(std::vector<RalColumn>& columns, const blazingdb::uc::Agent* agent) {
+            std::basic_string<uint8_t>result;
+            for (const auto& column : columns) {
+                auto* column_ptr =  column.get_gdf_column();
+
+                auto data_buffer = agent->Register(column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
+                auto valid_buffer = agent->Register(column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
+
+                auto serialized_data = data_buffer->SerializedRecord();
+                auto serialized_valid = valid_buffer->SerializedRecord();
+
+                result += std::basic_string<uint8_t> (serialized_data->Data(), serialized_data->Size());
+                result += std::basic_string<uint8_t> (serialized_valid->Data(), serialized_valid->Size());
+
+                UCPool::getInstance().push(data_buffer.release()); 
+                UCPool::getInstance().push(valid_buffer.release()); 
+            }
+            return std::string((const char *)result.c_str());
         }
 
         static CudfColumn deserializeCudfColumn(rapidjson::Value::ConstObject&& object) {

@@ -30,6 +30,8 @@ namespace messages {
 
         const std::string serializeToBinary() const override;
 
+        const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const override;
+
     public:
         static const std::string getMessageID();
 

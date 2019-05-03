@@ -7,6 +7,8 @@
 #include "blazingdb/communication/Node.h"
 #include "blazingdb/communication/messages/MessageToken.h"
 
+#include <blazingdb/uc/Context.hpp>
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -25,6 +27,7 @@ public:
 public:
   virtual const std::string serializeToJson() const = 0;
   virtual const std::string serializeToBinary() const = 0;
+  virtual const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const = 0;
 
   virtual void CreateRemoteBuffer(const Node &) const {
     throw std::runtime_error("Message#CreateRemoteBuffer not implemented");

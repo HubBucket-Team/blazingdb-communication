@@ -73,6 +73,10 @@ namespace messages {
             return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns));
         }
 
+        const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const override {
+            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns), agent);
+        }
+        
     public:
         static const std::string getMessageID() {
             return MessageID;

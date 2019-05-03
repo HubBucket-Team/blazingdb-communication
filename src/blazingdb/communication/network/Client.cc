@@ -8,6 +8,8 @@
 
 #include <simple-web-server/client_http.hpp>
 
+#include <blazingdb/uc/UCPool.hpp>
+
 namespace blazingdb {
 namespace communication {
 namespace network {
@@ -66,29 +68,28 @@ public:
 
   std::shared_ptr<Status> send(const Node& node,
                                  std::shared_ptr<messages::Message>& message) override {
+        
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
 
-        //  concreteAddress = toConcrete(node.address)
-        //
-        //  serializeToBinary(node.address.trader())
-        //     c = Context(trader)
-        //     sender = c.OwnAgent()
-        //     receiver = c.PeerAgent()
-        //
-        //     sendBuf = sender.Register(MyPtr, MySize);
-        //     recvBuf = receiver.Register(nullptr, 0);
-        //
-        //     sendBuf.Link(recvBuf)
-        //
-        //     // send message
+
+        auto &concreteAddress = *static_cast<
+              const blazingdb::communication::internal::ConcreteAddress *>(
+              node.address());
+
+        auto context = blazingdb::uc::Context::IPC();
+
+        auto agent  = context->Agent();
 
         const std::string head_json = message->serializeToJson();
-        const std::string body_binary = message->serializeToBinary();
+        const std::string buffer_descriptors = message->serializeToBinary(agent.get());
+
+        UCPool::getInstance().push(agent.release()); 
+        UCPool::getInstance().push(context.release()); 
 
         std::map<std::string, std::string> headers{{"json_data", head_json}};
 
-        return sendPost(httpClient, message->getMessageTokenValue(), headers, body_binary);
+        return sendPost(httpClient, message->getMessageTokenValue(), headers, buffer_descriptors);
     }
 
   std::shared_ptr<Status> SendNodeData(const std::string &ip,
@@ -121,6 +122,23 @@ public:
                                      const std::string& body) {
         try {
             std::shared_ptr<HttpClient::Response> response = httpClient.request("POST", "/message/" + endpoint, body, headers);
+            
+            //  
+            //  concreteAddress = toConcrete(node.address)
+            //
+            //  serializeToBinary(node.address.trader())
+            //     c = Context(trader)
+            //     sender = c.OwnAgent()
+            //     receiver = c.PeerAgent()
+            //
+            //     sendBuf = sender.Register(MyPtr, MySize);
+            //     recvBuf = receiver.Register(nullptr, 0);
+            //
+            //     sendBuf.Link(recvBuf)
+            //
+            //     // send message
+
+            // context_pointer_pool
             return std::shared_ptr<Status>(new ConcreteStatus{response});
         }
         catch (const std::exception& e) {
@@ -134,6 +152,21 @@ public:
 std::unique_ptr<Client> Client::Make() {
   return std::unique_ptr<Client>(new ConcreteClient);
 }
+
+
+    // std::shared_ptr<Client::Status> Client::send(const Node& node,
+    //                                              std::shared_ptr<Message>& message) {
+        // auto client = blazingdb::communication::network::Client::Make();
+    //     return client->send(node, message);
+    // }
+
+    // std::shared_ptr<Client::Status> Client::sendNodeData(const std::string& orchestratorIp,
+    //                                                     int16_t orchestratorPort,
+    //                                                     std::shared_ptr<Message>& message) {
+    //     auto client = blazingdb::communication::network::Client::Make();
+    //     return client->SendNodeData(orchestratorIp, orchestratorPort, *message);
+    // }
+
 
 }  // namespace network
 }  // namespace communication
