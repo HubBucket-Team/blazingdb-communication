@@ -18,14 +18,16 @@ namespace uc {
 class Context {
 public:
   /// \brief Create an agent for own buffers
-  virtual std::unique_ptr<Agent>
+  virtual std::unique_ptr<uc::Agent>
   OwnAgent() const = 0;
 
   /// \brief Create an agent for peer buffers
-  ///
   /// In the case of IPC and GDR, this is a remote agent descriptor
-  virtual std::unique_ptr<Agent>
+  virtual std::unique_ptr<uc::Agent>
   PeerAgent() const = 0;
+
+  virtual std::unique_ptr<uc::Agent>
+  Agent() const = 0;
 
   // ----------------------------------------------------------------------
   // Builders

@@ -124,7 +124,7 @@ TEST(ApiOnProcessesTest, Direct) {
     Print("own", data, length);
 
     auto context = Context::IPC();
-    auto agent   = context->PeerAgent();
+    auto agent   = context->Agent();
     auto buffer  = agent->Register(data, length);
 
     auto serializedRecord = buffer->SerializedRecord();
@@ -136,7 +136,7 @@ TEST(ApiOnProcessesTest, Direct) {
     Print("peer", data, length);
 
     auto context = Context::IPC();
-    auto agent   = context->PeerAgent();
+    auto agent   = context->Agent();
     auto buffer  = agent->Register(data, length);
 
     std::uint8_t recordData[104];

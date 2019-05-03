@@ -93,6 +93,12 @@ ManagedContext::OwnAgent() const {
 
 std::unique_ptr<Agent>
 ManagedContext::PeerAgent() const {
+  return std::make_unique<AddressableAgent>(
+      md_, md_attr_, trader_, ep_, *async_context_, worker_, iface_);
+}
+
+std::unique_ptr<Agent>
+ManagedContext::Agent() const {
   CHECK_UCS(uct_ep_create_connected(const_cast<uct_iface_h>(iface_),
                                     device_addr_,
                                     iface_addr_,

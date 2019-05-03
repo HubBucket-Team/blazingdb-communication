@@ -19,11 +19,15 @@ public:
 
   ~ManagedContext() final;
 
-  std::unique_ptr<Agent>
+  std::unique_ptr<uc::Agent>
   OwnAgent() const final;
 
-  std::unique_ptr<Agent>
+  std::unique_ptr<uc::Agent>
   PeerAgent() const final;
+
+  std::unique_ptr<uc::Agent>
+  Agent() const final;
+
 
 private:
   const Resource &resource_;
