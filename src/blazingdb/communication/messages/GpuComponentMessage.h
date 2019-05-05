@@ -1,10 +1,16 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 
+#include <cmath>
+
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
 
 #include <blazingdb/uc/Context.hpp>
+// TODO(uc): UCPool should not be part of blazingdb-uc API.
+//           Move it to blazingdb-communication messages component.
 #include <blazingdb/uc/UCPool.hpp>
+
+#include <cuda_runtime_api.h>
 
 namespace blazingdb {
 namespace communication {
@@ -69,7 +75,7 @@ namespace messages {
             }
             writer.EndObject();
         }
-        
+
         //todo: deprecate this
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
             std::string result;
@@ -77,7 +83,7 @@ namespace messages {
             std::size_t capacity = 0;
             for (const auto& column : columns) {
                 capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column()); 
+                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
             }
             result.resize(capacity);
 
@@ -101,8 +107,8 @@ namespace messages {
                 result += std::basic_string<uint8_t> (serialized_data->Data(), serialized_data->Size());
                 result += std::basic_string<uint8_t> (serialized_valid->Data(), serialized_valid->Size());
 
-                UCPool::getInstance().push(data_buffer.release()); 
-                UCPool::getInstance().push(valid_buffer.release()); 
+                UCPool::getInstance().push(data_buffer.release());
+                UCPool::getInstance().push(valid_buffer.release());
             }
             return std::string((const char *)result.c_str());
         }
@@ -159,6 +165,78 @@ namespace messages {
             ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
 
             return ral_column;
+        }
+
+        static RalColumn
+        deserializeRalColumn(std::size_t&                    binary_pointer,
+                             const std::string&              binary_data,
+                             rapidjson::Value::ConstObject&& object,
+                             blazingdb::uc::Agent &agent) {
+          const auto& column_name_data = object["column_name"];
+          std::string column_name(column_name_data.GetString(),
+                                  column_name_data.GetStringLength());
+
+          bool is_ipc = object["is_ipc"].GetBool();
+
+          std::uint64_t column_token = object["column_token"].GetUint64();
+
+          auto cudf_column =
+              deserializeCudfColumn(object["cudf_column"].GetObject());
+
+          // Calculate pointers and update binary_pointer
+          std::size_t dtype_size =
+              GpuFunctions::getDTypeSize(cudf_column.dtype);
+          std::size_t data_pointer = binary_pointer;
+          std::size_t valid_pointer =
+              data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
+          binary_pointer =
+              valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
+
+          // reserve for local data and valid for gdf column
+          cudaError_t cudaStatus;
+
+          void* data     = nullptr;
+          int   dataSize = 100;  // gdf_size_type
+
+          cudaStatus = cudaMalloc(&data, dataSize);
+          assert(cudaSuccess == cudaStatus);
+
+          void*       valid     = nullptr;
+          std::size_t validSize = std::ceil(dataSize);
+
+          cudaStatus = cudaMalloc(&valid, validSize);
+          assert(cudaSuccess == cudaStatus);
+
+          // get remote data and valid
+          auto dataBuffer = agent.Register(data, dataSize);
+
+          auto dataRecordData =
+              reinterpret_cast<const std::uint8_t*>(binary_data.data());
+
+          auto dataTransport = dataBuffer->Link(dataRecordData);
+          auto dataFuture    = dataTransport->Get();
+          dataFuture.wait();
+
+          auto validBuffer = agent.Register(valid, validSize);
+
+          auto validRecordData =
+              reinterpret_cast<const std::uint8_t*>(binary_data.data() + 104);
+
+          auto validTransport = validBuffer->Link(validRecordData);
+          auto validFuture    = validTransport->Get();
+          validFuture.wait();
+
+          // set gdf column
+          RalColumn ral_column;
+          ral_column.set_column_token(column_token);
+
+          auto gdfColumn        = ral_column.get_gdf_column();
+          gdfColumn->data       = data;
+          gdfColumn->valid      = valid;
+          gdfColumn->null_count = cudf_column.null_count;
+          gdfColumn->dtype_info = cudf_column.dtype_info;
+
+          return ral_column;
         }
     };
 

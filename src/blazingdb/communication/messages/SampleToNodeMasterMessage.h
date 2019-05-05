@@ -105,12 +105,17 @@ namespace messages {
             // Get total row size
             std::uint64_t total_row_size = document["total_row_size"].GetUint64();
 
+            // blazingdb-uc
+            auto context = blazingdb::uc::Context::IPC();
+            auto agent = context->Agent();
+
             // Get samples
             std::vector<RalColumn> columns;
             std::size_t binary_pointer = 0;
             const auto& gpu_data_array = document["samples"].GetArray();
             for (const auto& gpu_data : gpu_data_array) {
-                columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
+              columns.emplace_back(BaseClass::deserializeRalColumn(
+                  binary_pointer, binary, gpu_data.GetObject(), *agent));
             }
 
             // Create the message

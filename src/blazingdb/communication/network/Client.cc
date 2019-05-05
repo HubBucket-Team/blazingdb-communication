@@ -61,14 +61,13 @@ public:
 
   std::shared_ptr<Status> Send(const Node &node, const std::string &endpoint,
                                const Message &message) final {
-    message.CreateRemoteBuffer(node);
     return Send(node, endpoint, message.serializeToJson(),
                 message.serializeToBinary());
   }
 
   std::shared_ptr<Status> send(const Node& node,
                                  std::shared_ptr<messages::Message>& message) override {
-        
+
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
 
@@ -84,8 +83,8 @@ public:
         const std::string head_json = message->serializeToJson();
         const std::string buffer_descriptors = message->serializeToBinary(agent.get());
 
-        UCPool::getInstance().push(agent.release()); 
-        UCPool::getInstance().push(context.release()); 
+        UCPool::getInstance().push(agent.release());
+        UCPool::getInstance().push(context.release());
 
         std::map<std::string, std::string> headers{{"json_data", head_json}};
 
@@ -122,8 +121,8 @@ public:
                                      const std::string& body) {
         try {
             std::shared_ptr<HttpClient::Response> response = httpClient.request("POST", "/message/" + endpoint, body, headers);
-            
-            //  
+
+            //
             //  concreteAddress = toConcrete(node.address)
             //
             //  serializeToBinary(node.address.trader())
