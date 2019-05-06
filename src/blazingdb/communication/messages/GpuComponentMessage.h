@@ -195,16 +195,19 @@ namespace messages {
           // reserve for local data and valid for gdf column
           cudaError_t cudaStatus;
 
-          void* data     = nullptr;
+          // TODO(issue): remove couple between sources of ral and communication
+          char* data     = nullptr;
           int   dataSize = 100;  // gdf_size_type
 
-          cudaStatus = cudaMalloc(&data, dataSize);
+          cudaStatus = cudaMalloc(reinterpret_cast<void**>(&data), dataSize);
           assert(cudaSuccess == cudaStatus);
 
-          void*       valid     = nullptr;
-          std::size_t validSize = std::ceil(dataSize);
+          // TODO(issue): see previous TODO
+          using gdf_valid_type      = unsigned char;
+          gdf_valid_type* valid     = nullptr;
+          std::size_t     validSize = std::ceil(dataSize);
 
-          cudaStatus = cudaMalloc(&valid, validSize);
+          cudaStatus = cudaMalloc(reinterpret_cast<void**>(&valid), validSize);
           assert(cudaSuccess == cudaStatus);
 
           // get remote data and valid
