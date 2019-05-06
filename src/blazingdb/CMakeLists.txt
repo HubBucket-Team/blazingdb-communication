@@ -10,7 +10,7 @@ endif ()
 
 function (blazingdb_artifact)
   set (OPTIONS OPTIONAL VIRTUAL)
-  set (ONE_VALUE_ARGS TARGET)
+  set (ONE_VALUE_ARGS PREFIX TARGET)
   set (MULTI_VALUE_ARGS SOURCES INCLUDES LIBRARIES PUBLIC_HEADERS TESTS)
   cmake_parse_arguments (ARG "${OPTIONS}" "${ONE_VALUE_ARGS}"
     "${MULTI_VALUE_ARGS}" ${ARGN})
@@ -32,6 +32,20 @@ function (blazingdb_artifact)
   if (ARG_INCLUDES)
     target_include_directories (${ARG_TARGET} ${ARG_INCLUDES})
   endif ()
+
+  if (ARG_PUBLIC_HEADERS)
+    set_target_properties (${ARG_TARGET} PROPERTIES
+      PUBLIC_HEADER "${ARG_PUBLIC_HEADERS}")
+  endif ()
+
+  if (NOT ARG_PREFIX)
+    set (ARG_PREFIX "")
+  endif ()
+
+  install (TARGETS ${ARG_TARGET}
+    PUBLIC_HEADER DESTINATION include/${ARG_PREFIX}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
 
   if (GTEST_FOUND AND ARG_TESTS)
     add_executable (${ARG_TARGET}-gtest EXCLUDE_FROM_ALL ${ARG_TESTS})

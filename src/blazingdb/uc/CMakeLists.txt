@@ -31,11 +31,13 @@ blazingdb_artifact (
   LIBRARIES
     UCX::UCX
 
+  PREFIX
+    blazingdb/uc
+
   PUBLIC_HEADERS
     Agent.hpp
     Buffer.hpp
     Context.hpp
-    Manager.hpp
     Transport.hpp
 
   TESTS

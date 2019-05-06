@@ -31,19 +31,44 @@ blazingdb_artifact (
     Boost::system
     blazingdb-uc
 
+  PREFIX
+    blazingdb/communication
+
+  PUBLIC_HEADERS
+    messages/SampleToNodeMasterMessage.h
+    messages/Message.h
+    messages/GpuComponentMessage.h
+    messages/DataScatterMessage.h
+    messages/DataPivot.h
+    messages/MessageToken.h
+    messages/BaseComponentMessage.h
+    messages/ColumnDataMessage.h
+    messages/NodeDataMessage.h
+    messages/PartitionPivotsMessage.h
+    ContextToken.h
+    Cluster.h
+    Address.h
+    shared/Identity.h
+    shared/macros.h
+    shared/Entity.h
+    shared/Builder.h
+    shared/JsonSerializable.h
+    Manager.h
+    Context.h
+    Buffer.h
+    network/Client.h
+    network/MessageQueue.h
+    network/ClientExceptions.h
+    network/Server.h
+    network/Status.h
+    Router.h
+    Listener.h
+    Node.h
+
   TESTS
     manager-test.cc
     messages/message-test.cpp
     node-test.cc
     network/integration-server-client-test.cc
     processes-test.cc
-)
-
-install (TARGETS blazingdb-communication
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-
-install (DIRECTORY "${PROJECT_SOURCE_DIR}/src/blazingdb" DESTINATION "include"
-  FILES_MATCHING PATTERN "*.h" PATTERN "*Internal.h" EXCLUDE
 )
