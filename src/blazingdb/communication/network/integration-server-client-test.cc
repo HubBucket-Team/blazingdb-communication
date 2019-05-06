@@ -52,6 +52,8 @@ public:
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
+  MOCK_CONST_METHOD1(serializeToBinary,
+                     const std::string(const blazingdb::uc::Agent *));
 
   void
   CreateRemoteBuffer(const Node &node) const final {  // Run on Cliente::Send
@@ -83,7 +85,8 @@ public:
     auto transport = ownBuffer->Link(peerBuffer.get());
   }
 
-  void GetRemoteBuffer () { // Run on Server::getMessage
+  void
+  GetRemoteBuffer() {  // Run on Server::getMessage
     // ... previous code
     // future = transport.Get()
     // future.wait()
@@ -158,9 +161,9 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   const std::string json_data   = "{\"pages\": 12, \"model\": \"qwerty\"}";
   const std::string binary_data = "";
 
-  EXPECT_CALL(mockMessage, serializeToJson)
+  EXPECT_CALL(mockMessage, serializeToJson())
       .WillOnce(testing::Return(json_data));
-  EXPECT_CALL(mockMessage, serializeToBinary)
+  EXPECT_CALL(mockMessage, serializeToBinary())
       .WillOnce(testing::Return(binary_data));
 
   // Create node info

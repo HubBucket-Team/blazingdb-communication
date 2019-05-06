@@ -48,6 +48,8 @@ public:
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
+  MOCK_CONST_METHOD1(serializeToBinary,
+                     const std::string(const blazingdb::uc::Agent *));
 
   void
   CreateRemoteBuffer(const Node &node) const final {
@@ -86,7 +88,7 @@ ExecServer() {
 
   std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001);
   Node                     node{std::move(address)};
-  std::shared_ptr<Message> message = server->getMessage(1243, node);
+  std::shared_ptr<Message> message = server->getMessage(1243);
 
   server->Close();
   serverThread.join();
@@ -113,8 +115,8 @@ ExecClient() {
   std::unique_ptr<MessageToken> messageToken = MessageToken::Make("id");
   MockMessage message{std::move(contextToken), std::move(messageToken)};
 
-  EXPECT_CALL(message, serializeToJson).WillOnce(testing::Return(""));
-  EXPECT_CALL(message, serializeToBinary).WillOnce(testing::Return(""));
+  EXPECT_CALL(message, serializeToJson()).WillOnce(testing::Return(""));
+  EXPECT_CALL(message, serializeToBinary()).WillOnce(testing::Return(""));
   testing::Mock::AllowLeak(&message);
 
   try {

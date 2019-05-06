@@ -33,6 +33,7 @@ blazingdb_artifact (
 
   TESTS
     manager-test.cc
+    messages/message-test.cpp
     node-test.cc
     network/integration-server-client-test.cc
     processes-test.cc
