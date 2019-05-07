@@ -33,30 +33,30 @@ function (blazingdb_artifact)
     target_include_directories (${ARG_TARGET} ${ARG_INCLUDES})
   endif ()
 
-  if (ARG_PUBLIC_HEADERS)
-    set_target_properties (${ARG_TARGET} PROPERTIES
-      PUBLIC_HEADER "${ARG_PUBLIC_HEADERS}")
-  endif ()
-
   if (NOT ARG_PREFIX)
     set (ARG_PREFIX "")
   endif ()
 
   install (TARGETS ${ARG_TARGET}
-    PUBLIC_HEADER DESTINATION include/${ARG_PREFIX}
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
+
+  if (ARG_PUBLIC_HEADERS)
+    foreach (ARG_PUBLIC_HEADER ${ARG_PUBLIC_HEADERS})
+      get_filename_component (ARG_BASE ${ARG_PUBLIC_HEADER} DIRECTORY)
+      install (FILES ${ARG_PUBLIC_HEADER}
+        DESTINATION include/${ARG_PREFIX}/${ARG_BASE})
+    endforeach ()
+  endif ()
 
   if (GTEST_FOUND AND ARG_TESTS)
     add_executable (${ARG_TARGET}-gtest EXCLUDE_FROM_ALL ${ARG_TESTS})
     target_include_directories (${ARG_TARGET} PUBLIC src)
-    target_compile_options (${ARG_TARGET}
-      PUBLIC -ggdb -O0 -fprofile-arcs -ftest-coverage -fPIC)
+    target_compile_options (${ARG_TARGET} PUBLIC -ggdb -O0)
     target_link_libraries (${ARG_TARGET}-gtest ${ARG_TARGET}
       GTest::GTest
       ${GTEST_ROOT}/lib/libgmock_main.a
-      ${GTEST_ROOT}/lib/libgmock.a
-      gcov --coverage)
+      ${GTEST_ROOT}/lib/libgmock.a)
     add_custom_target (${ARG_TARGET}-gtest-run
       COMMAND $<TARGET_FILE:${ARG_TARGET}-gtest>)
     add_dependencies (coverage ${ARG_TARGET}-gtest-run)

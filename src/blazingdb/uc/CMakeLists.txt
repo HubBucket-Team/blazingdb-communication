@@ -36,9 +36,13 @@ blazingdb_artifact (
 
   PUBLIC_HEADERS
     Agent.hpp
+    API.h
     Buffer.hpp
     Context.hpp
+    Record.hpp
+    Trader.hpp
     Transport.hpp
+    util/macros.hpp
 
   TESTS
     api-common-test.cpp

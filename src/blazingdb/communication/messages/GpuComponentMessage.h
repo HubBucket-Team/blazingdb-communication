@@ -222,6 +222,7 @@ namespace messages {
 
           auto validBuffer = agent.Register(valid, validSize);
 
+          // TODO(issue): get magic number 104 from json data
           auto validRecordData =
               reinterpret_cast<const std::uint8_t*>(binary_data.data() + 104);
 

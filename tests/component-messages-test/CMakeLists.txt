@@ -28,7 +28,7 @@ target_include_directories(${test_name} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 message("DATA: ${RAPIDJSON_ROOT}")
 target_link_libraries(${test_name}
-  GTest::GTest GTest::Main Boost::system blazingdb-uc gcov --coverage)
+  GTest::GTest GTest::Main Boost::system blazingdb-uc)
 
 set_target_properties(${test_name}
   PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/gtests/")

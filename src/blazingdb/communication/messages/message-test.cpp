@@ -3,6 +3,8 @@
 #include <blazingdb/communication/network/ClientExceptions.h>
 #include <blazingdb/communication/network/Server.h>
 
+#include <blazingdb/uc/API.h>
+
 #include <cuda.h>
 
 #include <gmock/gmock.h>
@@ -25,8 +27,8 @@ public:
                      const std::string(const blazingdb::uc::Agent *));
 
   static std::shared_ptr<Message>
-  Make(const std::string & /*jsonData*/, const std::string & /*binaryData*/) {
-    std::cout << "+++++++++HOLA++++++++++" << std::endl;
+  Make(const std::string & /*jsonData*/, const std::string &binaryData) {
+    std::cout << ">>> " << binaryData << std::endl;
     return nullptr;
   }
 };
