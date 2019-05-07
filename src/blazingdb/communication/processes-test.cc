@@ -4,7 +4,7 @@
 #include <blazingdb/communication/network/Client.h>
 #include <blazingdb/communication/network/ClientExceptions.h>
 #include <blazingdb/communication/network/Server.h>
-#include <blazingdb/uc/API.h>
+#include <blazingdb/uc/API.hpp>
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -47,7 +47,7 @@ public:
                 std::move(contextToken)} {}
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
-  MOCK_CONST_METHOD0(serializeToBinary, const std::string()); 
+  MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
   void
   CreateRemoteBuffer(const Node &node) const final {

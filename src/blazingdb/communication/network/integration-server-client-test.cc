@@ -5,7 +5,7 @@
 #include <blazingdb/communication/Address-Internal.h>
 #include <blazingdb/communication/ContextToken.h>
 #include <blazingdb/communication/messages/Message.h>
-#include <blazingdb/uc/API.h>
+#include <blazingdb/uc/API.hpp>
 
 #include <chrono>
 #include <memory>

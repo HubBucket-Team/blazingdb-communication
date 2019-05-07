@@ -3,7 +3,7 @@
 #include <iostream>
 #include "../internal/Trader.hpp"
 #include "../Address-Internal.h"
-#include <blazingdb/uc/API.h>
+#include <blazingdb/uc/API.hpp>
 #include <cuda_runtime_api.h>
 
 namespace blazingdb {

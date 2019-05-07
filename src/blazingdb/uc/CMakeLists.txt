@@ -36,7 +36,7 @@ blazingdb_artifact (
 
   PUBLIC_HEADERS
     Agent.hpp
-    API.h
+    API.hpp
     Buffer.hpp
     Context.hpp
     Record.hpp

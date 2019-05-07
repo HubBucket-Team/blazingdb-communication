@@ -3,7 +3,7 @@
 #include <blazingdb/communication/network/ClientExceptions.h>
 #include <blazingdb/communication/network/Server.h>
 
-#include <blazingdb/uc/API.h>
+#include <blazingdb/uc/API.hpp>
 
 #include <cuda.h>
 

@@ -106,7 +106,7 @@ namespace messages {
 
             auto context = blazingdb::uc::Context::IPC();
             auto agent  = context->Agent();
-    
+
             for (const auto& column : columns) {
                 auto* column_ptr =  column.get_gdf_column();
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
@@ -171,26 +171,20 @@ namespace messages {
             return ral_column;
         }
 
-        
- static RalColumn
+        static RalColumn
         deserializeRalColumn(std::size_t&                    binary_pointer,
                              const std::string&              binary_data,
                              rapidjson::Value::ConstObject&& object,
-                             const void* agent) {
+                             const void*                     agent) {
           const auto& column_name_data = object["column_name"];
           std::string column_name(column_name_data.GetString(),
                                   column_name_data.GetStringLength());
-
-          bool is_ipc = object["is_ipc"].GetBool();
 
           std::uint64_t column_token = object["column_token"].GetUint64();
 
           auto cudf_column =
               deserializeCudfColumn(object["cudf_column"].GetObject());
 
-          // Calculate pointers and update binary_pointer
-          std::size_t dtype_size =
-              GpuFunctions::getDTypeSize(cudf_column.dtype);
           std::size_t data_pointer = binary_pointer;
           std::size_t valid_pointer =
               data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
@@ -215,12 +209,15 @@ namespace messages {
           auto dataRecordData =
               reinterpret_cast<const std::uint8_t*>(binary_data.data());
 
+          // TODO(issue): get magic number 104 from json data
           auto validRecordData =
               reinterpret_cast<const std::uint8_t*>(binary_data.data() + 104);
 
-          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(agent, dataRecordData, data, dataSize);
-          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(agent, validRecordData, valid, validSize);
- 
+          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(
+              agent, dataRecordData, data, dataSize);
+          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(
+              agent, validRecordData, valid, validSize);
+
           // set gdf column
           RalColumn ral_column;
           ral_column.set_column_token(column_token);
@@ -235,8 +232,8 @@ namespace messages {
         }
     };
 
-} // namespace messages
-} // namespace communication
-} // namespace blazingdb
+    }  // namespace messages
+    }  // namespace communication
+    }  // namespace blazingdb
 
 #endif //BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
