@@ -47,9 +47,7 @@ public:
                 std::move(contextToken)} {}
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
-  MOCK_CONST_METHOD0(serializeToBinary, const std::string());
-  MOCK_CONST_METHOD1(serializeToBinary,
-                     const std::string(const blazingdb::uc::Agent *));
+  MOCK_CONST_METHOD0(serializeToBinary, const std::string()); 
 
   void
   CreateRemoteBuffer(const Node &node) const final {

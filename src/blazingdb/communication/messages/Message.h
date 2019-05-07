@@ -27,7 +27,6 @@ public:
 public:
   virtual const std::string serializeToJson() const = 0;
   virtual const std::string serializeToBinary() const = 0;
-  virtual const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const = 0;
 
   virtual void CreateRemoteBuffer(const Node &) const {
     throw std::runtime_error("Message#CreateRemoteBuffer not implemented");

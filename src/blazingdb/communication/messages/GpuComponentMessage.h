@@ -76,40 +76,44 @@ namespace messages {
             writer.EndObject();
         }
 
-        //todo: deprecate this
+
+
+        static std::string  RegisterAndGetBufferDescriptor(const void *agent_ptr, const void* data, size_t data_size) {
+            const blazingdb::uc::Agent* agent = static_cast<const blazingdb::uc::Agent*>(agent_ptr);
+            auto data_buffer = agent->Register(data, data_size);
+
+            auto serialized_data = data_buffer->SerializedRecord();
+
+            std::basic_string<uint8_t> response(serialized_data->Data(), serialized_data->Size());
+
+            UCPool::getInstance().push(data_buffer.release());
+
+            return std::string((const char *)response.c_str());
+        }
+
+        static void LinkDataRecordAndWaitForGpuData(const void *agent_ptr, const std::uint8_t* dataRecordData, const void* data, size_t dataSize) {
+            const blazingdb::uc::Agent* agent = static_cast<const blazingdb::uc::Agent*>(agent_ptr);
+            auto dataBuffer = agent->Register(data, dataSize);
+
+            auto dataTransport = dataBuffer->Link(dataRecordData);
+            auto dataFuture    = dataTransport->Get();
+            dataFuture.wait();
+        }
+
+
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
             std::string result;
 
-            std::size_t capacity = 0;
-            for (const auto& column : columns) {
-                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
-            }
-            result.resize(capacity);
-
-            std::size_t binary_pointer = 0;
-            for (const auto& column : columns) {
-                GpuFunctions::copyGpuToCpu(binary_pointer, result, const_cast<RalColumn&>(column));
-            }
-            return result;
-        }
-        static std::string serializeToBinary(std::vector<RalColumn>& columns, const blazingdb::uc::Agent* agent) {
-            std::basic_string<uint8_t>result;
+            auto context = blazingdb::uc::Context::IPC();
+            auto agent  = context->Agent();
+    
             for (const auto& column : columns) {
                 auto* column_ptr =  column.get_gdf_column();
-
-                auto data_buffer = agent->Register(column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
-                auto valid_buffer = agent->Register(column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
-
-                auto serialized_data = data_buffer->SerializedRecord();
-                auto serialized_valid = valid_buffer->SerializedRecord();
-
-                result += std::basic_string<uint8_t> (serialized_data->Data(), serialized_data->Size());
-                result += std::basic_string<uint8_t> (serialized_valid->Data(), serialized_valid->Size());
-
-                UCPool::getInstance().push(data_buffer.release());
-                UCPool::getInstance().push(valid_buffer.release());
+                result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
+                result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
             }
+            UCPool::getInstance().push(agent.release());
+            UCPool::getInstance().push(context.release());
             return std::string((const char *)result.c_str());
         }
 
@@ -167,11 +171,12 @@ namespace messages {
             return ral_column;
         }
 
-        static RalColumn
+        
+ static RalColumn
         deserializeRalColumn(std::size_t&                    binary_pointer,
                              const std::string&              binary_data,
                              rapidjson::Value::ConstObject&& object,
-                             blazingdb::uc::Agent &agent) {
+                             const void* agent) {
           const auto& column_name_data = object["column_name"];
           std::string column_name(column_name_data.GetString(),
                                   column_name_data.GetStringLength());
@@ -195,48 +200,34 @@ namespace messages {
           // reserve for local data and valid for gdf column
           cudaError_t cudaStatus;
 
-          // TODO(issue): remove couple between sources of ral and communication
-          char* data     = nullptr;
+          void* data     = nullptr;
           int   dataSize = 100;  // gdf_size_type
 
-          cudaStatus = cudaMalloc(reinterpret_cast<void**>(&data), dataSize);
+          cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);
 
-          // TODO(issue): see previous TODO
-          using gdf_valid_type      = unsigned char;
-          gdf_valid_type* valid     = nullptr;
-          std::size_t     validSize = std::ceil(dataSize);
+          void*       valid     = nullptr;
+          std::size_t validSize = std::ceil(dataSize);
 
-          cudaStatus = cudaMalloc(reinterpret_cast<void**>(&valid), validSize);
+          cudaStatus = cudaMalloc(&valid, validSize);
           assert(cudaSuccess == cudaStatus);
-
-          // get remote data and valid
-          auto dataBuffer = agent.Register(data, dataSize);
 
           auto dataRecordData =
               reinterpret_cast<const std::uint8_t*>(binary_data.data());
 
-          auto dataTransport = dataBuffer->Link(dataRecordData);
-          auto dataFuture    = dataTransport->Get();
-          dataFuture.wait();
-
-          auto validBuffer = agent.Register(valid, validSize);
-
-          // TODO(issue): get magic number 104 from json data
           auto validRecordData =
               reinterpret_cast<const std::uint8_t*>(binary_data.data() + 104);
 
-          auto validTransport = validBuffer->Link(validRecordData);
-          auto validFuture    = validTransport->Get();
-          validFuture.wait();
-
+          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(agent, dataRecordData, data, dataSize);
+          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(agent, validRecordData, valid, validSize);
+ 
           // set gdf column
           RalColumn ral_column;
           ral_column.set_column_token(column_token);
 
           auto gdfColumn        = ral_column.get_gdf_column();
-          gdfColumn->data       = data;
-          gdfColumn->valid      = valid;
+          gdfColumn->data       = (char*)data;
+          gdfColumn->valid      = (uint8_t*)valid;
           gdfColumn->null_count = cudf_column.null_count;
           gdfColumn->dtype_info = cudf_column.dtype_info;
 

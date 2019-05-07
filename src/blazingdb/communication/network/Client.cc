@@ -8,8 +8,6 @@
 
 #include <simple-web-server/client_http.hpp>
 
-#include <blazingdb/uc/UCPool.hpp>
-
 namespace blazingdb {
 namespace communication {
 namespace network {
@@ -71,20 +69,12 @@ public:
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
 
-
         auto &concreteAddress = *static_cast<
               const blazingdb::communication::internal::ConcreteAddress *>(
               node.address());
 
-        auto context = blazingdb::uc::Context::IPC();
-
-        auto agent  = context->Agent();
-
         const std::string head_json = message->serializeToJson();
-        const std::string buffer_descriptors = message->serializeToBinary(agent.get());
-
-        UCPool::getInstance().push(agent.release());
-        UCPool::getInstance().push(context.release());
+        const std::string buffer_descriptors = message->serializeToBinary();
 
         std::map<std::string, std::string> headers{{"json_data", head_json}};
 

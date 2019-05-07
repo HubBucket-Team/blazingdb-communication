@@ -28,10 +28,6 @@ const std::string NodeDataMessage::serializeToJson() const {
 
 const std::string NodeDataMessage::serializeToBinary() const { return ""; };
 
-const std::string NodeDataMessage::serializeToBinary(const blazingdb::uc::Agent* agent) const {
-    return "";
-}
-
 std::shared_ptr<NodeDataMessage> NodeDataMessage::Make(const std::string& jsonBuffer,
                                                const std::string& binBuffer) {
   rapidjson::Document doc;

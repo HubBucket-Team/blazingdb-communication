@@ -23,8 +23,6 @@ public:
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
-  MOCK_CONST_METHOD1(serializeToBinary,
-                     const std::string(const blazingdb::uc::Agent *));
 
   static std::shared_ptr<Message>
   Make(const std::string & /*jsonData*/, const std::string &binaryData) {
