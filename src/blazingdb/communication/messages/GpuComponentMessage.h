@@ -6,10 +6,8 @@
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
 
 #include <blazingdb/uc/Context.hpp>
-// TODO(uc): UCPool should not be part of blazingdb-uc API.
-//           Move it to blazingdb-communication messages component.
-#include <blazingdb/uc/UCPool.hpp>
 
+#include "blazingdb/communication/messages/UCPool.h"
 #include <cuda_runtime_api.h>
 
 namespace blazingdb {
