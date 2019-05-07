@@ -14,7 +14,6 @@ public:
 
   const std::string serializeToJson() const override;
   const std::string serializeToBinary() const override;
-  const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const override;
 
   const Node node;
 

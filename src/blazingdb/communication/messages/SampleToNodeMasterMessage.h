@@ -79,9 +79,6 @@ namespace messages {
         const std::string serializeToBinary() const override {
             return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(samples_));
         }
-        const std::string serializeToBinary(const blazingdb::uc::Agent* agent) const override {
-            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(samples_), agent);
-        }
 
     public:
         static const std::string getMessageID() {
@@ -115,7 +112,7 @@ namespace messages {
             const auto& gpu_data_array = document["samples"].GetArray();
             for (const auto& gpu_data : gpu_data_array) {
               columns.emplace_back(BaseClass::deserializeRalColumn(
-                  binary_pointer, binary, gpu_data.GetObject(), *agent));
+                  binary_pointer, binary, gpu_data.GetObject(), agent.get()));
             }
 
             // Create the message
