@@ -10,6 +10,50 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <cuda_runtime_api.h>
+
+static constexpr std::size_t length = 100;
+
+static void *
+Malloc() {
+  cudaError_t cudaStatus;
+
+  void *data = nullptr;
+
+  cudaStatus = cudaMalloc(&data, length);
+  assert(cudaSuccess == cudaStatus);
+
+  std::uint8_t content[length];
+  for (std::size_t i = 0; i < length; i++) { content[i] = i; }
+
+  cudaStatus = cudaMemcpy(data, content, length, cudaMemcpyHostToDevice);
+  assert(cudaSuccess == cudaStatus);
+
+  return data;
+}
+
+class DataContainer {
+public:
+  DataContainer() : context_{blazingdb::uc::Context::IPC()} {
+    auto agent = context_->Agent();
+    buffers_.emplace_back(agent->Register(Malloc(), length));
+
+    data_.resize(buffers_.size() * 104);
+
+    std::memcpy(&data_[0], buffers_[0]->SerializedRecord()->Data(), 104);
+  }
+
+  const std::string &
+  data() const noexcept {
+    return data_;
+  }
+
+private:
+  std::unique_ptr<blazingdb::uc::Context>             context_;
+  std::vector<std::unique_ptr<blazingdb::uc::Buffer>> buffers_;
+  std::string                                         data_;
+};
+
 class MockMessage : public blazingdb::communication::messages::Message {
 public:
   MockMessage(
