@@ -45,6 +45,7 @@ blazingdb_artifact (
     messages/ColumnDataMessage.h
     messages/NodeDataMessage.h
     messages/PartitionPivotsMessage.h
+    messages/UCPool.h
     ContextToken.h
     Cluster.h
     Address.h
