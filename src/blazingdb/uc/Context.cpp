@@ -39,6 +39,14 @@ Context::IPC() {
   return std::make_unique<internal::ManagedContext>(resource, trader);
 }
 
+std::unique_ptr<Context>
+Context::GDR() {
+  UC_STATIC_LOCAL(internal::GDRCopyResource, resource);
+  UC_STATIC_LOCAL(VoidTrader, trader);
+  return std::make_unique<internal::ManagedContext>(resource, trader);
+}
+
+
 std::vector<Context::Capability>
 Context::LookupCapabilities() noexcept {
   uct_md_resource_desc_t *md_resources;
