@@ -103,7 +103,7 @@ namespace messages {
             std::uint64_t total_row_size = document["total_row_size"].GetUint64();
 
             // blazingdb-uc
-            auto context = blazingdb::uc::Context::IPC();
+            auto context = blazingdb::uc::Context::GDR();
             auto agent = context->Agent();
 
             // Get samples

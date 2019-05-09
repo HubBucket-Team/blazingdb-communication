@@ -60,7 +60,7 @@ Message::GetRemoteBuffer(const Node &node) {
       *static_cast<const blazingdb::communication::internal::ConcreteAddress *>(
           node.address());
 
-  auto context = blazingdb::uc::Context::IPC(concreteAddress.trader());
+  auto context = blazingdb::uc::Context::GDR(concreteAddress.trader());
 
   auto ownAgent  = context->OwnAgent();
   auto peerAgent = context->PeerAgent();

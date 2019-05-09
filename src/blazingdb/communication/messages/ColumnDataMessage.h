@@ -90,12 +90,16 @@ public:
         std::shared_ptr<ContextToken> contextToken;
         deserializeMessage(object["message"].GetObject(), messageToken, contextToken, node);
 
+        // blazingdb-uc
+        auto context = blazingdb::uc::Context::GDR();
+        auto agent = context->Agent();
+
         // Get array columns (payload)
         std::size_t binary_pointer = 0;
         std::vector<RalColumn> columns;
         const auto& gpu_data_array = object["columns"].GetArray();
         for (const auto& gpu_data : gpu_data_array) {
-            columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
+            columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject(), agent.get()));
         }
 
         // Create the message

@@ -102,7 +102,7 @@ namespace messages {
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
             std::string result;
 
-            auto context = blazingdb::uc::Context::IPC();
+            auto context = blazingdb::uc::Context::GDR();
             auto agent  = context->Agent();
 
             for (const auto& column : columns) {
