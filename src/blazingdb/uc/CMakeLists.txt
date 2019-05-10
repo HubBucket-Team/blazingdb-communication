@@ -1,19 +1,3 @@
-if (NOT DEFINED UCX_INSTALL_DIR)
-  message (FATAL_ERROR
-    "- - - - - - - - - - - - - - - - -\n"
-    "Don't forget -DUCX_INSTALL_DIR=/path/to/ucx\n"
-    "- - - - - - - - - - - - - - - - -")
-endif ()
-
-add_library (UCX::UCX INTERFACE IMPORTED)
-set_target_properties(UCX::UCX PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-  "${UCX_INSTALL_DIR}/include;/usr/local/cuda/include")
-target_link_libraries (UCX::UCX INTERFACE
-  ${UCX_INSTALL_DIR}/lib/libuct.so
-  ${UCX_INSTALL_DIR}/lib/libucs.so
-  ${UCX_INSTALL_DIR}/lib/libucm.so
-  /usr/local/cuda/lib64/libcudart.so cuda)
-
 blazingdb_artifact (
   VIRTUAL TARGET
     blazingdb-uc
@@ -28,8 +12,15 @@ blazingdb_artifact (
     internal/buffers/transports/ZCopyTransport.cpp
     internal/ManagedContext.cpp
 
+  INCLUDES
+    PUBLIC /usr/local/cuda/include
+
   LIBRARIES
-    UCX::UCX
+    cuda
+    /usr/local/cuda/lib64/libcudart.so
+    ${UCX_UCT_STATIC_LIB}
+    ${UCX_UCS_STATIC_LIB}
+    ${UCX_UCM_STATIC_LIB}
 
   PREFIX
     blazingdb/uc

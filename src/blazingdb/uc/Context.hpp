@@ -45,6 +45,9 @@ public:
   static std::unique_ptr<Context>
   IPC();
 
+  static std::unique_ptr<Context>
+  GDR();
+
   // ----------------------------------------------------------------------
   // List machine info about UCX valid interfaces
 

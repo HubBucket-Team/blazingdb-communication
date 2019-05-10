@@ -10,23 +10,6 @@ project(blazingdb-communication C CXX)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
-set(CMAKE_CUDA_STANDARD 14)
-set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
-message(STATUS "Using C++ standard: c++${CMAKE_CXX_STANDARD}")
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-    option(CXX_OLD_ABI "Disable the GLIBCXX11 ABI" OFF)
-    if(CXX_OLD_ABI)
-        message(STATUS "Disabling the GLIBCXX11 ABI")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
-        set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -D_GLIBCXX_USE_CXX11_ABI=0")
-    else()
-        message(STATUS "Enabling the GLIBCXX11 ABI")
-    endif(CXX_OLD_ABI)
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
 # NOTE Import cmake modules from blazingdb-dependencies (Mandatory: First step!)
 include(ImportCMakeModules)
 include(ConfigureBlazingDBHostCompiler)
@@ -45,6 +28,7 @@ include(ConfigureBlazingDBDependencies)
 include(ConfigureBoost)
 include(ConfigureRapidJSON)
 include(ConfigureSimpleWebServer)
+include(ConfigureUCX)
 
 # BEGIN MAIN #
 include_directories(

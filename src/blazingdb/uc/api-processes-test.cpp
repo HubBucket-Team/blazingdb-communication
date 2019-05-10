@@ -117,9 +117,9 @@ TEST(ApiOnProcessesTest, Direct) {
   ASSERT_NE(-1, pid);
 
   static constexpr std::size_t length = 20;
-  static char                  barrier[length];
 
   if (pid) {
+    close(pipedes[0]);
     const void *data = CreateData(length, ownSeed, ownOffset);
     Print("own", data, length);
 
@@ -130,8 +130,10 @@ TEST(ApiOnProcessesTest, Direct) {
     auto serializedRecord = buffer->SerializedRecord();
 
     write(pipedes[1], serializedRecord->Data(), serializedRecord->Size());
-    read(pipedes[0], barrier, length);
+    int stat_loc;
+    waitpid(pid, &stat_loc, WUNTRACED | WCONTINUED);
   } else {
+    close(pipedes[1]);
     const void *data = CreateData(length, peerSeed, peerOffset);
     Print("peer", data, length);
 
@@ -147,8 +149,6 @@ TEST(ApiOnProcessesTest, Direct) {
     future.wait();
 
     Print("peer", data, length);
-
-    write(pipedes[1], barrier, length);
     std::exit(EXIT_SUCCESS);
   }
 }

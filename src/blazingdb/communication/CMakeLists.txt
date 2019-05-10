@@ -1,5 +1,3 @@
-find_package(Boost REQUIRED COMPONENTS system)
-
 blazingdb_artifact (
   TARGET
     blazingdb-communication
