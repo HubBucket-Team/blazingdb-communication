@@ -21,6 +21,7 @@ blazingdb_artifact (
     ${UCX_UCT_STATIC_LIB}
     ${UCX_UCS_STATIC_LIB}
     ${UCX_UCM_STATIC_LIB}
+    ${GDR_STATIC_LIB}
 
   PREFIX
     blazingdb/uc
