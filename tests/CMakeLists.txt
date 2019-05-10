@@ -16,6 +16,12 @@ function(configure_test TEST_NAME Tests_SRCS)
         GTest::GTest
         blazingdb-communication
         #${X_STATIC_LIB}
+        cuda
+        /usr/local/cuda/lib64/libcudart.so
+        ${UCX_UCT_STATIC_LIB}
+        ${GDR_STATIC_LIB}
+        ${UCX_UCS_STATIC_LIB}
+        ${UCX_UCM_STATIC_LIB}
     )
 
     set_target_properties(${TEST_NAME} PROPERTIES
