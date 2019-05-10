@@ -1,3 +1,6 @@
+message(STATUS "================================================> GDR LIB: ${GDR_STATIC_LIB}")
+
+
 blazingdb_artifact (
   VIRTUAL TARGET
     blazingdb-uc
