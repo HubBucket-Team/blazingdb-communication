@@ -5,7 +5,6 @@ blazingdb_artifact (
   SOURCES
     Address.cc
     Address-Internal.cc
-    Configuration.cc
     ContextToken.cc
     Context.cc
     Cluster.cc
@@ -51,7 +50,6 @@ blazingdb_artifact (
     messages/NodeDataMessage.h
     messages/PartitionPivotsMessage.h
     messages/UCPool.h
-    Configuration.h
     ContextToken.h
     Cluster.h
     Address.h
@@ -73,7 +71,6 @@ blazingdb_artifact (
     Node.h
 
   TESTS
-    configuration-test.cc
     manager-test.cc
     messages/message-test.cpp
     node-test.cc
