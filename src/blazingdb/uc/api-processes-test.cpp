@@ -134,12 +134,14 @@ TEST(ApiOnProcessesTest, Direct) {
     waitpid(pid, &stat_loc, WUNTRACED | WCONTINUED);
   } else {
     close(pipedes[1]);
-    const void *data = CreateData(length, peerSeed, peerOffset);
+    //const void *data = CreateData(length, peerSeed, peerOffset);
+    void *data;
     Print("peer", data, length);
 
     auto context = Context::IPC();
     auto agent   = context->Agent();
-    auto buffer  = agent->Register(data, length);
+    //auto buffer  = agent->Register(data, length);
+    auto buffer  = agent->View(&data);
 
     std::uint8_t recordData[104];
     read(pipedes[0], recordData, 104);
