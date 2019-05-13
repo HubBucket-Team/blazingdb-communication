@@ -1,6 +1,6 @@
 #include "Configuration.h"
 
-namespace blazingdb {
+namespace blazgindb {
 namespace communication {
 
 namespace {

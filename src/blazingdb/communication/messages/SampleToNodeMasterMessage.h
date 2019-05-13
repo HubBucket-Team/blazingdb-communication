@@ -5,8 +5,6 @@
 #include "blazingdb/communication/Node.h"
 #include "blazingdb/communication/messages/GpuComponentMessage.h"
 
-#include <blazingdb/communication/Configuration.h>
-
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -87,56 +85,42 @@ namespace messages {
             return MessageID;
         }
 
-        static std::shared_ptr<Message>
-        Make(const std::string& json, const std::string& binary) {
-          // Parse json
-          rapidjson::Document document;
-          document.Parse(json.c_str());
+        static std::shared_ptr<Message> Make(const std::string& json, const std::string& binary) {
+            // Parse json
+            rapidjson::Document document;
+            document.Parse(json.c_str());
 
-          // Get main object
-          const auto& object = document.GetObject();
+            // Get main object
+            const auto& object = document.GetObject();
 
-          // Get message values;
-          std::unique_ptr<Node>         sender_node;
-          std::unique_ptr<MessageToken> messageToken;
-          std::shared_ptr<ContextToken> contextToken;
-          deserializeMessage(object["message"].GetObject(),
-                             messageToken,
-                             contextToken,
-                             sender_node);
+            // Get message values;
+            std::unique_ptr<Node> sender_node;
+            std::unique_ptr<MessageToken> messageToken;
+            std::shared_ptr<ContextToken> contextToken;
+            deserializeMessage(object["message"].GetObject(), messageToken, contextToken, sender_node);
 
-          // Get total row size
-          std::uint64_t total_row_size = document["total_row_size"].GetUint64();
+            // Get total row size
+            std::uint64_t total_row_size = document["total_row_size"].GetUint64();
 
-          // blazingdb-uc
-          const Configuration& configuration =
-              blazingdb::communication::Configuration::Instance();
+            // blazingdb-uc
+            auto context = blazingdb::uc::Context::IPC();
+            auto agent = context->Agent();
 
-          std::unique_ptr<blazingdb::uc::Context> context;
+            // Get samples
+            std::vector<RalColumn> columns;
+            std::size_t binary_pointer = 0;
+            const auto& gpu_data_array = document["samples"].GetArray();
+            for (const auto& gpu_data : gpu_data_array) {
+              columns.emplace_back(BaseClass::deserializeRalColumn(
+                  binary_pointer, binary, gpu_data.GetObject(), agent.get()));
+            }
 
-          if (configuration.WithGDR()) {
-            context = blazingdb::uc::Context::GDR();
-          } else {
-            context = blazingdb::uc::Context::IPC();
-          }
-
-          auto agent = context->Agent();
-
-          // Get samples
-          std::vector<RalColumn> columns;
-          std::size_t            binary_pointer = 0;
-          const auto& gpu_data_array = document["samples"].GetArray();
-          for (const auto& gpu_data : gpu_data_array) {
-            columns.emplace_back(BaseClass::deserializeRalColumn(
-                binary_pointer, binary, gpu_data.GetObject(), agent.get()));
-          }
-
-          // Create the message
-          return std::make_shared<MessageType>(std::move(messageToken),
-                                               std::move(contextToken),
-                                               *sender_node,
-                                               total_row_size,
-                                               std::move(columns));
+            // Create the message
+            return std::make_shared<MessageType>(std::move(messageToken),
+                                                 std::move(contextToken),
+                                                 *sender_node,
+                                                 total_row_size,
+                                                 std::move(columns));
         }
 
     private:
