@@ -1,7 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_CONFIGURATION_H_
 #define BLAZINGDB_COMMUNICATION_CONFIGURATION_H_
 
-namespace blazgindb {
+namespace blazingdb {
 namespace communication {
 
 class Configuration {
