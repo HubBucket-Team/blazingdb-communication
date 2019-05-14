@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
+#include <blazingdb/communication/Configuration.h>
 
 #include <blazingdb/uc/Context.hpp>
 
@@ -102,7 +103,17 @@ namespace messages {
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
             std::string result;
 
-            auto context = blazingdb::uc::Context::IPC();
+            std::unique_ptr<blazingdb::uc::Context> context;
+
+            const blazingdb::communication::Configuration &configuration =
+              blazingdb::communication::Configuration::Instance();
+
+            if (configuration.WithGDR()) {
+              context = blazingdb::uc::Context::GDR();
+            } else {
+              context = blazingdb::uc::Context::IPC();
+            }
+
             auto agent  = context->Agent();
 
             for (const auto& column : columns) {
