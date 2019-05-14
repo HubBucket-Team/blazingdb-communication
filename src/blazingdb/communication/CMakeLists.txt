@@ -28,8 +28,6 @@ blazingdb_artifact (
   LIBRARIES
     Boost::system
     blazingdb-uc
-    cuda
-    /usr/local/cuda/lib64/libcudart.so
     ${UCX_UCT_STATIC_LIB}
     ${GDR_STATIC_LIB}
     ${UCX_UCS_STATIC_LIB}

@@ -19,8 +19,6 @@ blazingdb_artifact (
     PUBLIC /usr/local/cuda/include
 
   LIBRARIES
-    cuda
-    /usr/local/cuda/lib64/libcudart.so
     ${UCX_UCT_STATIC_LIB}
     ${GDR_STATIC_LIB}
     ${UCX_UCS_STATIC_LIB}
