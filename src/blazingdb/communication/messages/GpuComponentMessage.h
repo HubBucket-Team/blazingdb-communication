@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
+#include <blazingdb/communication/Configuration.h>
 
 #include <blazingdb/uc/Context.hpp>
 
@@ -102,7 +103,17 @@ namespace messages {
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
             std::string result;
 
-            auto context = blazingdb::uc::Context::IPC();
+            std::unique_ptr<blazingdb::uc::Context> context;
+
+            const blazingdb::communication::Configuration &configuration =
+              blazingdb::communication::Configuration::Instance();
+
+            if (configuration.WithGDR()) {
+              context = blazingdb::uc::Context::GDR();
+            } else {
+              context = blazingdb::uc::Context::IPC();
+            }
+
             auto agent  = context->Agent();
 
             for (const auto& column : columns) {
@@ -183,12 +194,6 @@ namespace messages {
           auto cudf_column =
               deserializeCudfColumn(object["cudf_column"].GetObject());
 
-          std::size_t data_pointer = binary_pointer;
-          std::size_t valid_pointer =
-              data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
-          binary_pointer =
-              valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
-
           // reserve for local data and valid for gdf column
           cudaError_t cudaStatus;
 
@@ -205,11 +210,13 @@ namespace messages {
           assert(cudaSuccess == cudaStatus);
 
           auto dataRecordData =
-              reinterpret_cast<const std::uint8_t*>(binary_data.data());
+              reinterpret_cast<const std::uint8_t*>(binary_data.data()) +
+              binary_pointer;
 
           // TODO(issue): get magic number 104 from json data
           auto validRecordData =
-              reinterpret_cast<const std::uint8_t*>(binary_data.data() + 104);
+              reinterpret_cast<const std::uint8_t*>(binary_data.data()) +
+              binary_pointer + 104;
 
           GpuComponentMessage::LinkDataRecordAndWaitForGpuData(
               agent, dataRecordData, data, dataSize);
@@ -225,6 +232,8 @@ namespace messages {
           gdfColumn->valid      = (uint8_t*)valid;
           gdfColumn->null_count = cudf_column.null_count;
           gdfColumn->dtype_info = cudf_column.dtype_info;
+
+          binary_pointer += 208;
 
           return ral_column;
         }
