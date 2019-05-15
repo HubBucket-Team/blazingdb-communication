@@ -49,6 +49,11 @@ public:
   GDR();
 
   // ----------------------------------------------------------------------
+  // Helpers
+  static std::unique_ptr<Context>
+  BestContext();
+
+  // ----------------------------------------------------------------------
   // List machine info about UCX valid interfaces
 
   class Capability {

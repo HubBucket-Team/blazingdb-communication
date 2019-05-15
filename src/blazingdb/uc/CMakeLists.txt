@@ -7,6 +7,7 @@ blazingdb_artifact (
 
   SOURCES
     Context.cpp
+    ContextHelpers.cpp
     internal/agents/AddressableAgent.cpp
     internal/agents/ManagedAgent.cpp
     internal/buffers/LinkerBuffer.cpp

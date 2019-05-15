@@ -4,16 +4,18 @@
 
 using blazingdb::uc::Context;
 
-static bool FindIn(const std::vector<Context::Capability> &capabilities,
-                   const std::string &memoryModel) {
+static bool
+FindIn(const std::vector<Context::Capability> &capabilities,
+       const std::string &                     memoryModel) {
   return capabilities.cend() !=
-         std::find_if(capabilities.cbegin(), capabilities.cend(),
+         std::find_if(capabilities.cbegin(),
+                      capabilities.cend(),
                       [&memoryModel](const Context::Capability &capability) {
                         return memoryModel == capability.memoryModel;
                       });
 }
 
-TEST(Context, LookupCapabilities) {
+TEST(ContextTest, LookupCapabilities) {
   const std::vector<Context::Capability> capabilities =
       Context::LookupCapabilities();
 
@@ -22,3 +24,5 @@ TEST(Context, LookupCapabilities) {
   EXPECT_TRUE(FindIn(capabilities, "tcp"));
   EXPECT_TRUE(FindIn(capabilities, "cma"));
 }
+
+TEST(ContextTest, BestContext) { Context::BestContext(); }
