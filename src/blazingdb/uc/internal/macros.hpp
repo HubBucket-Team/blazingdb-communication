@@ -23,14 +23,8 @@ using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
     if (UCS_OK != (_status)) { UC_ABORT(ucs_status_string(_status)); }         \
   } while (0)
 
-#undef UCT_MEM_HANDLE_NULL
-#define UCT_MEM_HANDLE_NULL nullptr
-
-#undef UCT_INVALID_RKEY
-#define UCT_INVALID_RKEY static_cast<std::uintptr_t>(-1)
-
-#undef UCS_BIT
-#define UCS_BIT(i) (1UL << (i))
+#define UC_MEM_HANDLE_NULL nullptr
+#define UC_INVALID_RKEY static_cast<std::uintptr_t>(-1)
 #define UC_BIT(i) (1UL << (i))
 
 #define UC_CONST const __attribute__((__const__))
