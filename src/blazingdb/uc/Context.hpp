@@ -46,6 +46,9 @@ public:
   IPC();
 
   static std::unique_ptr<Context>
+  IPCView();
+
+  static std::unique_ptr<Context>
   GDR();
 
   // ----------------------------------------------------------------------
