@@ -10,7 +10,7 @@ namespace internal {
 
 class UC_NOEXPORT ViewBuffer : public Buffer {
 public:
-  explicit ViewBuffer(const void *const data);
+  explicit ViewBuffer(const void* &data);
 
   ~ViewBuffer() final;
 
@@ -28,7 +28,7 @@ public:
   UC_CONCRETE(ViewBuffer);
 
 private:
-    const void * data_;
+    const void* &data_;
 };
 
 }  // namespace internal

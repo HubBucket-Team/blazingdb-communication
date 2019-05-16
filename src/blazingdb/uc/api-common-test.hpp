@@ -28,4 +28,4 @@ CreateData(const std::size_t    size,
            const std::ptrdiff_t offset);
 
 void
-Client(const std::string &name, const Context &context, const void *const data);
+Client(const std::string &name, const Context &context, const void* &data);

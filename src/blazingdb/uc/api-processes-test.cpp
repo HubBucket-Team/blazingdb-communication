@@ -38,7 +38,7 @@ Exec(ContextBuilder &&    builder,
      const int (&own_pipedes)[2],
      const int (&peer_pipedes)[2]) {
   cudaSetDevice(device);
-  void *     data       = CreateData(length, seed, offset);
+  const void *     data       = CreateData(length, seed, offset);
   int        pipedes[2] = {own_pipedes[0], peer_pipedes[1]};
   StubTrader trader{pipedes};
   auto       context = decaycopy(builder)(trader);
@@ -157,6 +157,7 @@ TEST(ApiOnProcessesTest, Direct) {
 
 TEST(ApiOnProcessesTest, DirectView) {
   using namespace blazingdb::uc;
+  cuInit(0);
 
   int pipedes[2];
   pipe(pipedes);
@@ -165,7 +166,7 @@ TEST(ApiOnProcessesTest, DirectView) {
 
   ASSERT_NE(-1, pid);
 
-  static constexpr std::size_t length = 20;
+  static constexpr std::size_t length = 128;
 
   if (pid) {
     close(pipedes[0]);
@@ -183,7 +184,7 @@ TEST(ApiOnProcessesTest, DirectView) {
     waitpid(pid, &stat_loc, WUNTRACED | WCONTINUED);
   } else {
     close(pipedes[1]);
-    void *data = nullptr;
+    const void *data = nullptr;
 
     auto context = Context::IPCView(); // new builder: ViewContext : ManageContext ( Agent() -> ViewAgent ) 
     auto agent   = context->Agent(); // ViewAgent
@@ -192,8 +193,8 @@ TEST(ApiOnProcessesTest, DirectView) {
     // 
     auto buffer  = agent->Register(data, length);// ViewBuffer { Register()-> ViewBuffer }
  
-    std::uint8_t recordData[104]; // CU_IPC_HANDLE_SIZE: 64
-    read(pipedes[0], recordData, 104);
+    std::uint8_t recordData[sizeof(cudaIpcMemHandle_t)]; // CU_IPC_HANDLE_SIZE: 64
+    read(pipedes[0], recordData, sizeof(cudaIpcMemHandle_t));
     auto transport = buffer->Link(recordData); // Link() { cudaIpcGetMemHandle } 
     auto future = transport->Get();
     future.wait();

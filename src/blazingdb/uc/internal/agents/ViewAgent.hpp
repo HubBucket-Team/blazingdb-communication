@@ -13,7 +13,7 @@ public:
   explicit ViewAgent();
 
   std::unique_ptr<Buffer>
-  Register(const void *data, std::size_t size) const noexcept final;
+  Register(const void * &data, std::size_t size) const noexcept final;
 
 private:
 
