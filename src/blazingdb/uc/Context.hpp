@@ -26,11 +26,15 @@ public:
   virtual std::unique_ptr<uc::Agent>
   PeerAgent() const = 0;
 
+  /// \brief Create an agent for non-owning-peering buffers
+  /// Use when you do not want auto addresses negotiation
   virtual std::unique_ptr<uc::Agent>
   Agent() const = 0;
 
   // ----------------------------------------------------------------------
   // Builders
+  // TODO(context_builders): port method builders to class builders
+  //                         see #Context::SmartBuilder
   using Builder = std::unique_ptr<Context>(const Trader &);
 
   static std::unique_ptr<Context>
