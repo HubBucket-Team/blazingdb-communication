@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <blazingdb/uc/Agent.hpp>
+#include <blazingdb/uc/Capabilities.hpp>
 #include <blazingdb/uc/Trader.hpp>
 
 namespace blazingdb {
@@ -56,6 +57,9 @@ public:
   // Helpers
   static std::unique_ptr<Context>
   BestContext();
+
+  static std::unique_ptr<Context>
+  BestContext(const Capabilities &capabilities);
 
   // ----------------------------------------------------------------------
   // List machine info about UCX valid interfaces
