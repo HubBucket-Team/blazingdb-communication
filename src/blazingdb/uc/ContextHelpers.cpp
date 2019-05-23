@@ -53,44 +53,6 @@ private:
 }  // namespace
 
 std::unique_ptr<Context>
-Context::BestContext() {
-  // util definitions
-
-  uct_md_resource_desc_t *md_resources;
-  unsigned                num_md_resources;
-  CHECK_UCS(uct_query_md_resources(&md_resources, &num_md_resources));
-
-  std::vector<MDNameWithPriority>
-      mdNamesWithPriorities;  // use std::priority_queue
-  mdNamesWithPriorities.reserve(static_cast<std::size_t>(num_md_resources));
-
-  // find model domains
-
-  for (unsigned i = 0; i < num_md_resources; ++i) {
-    mdNamesWithPriorities.emplace_back(md_resources[i].md_name);
-  }
-
-  if (mdNamesWithPriorities.empty()) {
-    throw std::runtime_error("No available resources");
-  }
-
-  std::sort(mdNamesWithPriorities.begin(), mdNamesWithPriorities.end());
-
-  // TODO(uc::context): create resource builder
-  const MDNameWithPriority &bestMDNameWithPriotity =
-      mdNamesWithPriorities.front();
-
-  std::unique_ptr<Context> bestContext =
-      (std::string{EXPECTED_MD[0]} == bestMDNameWithPriotity.md_name())
-          ? Context::GDR()
-          : Context::IPC();
-
-  uct_release_md_resource_list(md_resources);
-
-  return bestContext;
-}
-
-std::unique_ptr<Context>
 Context::BestContext(const Capabilities &capabilities) {
   if (capabilities.AreNotThereResources()) {
     // TODO(capabilities): write there is not capabilities method

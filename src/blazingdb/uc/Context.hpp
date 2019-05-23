@@ -56,9 +56,6 @@ public:
   // ----------------------------------------------------------------------
   // Helpers
   static std::unique_ptr<Context>
-  BestContext();
-
-  static std::unique_ptr<Context>
   BestContext(const Capabilities &capabilities);
 
   // ----------------------------------------------------------------------

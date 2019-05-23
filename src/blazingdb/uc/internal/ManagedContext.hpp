@@ -28,6 +28,10 @@ public:
   std::unique_ptr<uc::Agent>
   Agent() const final;
 
+  const Resource &
+  resource() const noexcept {
+    return resource_;
+  }
 
 private:
   const Resource &resource_;
