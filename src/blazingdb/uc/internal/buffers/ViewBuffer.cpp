@@ -60,10 +60,20 @@ void PrintRaw(const std::string &name, const void *&data, const std::size_t size
 std::unique_ptr<const Record::Serialized>
 ViewBuffer::SerializedRecord() const noexcept {
   cudaIpcMemHandle_t ipc_memhandle;
-  CheckCudaErrors(cudaIpcGetMemHandle((cudaIpcMemHandle_t *) &ipc_memhandle, (void *) this->data_));
-  PrintRaw("SerializedRecord data:", this->data_, 128);
+  if (this->data_ == nullptr) {
+    std::cout << "***NULL - sender-ipc-handler***\n";
+    std::basic_string<uint8_t> bytes;
+    return std::make_unique<IpcViewSerialized>(bytes);
+  }
+  std::cout << "SerializedRecord: pointer address : " << this->data_ << std::endl;
 
-  std::basic_string<uint8_t> bytes((uint8_t*)(&ipc_memhandle), sizeof(cudaIpcMemHandle_t));
+  CheckCudaErrors(cudaIpcGetMemHandle(&ipc_memhandle, (void *) this->data_));
+  // PrintRaw("SerializedRecord data:", this->data_, 128);
+
+  std::basic_string<uint8_t> bytes;
+  bytes.resize(104);
+  memcpy((void*)bytes.data(), (uint8_t*)(&ipc_memhandle), sizeof(cudaIpcMemHandle_t));
+
   std::cout << "***sender-ipc-handler***\n";
   for (auto c : bytes)
     std::cout << (int) c << ", ";
@@ -76,11 +86,11 @@ ViewBuffer::SerializedRecord() const noexcept {
 static void* CudaIpcMemHandlerFrom (const std::basic_string<uint8_t>& handler) {
   void * response = nullptr;
   std::cout << "handler-content: " <<  handler.size() <<  std::endl;
-  if (handler.size() == sizeof(cudaIpcMemHandle_t)) {
+  // if (handler.size() == sizeof(cudaIpcMemHandle_t)) {
     cudaIpcMemHandle_t ipc_memhandle;
     memcpy((int8_t*)&ipc_memhandle, handler.data(), sizeof(ipc_memhandle));
     CheckCudaErrors(cudaIpcOpenMemHandle((void **)&response, ipc_memhandle, cudaIpcMemLazyEnablePeerAccess));
-  }
+  // }
   return response;
 }
 
@@ -93,8 +103,7 @@ ViewBuffer::Link(const std::uint8_t *recordData) {
   std::cout << std::endl;
 
   this->data_ = CudaIpcMemHandlerFrom(bytes);
-
-  PrintRaw("Link data:", this->data_, 128);
+  // PrintRaw("Link data:", this->data_, 128);
 
   return std::make_unique<ViewTransport>();
 } 

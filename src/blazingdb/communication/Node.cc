@@ -69,9 +69,9 @@ namespace {
 class NodeBuffer : public Buffer {
 public:
   explicit NodeBuffer(const std::string& nodeAsString)
-      :  nodeAsString_{nodeAsString} {
-        data_ = const_cast<char *>(nodeAsString_.data());
-        size_ = nodeAsString_.size();
+      :  nodeAsString_{nodeAsString}, Buffer{nodeAsString_.data(), nodeAsString_.size()} {
+        // data_ = const_cast<char *>(nodeAsString_.data());
+        // size_ = nodeAsString_.size();
   }
 
   const char*

@@ -7,6 +7,7 @@
 #include <blazingdb/communication/Configuration.h>
 
 #include <blazingdb/uc/Context.hpp>
+#include <iostream>
 
 #include "blazingdb/communication/messages/UCPool.h"
 #include <cuda_runtime_api.h>
@@ -83,11 +84,14 @@ namespace messages {
 
             auto serialized_data = data_buffer->SerializedRecord();
 
-            std::basic_string<uint8_t> response(serialized_data->Data(), serialized_data->Size());
+            std::basic_string<uint8_t> binary_buffer(serialized_data->Data(), serialized_data->Size());
 
             UCPool::getInstance().push(data_buffer.release());
 
-            return std::string((const char *)response.c_str());
+            std::string response;
+            for(auto c: binary_buffer)
+                response += char(c);
+            return response;
         }
 
         static void LinkDataRecordAndWaitForGpuData(const void *agent_ptr, const std::uint8_t* dataRecordData, const void* data, size_t dataSize) {
@@ -111,7 +115,7 @@ namespace messages {
             if (configuration.WithGDR()) {
               context = blazingdb::uc::Context::GDR();
             } else {
-              context = blazingdb::uc::Context::IPC();
+              context = blazingdb::uc::Context::IPCView();
             }
 
             auto agent  = context->Agent();
@@ -123,7 +127,7 @@ namespace messages {
             }
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());
-            return std::string((const char *)result.c_str());
+            return result;
         }
 
         static CudfColumn deserializeCudfColumn(rapidjson::Value::ConstObject&& object) {
@@ -188,6 +192,7 @@ namespace messages {
           const auto& column_name_data = object["column_name"];
           std::string column_name(column_name_data.GetString(),
                                   column_name_data.GetStringLength());
+          bool is_ipc = object["is_ipc"].GetBool();
 
           std::uint64_t column_token = object["column_token"].GetUint64();
 
@@ -224,16 +229,18 @@ namespace messages {
               agent, validRecordData, valid, validSize);
 
           // set gdf column
-          RalColumn ral_column;
+          RalColumn ral_column; 
+          //@todo: is ipc columnn?
+          ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
+                                                    data,
+                                                    (unsigned char*)valid,
+                                                    cudf_column.size,
+                                                    column_name);
           ral_column.set_column_token(column_token);
-
-          auto gdfColumn        = ral_column.get_gdf_column();
-          gdfColumn->data       = (char*)data;
-          gdfColumn->valid      = (uint8_t*)valid;
-          gdfColumn->null_count = cudf_column.null_count;
-          gdfColumn->dtype_info = cudf_column.dtype_info;
-
-          binary_pointer += 208;
+          ral_column.get_gdf_column()->null_count = cudf_column.null_count;
+          ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
+        
+            // binary_pointer += 208;
 
           return ral_column;
         }
