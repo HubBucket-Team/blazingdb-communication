@@ -12,7 +12,6 @@ set(test_sources
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/Message.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/MessageToken.cc
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/DataPivot.cpp
-    ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/PartitionPivotsMessage.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/communication/messages/NodeDataMessage.cc
 )
 

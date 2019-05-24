@@ -305,62 +305,62 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 }
 
 
-TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
+// TEST_F(ComponentMessagesTest, PartitionPivotsMessage) {
 
-    // Create Data - create nodes
-    using Address = blazingdb::communication::Address;
-    blazingdb::communication::Node node_1(Address::Make("1.2.3.4", 1234));
-    blazingdb::communication::Node node_2(Address::Make("5.6.7.8", 4564));
-    blazingdb::communication::Node node_3(Address::Make("10.11.20.21", 2021));
+//     // Create Data - create nodes
+//     using Address = blazingdb::communication::Address;
+//     blazingdb::communication::Node node_1(Address::Make("1.2.3.4", 1234));
+//     blazingdb::communication::Node node_2(Address::Make("5.6.7.8", 4564));
+//     blazingdb::communication::Node node_3(Address::Make("10.11.20.21", 2021));
 
-    // Create Data - create pivots
-    using blazingdb::communication::messages::DataPivot;
+//     // Create Data - create pivots
+//     using blazingdb::communication::messages::DataPivot;
 
-    std::vector<DataPivot> pivots;
-    pivots.emplace_back(DataPivot(node_1, "1111", "2222"));
-    pivots.emplace_back(DataPivot(node_2, "3333", "4444"));
-    pivots.emplace_back(DataPivot(node_3, "5555", "6666"));
+//     std::vector<DataPivot> pivots;
+//     pivots.emplace_back(DataPivot(node_1, "1111", "2222"));
+//     pivots.emplace_back(DataPivot(node_2, "3333", "4444"));
+//     pivots.emplace_back(DataPivot(node_3, "5555", "6666"));
 
-    // Make alias
-    using ContextToken = blazingdb::communication::ContextToken;
-    using PartitionPivotsMessage = blazingdb::communication::messages::PartitionPivotsMessage;
+//     // Make alias
+//     using ContextToken = blazingdb::communication::ContextToken;
+//     using PartitionPivotsMessage = blazingdb::communication::messages::PartitionPivotsMessage;
 
-    // Create context token
-    const ContextToken::TokenType context_token = 9678;
+//     // Create context token
+//     const ContextToken::TokenType context_token = 9678;
 
-    // Serialize data
-    std::string json_data;
-    std::string binary_data;
+//     // Serialize data
+//     std::string json_data;
+//     std::string binary_data;
 
-    // Serialize message
-    {
-        PartitionPivotsMessage message(ContextToken::Make(context_token), pivots);
+//     // Serialize message
+//     {
+//         PartitionPivotsMessage message(ContextToken::Make(context_token), pivots);
 
-        json_data = message.serializeToJson();
-        binary_data = message.serializeToBinary();
-    }
+//         json_data = message.serializeToJson();
+//         binary_data = message.serializeToBinary();
+//     }
 
-    // Deserialize message & test
-    {
-        std::shared_ptr<PartitionPivotsMessage> message = std::dynamic_pointer_cast<PartitionPivotsMessage>
-                (PartitionPivotsMessage::Make(json_data, binary_data));
+//     // Deserialize message & test
+//     {
+//         std::shared_ptr<PartitionPivotsMessage> message = std::dynamic_pointer_cast<PartitionPivotsMessage>
+//                 (PartitionPivotsMessage::Make(json_data, binary_data));
 
-        // Test context token
-        ASSERT_EQ(context_token, message->getContextTokenValue());
+//         // Test context token
+//         ASSERT_EQ(context_token, message->getContextTokenValue());
 
-        // Test message token
-        ASSERT_EQ(PartitionPivotsMessage::getMessageID(), message->getMessageTokenValue());
+//         // Test message token
+//         ASSERT_EQ(PartitionPivotsMessage::getMessageID(), message->getMessageTokenValue());
 
-        // Test pivots
-        ASSERT_EQ(message->getDataPivots().size(), pivots.size());
-        for (std::size_t k = 0; k < pivots.size(); ++k) {
-            const auto& message_pivot = message->getDataPivots()[k];
-            ASSERT_EQ(message_pivot.getMinRange(), pivots[k].getMinRange());
-            ASSERT_EQ(message_pivot.getMaxRange(), pivots[k].getMaxRange());
-            ASSERT_TRUE(message_pivot.getNode() == pivots[k].getNode());
-        }
-    }
-}
+//         // Test pivots
+//         ASSERT_EQ(message->getDataPivots().size(), pivots.size());
+//         for (std::size_t k = 0; k < pivots.size(); ++k) {
+//             const auto& message_pivot = message->getDataPivots()[k];
+//             ASSERT_EQ(message_pivot.getMinRange(), pivots[k].getMinRange());
+//             ASSERT_EQ(message_pivot.getMaxRange(), pivots[k].getMaxRange());
+//             ASSERT_TRUE(message_pivot.getNode() == pivots[k].getNode());
+//         }
+//     }
+// }
 
 
 TEST_F(ComponentMessagesTest, NodeDataMessage) {
