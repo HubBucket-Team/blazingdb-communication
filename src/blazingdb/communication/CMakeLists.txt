@@ -20,7 +20,6 @@ blazingdb_artifact (
     messages/Message.cc
     messages/MessageToken.cc
     messages/DataPivot.cpp
-    messages/PartitionPivotsMessage.cpp
     messages/NodeDataMessage.cc
 
   INCLUDES
