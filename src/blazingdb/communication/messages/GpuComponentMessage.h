@@ -179,7 +179,7 @@ namespace messages {
 
             return ral_column;
         }
-
+        // TODO: elimitar todo rastro de simple-distribution.
         static RalColumn
         deserializeRalColumn(std::size_t&                    binary_pointer,
                              const std::string&              binary_data,
@@ -198,7 +198,7 @@ namespace messages {
           cudaError_t cudaStatus;
 
           void* data     = nullptr;
-          int   dataSize = 100;  // gdf_size_type
+          int   dataSize = cudf_column.size * 8;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
 
           cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);
@@ -225,11 +225,14 @@ namespace messages {
 
           // set gdf column
           RalColumn ral_column;
-          ral_column.set_column_token(column_token);
 
+          ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
+                                                     (typename GpuFunctions::DataTypePointer)data,
+                                                     (typename GpuFunctions::ValidTypePointer)valid,
+                                                     cudf_column.size,
+                                                     column_name);
+          ral_column.set_column_token(column_token);
           auto gdfColumn        = ral_column.get_gdf_column();
-          gdfColumn->data       = (char*)data;
-          gdfColumn->valid      = (uint8_t*)valid;
           gdfColumn->null_count = cudf_column.null_count;
           gdfColumn->dtype_info = cudf_column.dtype_info;
 
