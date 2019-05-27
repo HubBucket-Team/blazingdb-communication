@@ -8,8 +8,6 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(blazingdb-communication C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
-set(BLAZINGDB_DEPENDENCIES_INSTALL_DIR /home/aocsa/blazingsql/workspace/new_dependencies/)
-set(BLAZINGDB_PROTOCOL_INSTALL_DIR /home/aocsa/blazingsql/workspace/blazingdb-protocol_project/develop/install)
 message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
 # NOTE Import cmake modules from blazingdb-dependencies (Mandatory: First step!)
