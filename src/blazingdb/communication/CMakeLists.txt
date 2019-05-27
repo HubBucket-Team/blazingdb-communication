@@ -20,7 +20,6 @@ blazingdb_artifact (
     messages/Message.cc
     messages/MessageToken.cc
     messages/DataPivot.cpp
-    messages/PartitionPivotsMessage.cpp
     messages/NodeDataMessage.cc
 
   INCLUDES
@@ -29,8 +28,6 @@ blazingdb_artifact (
   LIBRARIES
     Boost::system
     blazingdb-uc
-    cuda
-    /usr/local/cuda/lib64/libcudart.so
     ${UCX_UCT_STATIC_LIB}
     ${GDR_STATIC_LIB}
     ${UCX_UCS_STATIC_LIB}
