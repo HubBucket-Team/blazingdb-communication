@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="blazingdb-communication"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake\;CMake Files\..\;CMake Files\..\new_dependencies\;CMake Files\..\new_dependencies\lib\;CMake Files\..\new_dependencies\lib\cmake\;CMake Files\src\;CMake Files\src\blazingdb\;CMake Files\src\blazingdb\uc\;CMake Files\src\blazingdb\communication\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/strip">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 install/strip"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 install"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="list_install_components">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 list_install_components"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Nightly">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 Nightly"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/local">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 install/local"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Continuous">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 Continuous"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Experimental">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 Experimental"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="coverage">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/Makefile&quot;  VERBOSE=1 coverage"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-uc">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/blazingdb-uc.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 blazingdb-uc"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-uc/fast">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/blazingdb-uc.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 blazingdb-uc/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-uc-gtest">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/blazingdb-uc-gtest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 blazingdb-uc-gtest"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-uc-gtest/fast">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/blazingdb-uc-gtest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 blazingdb-uc-gtest/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-uc-gtest-run">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 blazingdb-uc-gtest-run"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-communication">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/libblazingdb-communication.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 blazingdb-communication"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-communication/fast">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/libblazingdb-communication.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 blazingdb-communication/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-communication-gtest">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/blazingdb-communication-gtest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 blazingdb-communication-gtest"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-communication-gtest/fast">
+				<Option output="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/blazingdb-communication-gtest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/src"/>
+					<Add directory="/usr/local/cuda/include"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/src"/>
+					<Add directory="/home/aocsa/blazingsql/workspace/new_dependencies/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 blazingdb-communication-gtest/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="blazingdb-communication-gtest-run">
+				<Option working_dir="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 blazingdb-communication-gtest-run"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/communication/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/Context.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/ManagedContext.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/ViewContext.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/agents/AddressableAgent.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/agents/ManagedAgent.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/agents/ViewAgent.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/buffers/LinkerBuffer.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/buffers/RemoteBuffer.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/buffers/ViewBuffer.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/buffers/records/RemotableRecord.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake-build-debug/src/blazingdb/uc/CMakeFiles/blazingdb-uc.dir/internal/buffers/transports/ZCopyTransport.cpp.o">
+			<Option target="blazingdb-uc-gtest"/>
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Address-Internal.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Address-Internal.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Address.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Address.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Cluster.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Cluster.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Configuration.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Configuration.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Context.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Context.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/ContextToken.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/ContextToken.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Manager.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Manager.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Node.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Node.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Router.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/Router.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/configuration-test.cc">
+			<Option target="blazingdb-communication-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/internal/Trader.cpp">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/internal/Trader.hpp">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/internal/TraderLock.cpp">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/internal/TraderLock.hpp">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/manager-test.cc">
+			<Option target="blazingdb-communication-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/DataPivot.cpp">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/DataPivot.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/Message.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/Message.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/MessageToken.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/MessageToken.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/NodeDataMessage.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/NodeDataMessage.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/messages/message-test.cpp">
+			<Option target="blazingdb-communication-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/Client.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/Client.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/MessageQueue.cpp">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/MessageQueue.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/Server.cc">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/Server.h">
+			<Option target="blazingdb-communication"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/network/integration-server-client-test.cc">
+			<Option target="blazingdb-communication-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/node-test.cc">
+			<Option target="blazingdb-communication-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/processes-test.cc">
+			<Option target="blazingdb-communication-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/Context.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/Context.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/api-common-test.cpp">
+			<Option target="blazingdb-uc-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/api-common-test.hpp">
+			<Option target="blazingdb-uc-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/api-processes-test.cpp">
+			<Option target="blazingdb-uc-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/api-threads-test.cpp">
+			<Option target="blazingdb-uc-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/context-test.cpp">
+			<Option target="blazingdb-uc-gtest"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/ManagedContext.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/ManagedContext.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/ViewContext.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/ViewContext.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/agents/AddressableAgent.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/agents/AddressableAgent.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/agents/ManagedAgent.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/agents/ManagedAgent.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/agents/ViewAgent.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/agents/ViewAgent.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/LinkerBuffer.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/LinkerBuffer.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/RemoteBuffer.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/RemoteBuffer.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/ViewBuffer.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/ViewBuffer.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/records/RemotableRecord.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/records/RemotableRecord.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/transports/ZCopyTransport.cpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/internal/buffers/transports/ZCopyTransport.hpp">
+			<Option target="blazingdb-uc"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/cmake/ImportCMakeModules.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureBlazingDBDependencies.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureBlazingDBHostCompiler.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureBoost.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureGoogleTest.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureRapidJSON.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureSimpleWebServer.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/ConfigureUCX.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/FindRapidJSON.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/FindSimpleWebServer.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/../new_dependencies/lib/cmake/FindUCX.cmake">
+			<Option virtualFolder="CMake Files\..\new_dependencies\lib\cmake\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\blazingdb\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/uc/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\blazingdb\uc\"/>
+		</Unit>
+		<Unit filename="/home/aocsa/blazingsql/workspace/blazingdb-communication-ucx/src/blazingdb/communication/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\blazingdb\communication\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
