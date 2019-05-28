@@ -28,6 +28,8 @@ public:
   std::unique_ptr<uc::Agent>
   Agent() const final;
 
+  std::size_t
+  serializedRecordSize() const noexcept final;
 
 private:
   const Resource &resource_;
