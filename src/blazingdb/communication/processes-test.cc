@@ -1,4 +1,5 @@
 #include <blazingdb/communication/Address-Internal.h>
+#include <blazingdb/communication/ContextToken.h>
 #include <blazingdb/communication/messages/Message.h>
 #include <blazingdb/communication/messages/MessageToken.h>
 #include <blazingdb/communication/network/Client.h>
@@ -28,6 +29,10 @@ Malloc(const std::string &&payload) {
   return data;
 }
 
+static constexpr char endpoint[] = "testEndpoint";
+static constexpr blazingdb::communication::network::Server::ContextTokenValue
+    contextTokenValueId = 1230;
+
 namespace {
 using namespace blazingdb::communication;
 
@@ -38,6 +43,8 @@ public:
 
 class MockMessage : public messages::Message {
 public:
+  static const std::string MesssageID;
+
   MockMessage(std::shared_ptr<ContextToken> &&contextToken,
               std::unique_ptr<blazingdb::communication::messages::MessageToken>
                   &&messageToken)
@@ -51,9 +58,21 @@ public:
 
   static std::shared_ptr<Message>
   Make(const std::string & /*jsonData*/, const std::string & /*binaryData*/) {
-    return nullptr;
+    using blazingdb::communication::messages::MessageToken;
+    std::shared_ptr<ContextToken> contextToken =
+        ContextToken::Make(contextTokenValueId);
+    std::unique_ptr<MessageToken> messageToken = MessageToken::Make(endpoint);
+    return std::make_shared<MockMessage>(std::move(contextToken),
+                                         std::move(messageToken));
+  }
+
+  static const std::string &
+  getMessageID() {
+    return MesssageID;
   }
 };
+
+const std::string MockMessage::MesssageID = endpoint;
 
 class DataContainer {
 public:
@@ -79,10 +98,6 @@ private:
 };
 }  // namespace
 
-static constexpr char endpoint[] = "testEndpoint";
-static constexpr blazingdb::communication::network::Server::ContextTokenValue
-    contextTokenValueId = 1230;
-
 static void
 ExecServer() {
   using namespace blazingdb::communication::messages;
@@ -99,7 +114,8 @@ ExecServer() {
 
   std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001);
   Node                     node{std::move(address)};
-  std::shared_ptr<Message> message = server->getMessage(contextTokenValueId);
+  std::shared_ptr<Message> message =
+      server->getMessage(contextTokenValueId, MockMessage::getMessageID());
 
   server->Close();
   serverThread.join();

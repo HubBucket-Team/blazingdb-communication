@@ -186,7 +186,8 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
   EXPECT_CALL(mockFlag, Flag()).Times(1);
 
   std::thread serverGetMessageThread([&server, &mockFlag]() {
-    std::shared_ptr<Message> message = server->getMessage(context_token);
+    std::shared_ptr<Message> message =
+        server->getMessage(context_token, endpoint);
 
     auto mock_message = std::dynamic_pointer_cast<MockMessage>(message);
     EXPECT_EQ(12, mock_message->pages());

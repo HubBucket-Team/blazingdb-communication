@@ -125,8 +125,9 @@ TEST(MessageTest, SerializingWithUCX) {
     EXPECT_TRUE(status->IsOk());
   } catch (const Client::SendError &error) { FAIL() << error.what(); }
 
-  std::thread serverGetMessageThread(
-      [&server]() { auto message = server->getMessage(contextToken); });
+  std::thread serverGetMessageThread([&server]() {
+    auto message = server->getMessage(contextToken, "testEndpoint");
+  });
 
   serverGetMessageThread.join();
   server->Close();

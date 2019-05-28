@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 TEST(ConfigurationTest, Initialization) {
-  using blazgindb::communication::Configuration;
+  using blazingdb::communication::Configuration;
 
   Configuration::Set(true);
 
