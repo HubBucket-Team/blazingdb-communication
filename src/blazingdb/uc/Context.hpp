@@ -29,6 +29,9 @@ public:
   virtual std::unique_ptr<uc::Agent>
   Agent() const = 0;
 
+  virtual std::size_t
+  serializedRecordSize() const noexcept = 0;
+
   // ----------------------------------------------------------------------
   // Builders
   using Builder = std::unique_ptr<Context>(const Trader &);
