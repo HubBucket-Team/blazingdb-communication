@@ -22,7 +22,7 @@ public:
                             const uct_iface_h &        iface);
 
   std::unique_ptr<Buffer>
-  Register(const void *data, std::size_t size) const noexcept final;
+  Register(const void* &data, std::size_t size) const noexcept final;
 
 private:
   const uct_md_h &     md_;

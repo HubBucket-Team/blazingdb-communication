@@ -26,7 +26,7 @@ ManagedAgent::ManagedAgent(const uct_md_h&            md,
 ManagedAgent::~ManagedAgent() { uct_ep_destroy(ep_); }
 
 std::unique_ptr<Buffer>
-ManagedAgent::Register(const void* const data, const std::size_t size) const
+ManagedAgent::Register(const void* &data, const std::size_t size) const
     noexcept {
   return std::make_unique<AllocatedBuffer>(
       md_, md_attr_, ep_, data, size, async_context_, worker_, iface_);

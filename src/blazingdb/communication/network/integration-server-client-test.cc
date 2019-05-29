@@ -68,8 +68,8 @@ public:
 
     cudaError_t cudaError;
 
-    void *ownData;
-    void *peerData;
+    const void *ownData;
+    const void *peerData;
 
     cudaError = cudaMalloc(&ownData, length);
     ASSERT_EQ(cudaSuccess, cudaError);

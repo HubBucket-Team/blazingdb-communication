@@ -13,21 +13,43 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+static constexpr std::size_t length = 64;
+
 static const void *
 Malloc(const std::string &&payload) {
   void *data;
-
   cudaError_t cudaError;
-
-  cudaError = cudaMalloc(&data, payload.length() + 100);
+  cudaError = cudaMalloc(&data, payload.length());
   assert(cudaSuccess == cudaError);
-
   cudaError = cudaMemcpy(
       data, payload.data(), payload.length(), cudaMemcpyHostToDevice);
   assert(cudaSuccess == cudaError);
-
   return data;
 }
+
+
+
+void
+Print(const std::string &name, const void *data, const std::size_t size) {
+  std::uint8_t *host = new std::uint8_t[size];
+
+  cudaError_t cudaStatus = cudaMemcpy(host, data, size, cudaMemcpyDeviceToHost);
+  assert(cudaSuccess == cudaStatus);
+
+  std::stringstream ss;
+
+  ss << ">>> [" << std::setw(9) << name << "]";
+  for (std::size_t i = 0; i < size; i++) {
+    ss << ' ' << std::setfill('0') << std::setw(3)
+       << static_cast<std::uint32_t>(host[i]);
+  }
+  ss << std::endl;
+  std::cout << ss.str();
+
+  delete[] host;
+}
+
+
 
 static constexpr char endpoint[] = "testEndpoint";
 static constexpr blazingdb::communication::network::Server::ContextTokenValue
@@ -44,82 +66,81 @@ public:
 class MockMessage : public messages::Message {
 public:
   static const std::string MesssageID;
+  using ContextTokenPtr = std::shared_ptr<ContextToken>;
+  using MessageTokenPtr = std::unique_ptr<blazingdb::communication::messages::MessageToken>;
 
-  MockMessage(std::shared_ptr<ContextToken> &&contextToken,
-              std::unique_ptr<blazingdb::communication::messages::MessageToken>
-                  &&messageToken)
-      : Message{std::forward<std::unique_ptr<
-                    blazingdb::communication::messages::MessageToken>>(
-                    messageToken),
+  MockMessage(ContextTokenPtr &&contextToken, MessageTokenPtr &&messageToken)
+      : Message{std::forward<MessageTokenPtr>(messageToken),
                 std::move(contextToken)} {}
 
   MOCK_CONST_METHOD0(serializeToJson, const std::string());
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
   static std::shared_ptr<Message>
-  Make(const std::string &jsonData, const std::string &binaryData) {
-    using blazingdb::uc::Context;
+  Make(const std::string & /*jsonData*/, const std::string & binaryData) {
+
+    std::cout << "make from bin: " << binaryData << std::endl;
+    auto init_content = std::string(length, '0');
+    const void *data = Malloc(std::move(init_content));
+    Print("initial peer", data, length);
+    using namespace blazingdb::uc;
+
     auto context = Context::IPC();
     auto agent   = context->Agent();
+    auto buffer  = agent->Register(data, length);
 
-    const void *const data = Malloc("-------");
+    std::uint8_t recordData[104];
+    for (size_t i = 0; i < 104; i++)
+    {
+      recordData[i] = binaryData[i];
+    }
+    
+    auto transport = buffer->Link(recordData);
 
-    auto buffer = agent->Register(data, 8);
+    auto future = transport->Get();
+    future.wait();
 
-    auto transport =
-        buffer->Link(reinterpret_cast<const std::uint8_t *>(binaryData.data()));
-
-    transport->Get().wait();
-
-    char result[8];
-
-    cudaError_t cudaError = cudaMemcpy(result, data, 8, cudaMemcpyDeviceToHost);
-    assert(cudaSuccess == cudaError);
-
-    EXPECT_EQ("{Hi}", jsonData);
-    EXPECT_STREQ("ownData", result);
+    Print("peer", data, length);
 
     using blazingdb::communication::messages::MessageToken;
-    std::shared_ptr<ContextToken> contextToken =
-        ContextToken::Make(contextTokenValueId);
-    std::unique_ptr<MessageToken> messageToken = MessageToken::Make(endpoint);
+    auto contextToken = ContextToken::Make(contextTokenValueId);
+    auto messageToken = MessageToken::Make(endpoint);
     return std::make_shared<MockMessage>(std::move(contextToken),
                                          std::move(messageToken));
   }
 
-  static const std::string &
-  getMessageID() {
+  static const std::string & getMessageID() {
     return MesssageID;
   }
 };
 
 const std::string MockMessage::MesssageID = endpoint;
+using BufferPtr = std::unique_ptr<blazingdb::uc::Buffer>;
 
 class DataContainer {
 public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
     agent_ = context_->Agent();
+    auto payload = std::string(length, 'P');
+    const void * d_ptr = Malloc(std::move(payload));
+    Print("own: ", d_ptr, length);
 
-    buffers_.emplace_back(agent_->Register(Malloc("ownData"), 8));
-
+    buffers_.emplace_back(agent_->Register(d_ptr, length));
     data_.resize(buffers_.size() * context_->serializedRecordSize());
-
-    auto serializedRecord = buffers_[0]->SerializedRecord();
-
-    std::memcpy(&data_[0], serializedRecord->Data(), serializedRecord->Size());
+    std::memcpy(&data_[0], buffers_[0]->SerializedRecord()->Data(), context_->serializedRecordSize());
   }
 
-  const std::string &
-  data() const noexcept {
+  const std::string & data() const noexcept {
     return data_;
   }
 
 private:
   std::unique_ptr<blazingdb::uc::Context>             context_;
   std::unique_ptr<blazingdb::uc::Agent>               agent_;
-  std::vector<std::unique_ptr<blazingdb::uc::Buffer>> buffers_;
+  std::vector<BufferPtr>                              buffers_;
   std::string                                         data_;
 };
+
 }  // namespace
 
 static void
@@ -136,10 +157,9 @@ ExecServer() {
   std::thread serverThread{&Server::Run, server.get(), 8000};
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001);
-  Node                     node{std::move(address)};
-  std::shared_ptr<Message> message =
-      server->getMessage(contextTokenValueId, MockMessage::getMessageID());
+  auto message = server->getMessage(contextTokenValueId, MockMessage::getMessageID());
+
+  auto concreteMessage = std::static_pointer_cast<MockMessage>(message);
 
   server->Close();
   serverThread.join();
@@ -185,7 +205,7 @@ ExecClient() {
   serverThread.join();
 }
 
-TEST(DISABLED_ProcessesTest, TwoProcesses) {
+TEST(ProcessesTest, TwoProcesses) {
   pid_t pid = fork();
   if (pid) {
     ExecServer();
@@ -193,4 +213,13 @@ TEST(DISABLED_ProcessesTest, TwoProcesses) {
     ExecClient();
     std::exit(0);
   }
+}
+
+
+TEST(ProcessesTest, Master) {
+  ExecServer(); 
+}
+
+TEST(ProcessesTest, Worker) {
+  ExecClient(); 
 }

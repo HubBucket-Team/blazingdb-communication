@@ -1,6 +1,7 @@
 #include "Context.hpp"
 
 #include "internal/ManagedContext.hpp"
+#include "internal/ViewContext.hpp"
 #include "internal/resources.hpp"
 
 namespace blazingdb {
@@ -37,6 +38,11 @@ Context::IPC() {
   UC_STATIC_LOCAL(internal::CudaIPCResource, resource);
   UC_STATIC_LOCAL(VoidTrader, trader);
   return std::make_unique<internal::ManagedContext>(resource, trader);
+}
+
+std::unique_ptr<Context>
+Context::IPCView() {
+  return std::make_unique<internal::ViewContext>();
 }
 
 std::unique_ptr<Context>

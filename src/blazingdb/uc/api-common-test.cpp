@@ -59,8 +59,8 @@ CreateData(const std::size_t    size,
 void
 Client(const std::string &name,
        const Context &    context,
-       const void *const  data) {
-  void *twinData = CreateData(length, twinSeed, twinOffset);
+       const void* &data) {
+  const void *twinData = CreateData(length, twinSeed, twinOffset);
 
   auto own  = context.OwnAgent();
   auto peer = context.PeerAgent();
