@@ -251,7 +251,7 @@ namespace messages {
           ral_column.get_gdf_column()->null_count = cudf_column.null_count;
           ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
         
-            // binary_pointer += 208;
+          binary_pointer += 208;
 
           return ral_column;
         }
