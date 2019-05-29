@@ -57,7 +57,28 @@ public:
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
   static std::shared_ptr<Message>
-  Make(const std::string & /*jsonData*/, const std::string & /*binaryData*/) {
+  Make(const std::string &jsonData, const std::string &binaryData) {
+    using blazingdb::uc::Context;
+    auto context = Context::IPC();
+    auto agent   = context->Agent();
+
+    const void *const data = Malloc("-------");
+
+    auto buffer = agent->Register(data, 8);
+
+    auto transport =
+        buffer->Link(reinterpret_cast<const std::uint8_t *>(binaryData.data()));
+
+    transport->Get().wait();
+
+    char result[8];
+
+    cudaError_t cudaError = cudaMemcpy(result, data, 8, cudaMemcpyDeviceToHost);
+    assert(cudaSuccess == cudaError);
+
+    EXPECT_EQ("{Hi}", jsonData);
+    EXPECT_STREQ("ownData", result);
+
     using blazingdb::communication::messages::MessageToken;
     std::shared_ptr<ContextToken> contextToken =
         ContextToken::Make(contextTokenValueId);
@@ -78,11 +99,14 @@ class DataContainer {
 public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
     agent_ = context_->Agent();
-    buffers_.emplace_back(agent_->Register(Malloc("ownData"), 108));
 
-    data_.resize(buffers_.size() * 104);
+    buffers_.emplace_back(agent_->Register(Malloc("ownData"), 8));
 
-    std::memcpy(&data_[0], buffers_[0]->SerializedRecord()->Data(), 104);
+    data_.resize(buffers_.size() * context_->serializedRecordSize());
+
+    auto serializedRecord = buffers_[0]->SerializedRecord();
+
+    std::memcpy(&data_[0], serializedRecord->Data(), serializedRecord->Size());
   }
 
   const std::string &
@@ -145,7 +169,7 @@ ExecClient() {
 
   DataContainer dataContainer;
 
-  EXPECT_CALL(message, serializeToJson()).WillOnce(testing::Return(""));
+  EXPECT_CALL(message, serializeToJson()).WillOnce(testing::Return("{Hi}"));
   EXPECT_CALL(message, serializeToBinary())
       .WillOnce(testing::Return(dataContainer.data()));
   testing::Mock::AllowLeak(&message);
