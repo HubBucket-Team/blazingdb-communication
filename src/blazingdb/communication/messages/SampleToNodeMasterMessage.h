@@ -117,7 +117,7 @@ namespace messages {
           if (configuration.WithGDR()) {
             context = blazingdb::uc::Context::GDR();
           } else {
-            context = blazingdb::uc::Context::IPC();
+            context = blazingdb::uc::Context::IPCView();
           }
 
           auto agent = context->Agent();
