@@ -13,7 +13,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-static constexpr std::size_t length = 100;
+static constexpr std::size_t length = 64;
 
 static const void *
 Malloc(const std::string &&payload) {
@@ -26,6 +26,30 @@ Malloc(const std::string &&payload) {
   assert(cudaSuccess == cudaError);
   return data;
 }
+
+
+
+void
+Print(const std::string &name, const void *data, const std::size_t size) {
+  std::uint8_t *host = new std::uint8_t[size];
+
+  cudaError_t cudaStatus = cudaMemcpy(host, data, size, cudaMemcpyDeviceToHost);
+  assert(cudaSuccess == cudaStatus);
+
+  std::stringstream ss;
+
+  ss << ">>> [" << std::setw(9) << name << "]";
+  for (std::size_t i = 0; i < size; i++) {
+    ss << ' ' << std::setfill('0') << std::setw(3)
+       << static_cast<std::uint32_t>(host[i]);
+  }
+  ss << std::endl;
+  std::cout << ss.str();
+
+  delete[] host;
+}
+
+
 
 static constexpr char endpoint[] = "testEndpoint";
 static constexpr blazingdb::communication::network::Server::ContextTokenValue
@@ -53,7 +77,31 @@ public:
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
   static std::shared_ptr<Message>
-  Make(const std::string & /*jsonData*/, const std::string & /*binaryData*/) {
+  Make(const std::string & /*jsonData*/, const std::string & binaryData) {
+
+    std::cout << "make from bin: " << binaryData << std::endl;
+    auto init_content = std::string(length, '0');
+    const void *data = Malloc(std::move(init_content));
+    Print("initial peer", data, length);
+    using namespace blazingdb::uc;
+
+    auto context = Context::IPC();
+    auto agent   = context->Agent();
+    auto buffer  = agent->Register(data, length);
+
+    std::uint8_t recordData[104];
+    for (size_t i = 0; i < 104; i++)
+    {
+      recordData[i] = binaryData[i];
+    }
+    
+    auto transport = buffer->Link(recordData);
+
+    auto future = transport->Get();
+    future.wait();
+
+    Print("peer", data, length);
+
     using blazingdb::communication::messages::MessageToken;
     auto contextToken = ContextToken::Make(contextTokenValueId);
     auto messageToken = MessageToken::Make(endpoint);
@@ -73,8 +121,10 @@ class DataContainer {
 public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
     agent_ = context_->Agent();
-    auto payload = std::string("P", length);
+    auto payload = std::string(length, 'P');
     const void * d_ptr = Malloc(std::move(payload));
+    Print("own: ", d_ptr, length);
+
     buffers_.emplace_back(agent_->Register(d_ptr, length));
     data_.resize(buffers_.size() * context_->serializedRecordSize());
     std::memcpy(&data_[0], buffers_[0]->SerializedRecord()->Data(), context_->serializedRecordSize());
@@ -90,6 +140,7 @@ private:
   std::vector<BufferPtr>                              buffers_;
   std::string                                         data_;
 };
+
 }  // namespace
 
 static void
@@ -107,6 +158,8 @@ ExecServer() {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   auto message = server->getMessage(contextTokenValueId, MockMessage::getMessageID());
+
+  auto concreteMessage = std::static_pointer_cast<MockMessage>(message);
 
   server->Close();
   serverThread.join();

@@ -86,6 +86,12 @@ namespace messages {
 
             std::basic_string<uint8_t> binary_buffer(serialized_data->Data(), serialized_data->Size());
 
+
+            std::cout << "***GetBufferDescriptor-ipc-handler***\n";
+            for (auto c : binary_buffer)
+                std::cout << (int) c << ", ";
+            std::cout << std::endl;
+
             UCPool::getInstance().push(data_buffer.release());
 
             std::string response;
@@ -115,7 +121,7 @@ namespace messages {
             if (configuration.WithGDR()) {
               context = blazingdb::uc::Context::GDR();
             } else {
-              context = blazingdb::uc::Context::IPCView();
+              context = blazingdb::uc::Context::IPC();
             }
 
             auto agent  = context->Agent();
@@ -125,6 +131,11 @@ namespace messages {
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
             }
+            std::hash<std::string> hasher;
+            auto hashed = hasher(result); 
+
+            std::cout << "****message sent: " << hashed << std::endl; 
+
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());
             return result;
@@ -203,7 +214,7 @@ namespace messages {
           cudaError_t cudaStatus;
 
           void* data     = nullptr;
-          int   dataSize = cudf_column.size * 8;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
+          int   dataSize = 100;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
 
           cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);

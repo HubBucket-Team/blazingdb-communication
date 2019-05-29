@@ -117,7 +117,7 @@ namespace messages {
           if (configuration.WithGDR()) {
             context = blazingdb::uc::Context::GDR();
           } else {
-            context = blazingdb::uc::Context::IPCView();
+            context = blazingdb::uc::Context::IPC();
           }
 
           auto agent = context->Agent();
@@ -127,11 +127,17 @@ namespace messages {
           std::size_t            binary_pointer = 0;
           const auto& gpu_data_array = document["samples"].GetArray();
           auto index = 0;
+
+          std::hash<std::string> hasher;
+          auto hashed = hasher(binary); 
+          std::cout << "****Make message from bin: " << binary  << std::endl; 
+          std::cout << "****Make message from: " << hashed << std::endl; 
           for (const auto& gpu_data : gpu_data_array) {
+            std::cout << "\t offset: " << index << std::endl; 
             columns.emplace_back(BaseClass::deserializeRalColumn(
                 binary_pointer, binary.substr(index), gpu_data.GetObject(), agent.get()));
 
-            index += 208;//@todo
+            index += context->serializedRecordSize();//@check if ok?
           }
 
           // Create the message
