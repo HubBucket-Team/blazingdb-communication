@@ -78,4 +78,5 @@ blazingdb_artifact (
     node-test.cc
     network/integration-server-client-test.cc
     processes-test.cc
+    processes-message-test.cc
 )

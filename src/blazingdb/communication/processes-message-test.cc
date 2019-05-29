@@ -62,7 +62,7 @@ public:
     auto context = Context::IPC();
     auto agent   = context->Agent();
 
-    const void *const data = Malloc("-------");
+    const void *data = Malloc("-------");
 
     auto buffer = agent->Register(data, 8);
 
@@ -100,7 +100,8 @@ public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
     agent_ = context_->Agent();
 
-    buffers_.emplace_back(agent_->Register(Malloc("ownData"), 8));
+    const void *data = Malloc("ownData");
+    buffers_.emplace_back(agent_->Register(data, 8));
 
     data_.resize(buffers_.size() * context_->serializedRecordSize());
 
@@ -185,7 +186,7 @@ ExecClient() {
   serverThread.join();
 }
 
-TEST(DISABLED_ProcessesTest, TwoProcesses) {
+TEST(DISABLED_ProcessesTest, ProcessesMessage) {
   pid_t pid = fork();
   if (pid) {
     ExecServer();
