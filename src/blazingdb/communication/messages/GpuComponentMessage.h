@@ -183,7 +183,7 @@ namespace messages {
 
             return ral_column;
         }
-
+        // TODO: elimitar todo rastro de simple-distribution.
         static RalColumn
         deserializeRalColumn(std::size_t&                    binary_pointer,
                              const std::string&              binary_data,
@@ -203,7 +203,7 @@ namespace messages {
           cudaError_t cudaStatus;
 
           void* data     = nullptr;
-          int   dataSize = 100;  // gdf_size_type
+          int   dataSize = cudf_column.size * 8;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
 
           cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);

@@ -107,6 +107,12 @@ ManagedContext::Agent() const {
       md_, md_attr_, trader_, ep_, *async_context_, worker_, iface_);
 }
 
+std::size_t
+ManagedContext::serializedRecordSize() const noexcept {
+  //! @see const void * for `RemotableBuffer`
+  return md_attr_.rkey_packed_size + sizeof(const void *);
+}
+
 }  // namespace internal
 }  // namespace uc
 }  // namespace blazingdb

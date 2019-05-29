@@ -1,5 +1,5 @@
 #include "blazingdb/communication/network/MessageQueue.h"
-#include <iostream>
+
 #include <algorithm>
 
 namespace blazingdb {
@@ -8,9 +8,9 @@ namespace network {
 
 std::shared_ptr<Message> MessageQueue::getMessage(const MessageTokenType& messageToken) {
     std::unique_lock<std::mutex> lock(mutex_);
-    condition_variable_.wait(lock, 
+    condition_variable_.wait(lock,
                             [&, this]{ return std::any_of(this->message_queue_.cbegin(),
-                                                        this->message_queue_.cend(), 
+                                                        this->message_queue_.cend(),
                                                         [&](const auto& e){ return e->getMessageTokenValue() == messageToken; }); });
     return getMessageQueue(messageToken);
 }

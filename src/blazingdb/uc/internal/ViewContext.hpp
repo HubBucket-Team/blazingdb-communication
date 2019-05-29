@@ -25,6 +25,9 @@ public:
     return nullptr;
   }
 
+ std::size_t
+  serializedRecordSize() const noexcept final;
+
   std::unique_ptr<uc::Agent> Agent() const final;
 };
 

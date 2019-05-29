@@ -36,7 +36,8 @@ class DataContainer {
 public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
     auto agent = context_->Agent();
-    buffers_.emplace_back(agent->Register(Malloc(), length));
+    const void* d_ptr = (const void* )Malloc();
+    buffers_.emplace_back(agent->Register(d_ptr, length));
 
     data_.resize(buffers_.size() * 104);
 
@@ -125,8 +126,9 @@ TEST(MessageTest, SerializingWithUCX) {
     EXPECT_TRUE(status->IsOk());
   } catch (const Client::SendError &error) { FAIL() << error.what(); }
 
-  std::thread serverGetMessageThread(
-      [&server]() { auto message = server->getMessage(contextToken); });
+  std::thread serverGetMessageThread([&server]() {
+    auto message = server->getMessage(contextToken, "testEndpoint");
+  });
 
   serverGetMessageThread.join();
   server->Close();

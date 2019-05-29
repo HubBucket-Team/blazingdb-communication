@@ -126,9 +126,12 @@ namespace messages {
           std::vector<RalColumn> columns;
           std::size_t            binary_pointer = 0;
           const auto& gpu_data_array = document["samples"].GetArray();
+          auto index = 0;
           for (const auto& gpu_data : gpu_data_array) {
             columns.emplace_back(BaseClass::deserializeRalColumn(
-                binary_pointer, binary, gpu_data.GetObject(), agent.get()));
+                binary_pointer, binary.substr(index), gpu_data.GetObject(), agent.get()));
+
+            index += 208;//@todo
           }
 
           // Create the message

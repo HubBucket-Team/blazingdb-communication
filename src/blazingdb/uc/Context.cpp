@@ -42,8 +42,6 @@ Context::IPC() {
 
 std::unique_ptr<Context>
 Context::IPCView() {
-  // UC_STATIC_LOCAL(internal::CudaIPCResource, resource);
-  // UC_STATIC_LOCAL(VoidTrader, trader);
   return std::make_unique<internal::ViewContext>();
 }
 

@@ -1,6 +1,5 @@
 #include "Message.h"
 
-#include <iostream>
 #include "../internal/Trader.hpp"
 #include "../Address-Internal.h"
 #include <blazingdb/uc/API.hpp>
