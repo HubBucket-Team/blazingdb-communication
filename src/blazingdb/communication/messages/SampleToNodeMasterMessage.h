@@ -124,18 +124,16 @@ namespace messages {
 
           // Get samples
           std::vector<RalColumn> columns;
-          std::size_t            binary_offset = 0;
+          std::size_t            binary_pointer = 0;
           const auto& gpu_data_array = document["samples"].GetArray();
-          
-          std::hash<std::string> hasher;
-          auto hashed = hasher(binary); 
-          std::cout << "****Make message from bin: " << binary  << std::endl; 
-          std::cout << "****Make message from: " << hashed << std::endl; 
+          auto index = 0;
           for (const auto& gpu_data : gpu_data_array) {
-            std::cout << "\t offset: " << binary_offset << std::endl; 
             columns.emplace_back(BaseClass::deserializeRalColumn(
-                binary_offset, binary, gpu_data.GetObject(), agent.get()));
+                binary_pointer, binary.substr(index), gpu_data.GetObject(), agent.get()));
+
+            index += 208;//@todo
           }
+
           // Create the message
           return std::make_shared<MessageType>(std::move(messageToken),
                                                std::move(contextToken),

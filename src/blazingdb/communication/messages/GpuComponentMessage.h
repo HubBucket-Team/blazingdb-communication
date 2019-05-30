@@ -214,7 +214,7 @@ namespace messages {
           cudaError_t cudaStatus;
 
           void* data     = nullptr;
-          int   dataSize = 100;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
+          int   dataSize = cudf_column.size * 8;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
 
           cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);
@@ -251,7 +251,7 @@ namespace messages {
           ral_column.get_gdf_column()->null_count = cudf_column.null_count;
           ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
         
-          binary_pointer += 208;
+            // binary_pointer += 208;
 
           return ral_column;
         }
