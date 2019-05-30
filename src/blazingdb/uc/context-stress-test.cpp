@@ -49,10 +49,10 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(MemoryAllocations,
                          ContextMemoryStressTest,
-                         ::testing::Values(TestAllocationParam::B(200),
+                         ::testing::Values(TestAllocationParam::B(20),
                                            TestAllocationParam::Kb(2),
                                            TestAllocationParam::Mb(2),
-                                           TestAllocationParam::Gb(1)));
+                                           TestAllocationParam::Gb(2)));
 
 void
 Sender(int (&pipedes)[2],
@@ -61,7 +61,7 @@ Sender(int (&pipedes)[2],
   cuInit(0);
   close(pipedes[0]);
 
-  const void *const data = CreateData(incrementalLength, ownSeed, ownOffset);
+  const void *const data = CreateData(incrementalLength, ownSeed, 0);
 
   auto context = Context::IPC();
   auto agent   = context->Agent();
@@ -83,7 +83,7 @@ Receiver(int (&pipedes)[2], const std::size_t incrementalLength) {
   cuInit(0);
   close(pipedes[1]);
 
-  const void *const data = CreateData(incrementalLength, peerSeed, peerOffset);
+  const void *const data = CreateData(incrementalLength, peerSeed, 0);
 
   auto context = Context::IPC();
   auto agent   = context->Agent();
@@ -96,17 +96,11 @@ Receiver(int (&pipedes)[2], const std::size_t incrementalLength) {
   auto future = transport->Get();
   future.wait();
 
-  const void *const expectedData =
-      CreateData(incrementalLength, ownSeed, ownOffset);
+  const void *const expected = CreateHostData(incrementalLength, ownSeed, 0);
 
-  std::uint8_t *expected = new std::uint8_t[incrementalLength];
-  std::uint8_t *result   = new std::uint8_t[incrementalLength];
+  std::uint8_t *result = new std::uint8_t[incrementalLength];
 
   cudaError_t cudaError;
-
-  cudaError = cudaMemcpy(
-      expected, expectedData, incrementalLength, cudaMemcpyDeviceToHost);
-  EXPECT_EQ(cudaSuccess, cudaError);
 
   cudaError =
       cudaMemcpy(result, data, incrementalLength, cudaMemcpyDeviceToHost);
