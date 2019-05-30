@@ -75,6 +75,7 @@ Sender(int (&pipedes)[2],
   waitpid(pid, &stat_loc, WUNTRACED | WCONTINUED);
   EXPECT_EQ(0, stat_loc);
   close(pipedes[1]);
+  std::exit(EXIT_SUCCESS);
 }
 
 void
@@ -111,6 +112,9 @@ Receiver(int (&pipedes)[2], const std::size_t incrementalLength) {
       cudaMemcpy(result, data, incrementalLength, cudaMemcpyDeviceToHost);
   EXPECT_EQ(cudaSuccess, cudaError);
 
+  cudaError = cudaDeviceSynchronize();
+  EXPECT_EQ(cudaSuccess, cudaError);
+
   EXPECT_EQ(0, std::memcmp(expected, result, incrementalLength));
 
   delete[] recordData;
@@ -129,7 +133,15 @@ TEST_P(ContextMemoryStressTest, HugeAllocations) {
   ASSERT_NE(-1, pid);
 
   if (pid) {
-    Sender(pipedes, pid, GetParam().size());
+    pid = fork();
+    ASSERT_NE(-1, pid);
+    if (pid) {
+      int stat_loc;
+      waitpid(pid, &stat_loc, WCONTINUED);
+      EXPECT_EQ(0, stat_loc);
+    } else {
+      Sender(pipedes, pid, GetParam().size());
+    }
   } else {
     Receiver(pipedes, GetParam().size());
   }
