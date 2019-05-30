@@ -42,7 +42,7 @@ public:
         static_cast<const internal::ConcreteAddress *>(node.address());
 
     const std::string serverPortPath =
-        concreteAddress->ip() + ":" + std::to_string(concreteAddress->port());
+        concreteAddress->ip() + ":" + std::to_string(concreteAddress->communication_port());
 
     HttpClient httpClient{serverPortPath};
 
@@ -97,7 +97,7 @@ public:
 
     const std::string getAddress(const Node& node) {
         const auto* concreteAddress = static_cast<const internal::ConcreteAddress*>(node.address());
-        return std::string{concreteAddress->ip() + ":" + std::to_string(concreteAddress->port())};
+        return std::string{concreteAddress->ip() + ":" + std::to_string(concreteAddress->communication_port())};
     }
 
     std::shared_ptr<Status> sendPost(HttpClient& httpClient,
