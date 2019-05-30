@@ -12,7 +12,6 @@ add_library (blazingdb-communication
   messages/Message.cc
   messages/MessageToken.cc
   messages/DataPivot.cpp
-  messages/PartitionPivotsMessage.cpp
   messages/NodeDataMessage.cc
 )
 

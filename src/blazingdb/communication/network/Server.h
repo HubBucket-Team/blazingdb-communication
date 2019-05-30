@@ -31,6 +31,8 @@ public:
      * Alias of the message class used in the implementation of the server.
      */
     using Message = blazingdb::communication::messages::Message;
+    
+    using MessageTokenType = blazingdb::communication::messages::MessageToken::TokenType;
 
     /**
      * Alias of the type that it is used for the deserialization function of the messages.
@@ -127,7 +129,7 @@ public:
      * @param context_token  identifier for the message queue using ContextToken.
      * @return               a shared pointer of a base message class.
      */
-    virtual std::shared_ptr<Message> getMessage(const ContextToken& context_token) = 0;
+    virtual std::shared_ptr<Message> getMessage(const ContextToken& context_token, const MessageTokenType& messageToken) = 0;
 
     /**
      * It retrieves the message that it is stored in the message queue.
@@ -139,7 +141,7 @@ public:
      * @param context_token  identifier for the message queue.
      * @return               a shared pointer of a base message class.
      */
-    virtual std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token) = 0;
+    virtual std::shared_ptr<Message> getMessage(const ContextTokenValue& context_token, const MessageTokenType& messageToken) = 0;
 
     /**
      * It stores the message in the message queue and it uses the ContextToken to select the queue.
