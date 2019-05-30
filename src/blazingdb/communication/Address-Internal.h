@@ -28,8 +28,11 @@ public:
       writer.Key("addressIp");
       writer.String(ip_.c_str());
 
-      writer.Key("addressPort");
-      writer.Int(port_);
+      writer.Key("addressCommunicationPort");
+      writer.Int(communication_port_);
+      
+      writer.Key("addressProtocolPort");
+      writer.Int(protocol_port_);
   };
 
 private:

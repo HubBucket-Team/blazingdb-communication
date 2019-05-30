@@ -11,9 +11,9 @@ std::shared_ptr<Address> Address::Make(const std::string& ip,
 }
 
 // TODO percy ?????
-std::shared_ptr<Address> Address::Make(const rapidjson::Value::Object& object, const std::int16_t protocol_port) {
+std::shared_ptr<Address> Address::Make(const rapidjson::Value::Object& object) {
   return std::make_shared<internal::ConcreteAddress>(
-      object["addressIp"].GetString(), object["addressPort"].GetInt(), protocol_port);
+      object["addressIp"].GetString(), object["addressCommunicationPort"].GetInt(), object["addressProtocolPort"].GetInt());
 }
 
 }  // namespace communication
