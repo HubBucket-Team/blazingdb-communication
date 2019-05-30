@@ -132,8 +132,8 @@ std::shared_ptr<Node> Node::makeShared(const Node& node) {
     return std::make_shared<ConcreteNode>(node.unixSocketId(), Address::Make(concreteAddress.ip(), concreteAddress.communication_port(), concreteAddress.protocol_port()));
 }
 
-std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip, int16_t port) {
-  return std::unique_ptr<Node>(new Node(unixSocketId, Address::Make(ip, port)));
+std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip, int16_t communication_port, int16_t protocol_port) {
+  return std::unique_ptr<Node>(new Node(unixSocketId, Address::Make(ip, communication_port, protocol_port)));
 }
 
 
