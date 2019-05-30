@@ -80,7 +80,7 @@ public:
         *static_cast<const internal::ConcreteAddress*>(address());
 
     const std::string nodeAsString =
-        concreteAddress.ip() + "," + std::to_string(concreteAddress.port());
+        concreteAddress.ip() + "," + std::to_string(concreteAddress.communication_port());
 
 
     std::cout << nodeAsString << "\n";
@@ -118,18 +118,18 @@ bool operator!=(const Node& lhs, const Node& rhs) {
     return !(lhs.address()->SameValueAs(*rhs.address()));
 }
 
-std::shared_ptr<Node> Node::makeShared(int unixSocketId, std::string&& ip, int16_t port) {
-    return std::make_shared<ConcreteNode>(unixSocketId, Address::Make(ip, port));
+std::shared_ptr<Node> Node::makeShared(int unixSocketId, std::string&& ip, int16_t communication_port, int16_t protocol_port) {
+    return std::make_shared<ConcreteNode>(unixSocketId, Address::Make(ip, communication_port, protocol_port));
 }
 
-std::shared_ptr<Node> Node::makeShared(int unixSocketId, const std::string& ip, int16_t port) {
-    return std::make_shared<ConcreteNode>(unixSocketId, Address::Make(ip, port));
+std::shared_ptr<Node> Node::makeShared(int unixSocketId, const std::string& ip, int16_t communication_port, int16_t protocol_port) {
+    return std::make_shared<ConcreteNode>(unixSocketId, Address::Make(ip, communication_port, protocol_port));
 }
 
 std::shared_ptr<Node> Node::makeShared(const Node& node) {
     const internal::ConcreteAddress& concreteAddress =
         *static_cast<const internal::ConcreteAddress*>(node.address());
-    return std::make_shared<ConcreteNode>(node.unixSocketId(), Address::Make(concreteAddress.ip(), concreteAddress.port()));
+    return std::make_shared<ConcreteNode>(node.unixSocketId(), Address::Make(concreteAddress.ip(), concreteAddress.communication_port(), concreteAddress.protocol_port()));
 }
 
 std::unique_ptr<Node> Node::make(int unixSocketId, const std::string& ip, int16_t port) {
