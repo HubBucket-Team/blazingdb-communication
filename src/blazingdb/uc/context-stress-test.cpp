@@ -18,6 +18,26 @@ public:
     return size_;
   }
 
+  static std::size_t
+  B(const std::size_t size) noexcept {
+    return size;
+  }
+
+  static std::size_t
+  Kb(const std::size_t sizeInBytes) noexcept {
+    return B(sizeInBytes) * 1000;
+  }
+
+  static std::size_t
+  Mb(const std::size_t sizeInKbs) noexcept {
+    return Kb(sizeInKbs) * 1000;
+  }
+
+  static std::size_t
+  Gb(const std::size_t sizeInMbs) noexcept {
+    return Mb(sizeInMbs) * 1000;
+  }
+
 private:
   std::size_t size_;
 };
@@ -29,7 +49,10 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(MemoryAllocations,
                          ContextMemoryStressTest,
-                         ::testing::Values(200, 400, 80000, 320000000));
+                         ::testing::Values(TestAllocationParam::B(200),
+                                           TestAllocationParam::Kb(2),
+                                           TestAllocationParam::Mb(2),
+                                           TestAllocationParam::Gb(1)));
 
 void
 Sender(int (&pipedes)[2],
@@ -51,6 +74,7 @@ Sender(int (&pipedes)[2],
   int stat_loc;
   waitpid(pid, &stat_loc, WUNTRACED | WCONTINUED);
   EXPECT_EQ(0, stat_loc);
+  close(pipedes[1]);
 }
 
 void
@@ -91,6 +115,7 @@ Receiver(int (&pipedes)[2], const std::size_t incrementalLength) {
 
   delete[] recordData;
 
+  close(pipedes[0]);
   std::exit(EXIT_SUCCESS);
 }
 
