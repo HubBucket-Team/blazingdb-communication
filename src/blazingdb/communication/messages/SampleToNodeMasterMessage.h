@@ -126,12 +126,18 @@ namespace messages {
           std::vector<RalColumn> columns;
           std::size_t            binary_pointer = 0;
           const auto& gpu_data_array = document["samples"].GetArray();
-          auto index = 0;
+          auto offset = 0;
+          auto buffer_size = context->serializedRecordSize();
           for (const auto& gpu_data : gpu_data_array) {
-            columns.emplace_back(BaseClass::deserializeRalColumn(
-                binary_pointer, binary.substr(index), gpu_data.GetObject(), agent.get()));
+            RalColumn column 
+                = BaseClass::deserializeRalColumn(
+                    binary.substr(offset),
+                    buffer_size,
+                    gpu_data.GetObject(),
+                    agent.get());
 
-            index += 208;//@todo
+            columns.emplace_back(std::move(column));
+            offset += 2 * buffer_size;
           }
 
           // Create the message

@@ -94,7 +94,7 @@ namespace messages {
             std::vector<RalColumn> columns;
             const auto& gpu_data_array = object["columns"].GetArray();
             for (const auto& gpu_data : gpu_data_array) {
-                columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
+                columns.emplace_back(BaseClass::deserializeRalColumnCPUBuffer(binary_pointer, binary, gpu_data.GetObject()));
             }
 
             // Create the message
