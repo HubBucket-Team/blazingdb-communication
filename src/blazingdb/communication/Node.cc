@@ -99,9 +99,10 @@ private:
     }
 
     const std::string ip{buffer.data(), it};
-    const std::uint16_t port = std::atoi(++it);
+    const std::uint16_t communication_port = std::atoi(++it);
+    const std::uint16_t protocol_port = std::atoi(++it);
 
-    return std::make_shared<internal::ConcreteAddress>(ip, port);
+    return std::make_shared<internal::ConcreteAddress>(ip, communication_port, protocol_port);
   }
 };
 }  // namespace
