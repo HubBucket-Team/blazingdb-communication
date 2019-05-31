@@ -13,7 +13,7 @@ namespace internal {
 ManagedContext::ManagedContext(const Resource &resource, const Trader &trader)
     : resource_{resource},
       md_config_{nullptr},
-      md_{UCT_MEM_HANDLE_NULL},
+      md_{UC_MEM_HANDLE_NULL},
       md_attr_{},
       iface_config_{nullptr},
       async_context_{nullptr},

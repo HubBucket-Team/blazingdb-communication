@@ -11,11 +11,21 @@
 namespace blazingdb {
 namespace uc {
 
+namespace pm {
+class UC_EXPORT Context {
+public:
+  virtual std::unique_ptr<uc::Agent>
+  Agent() const = 0;
+
+  UC_INTERFACE(Context);
+};
+}  // namespace pm
+
 /// \brief Scope for agents and buffers
 ///
 /// A object of this type specify the kind of transport (Copy, IPC, GDR)
 /// and the way to share the serialized addresses using a concerete `Trader`
-class Context {
+class Context : public pm::Context {
 public:
   /// \brief Create an agent for own buffers
   virtual std::unique_ptr<uc::Agent>
@@ -53,6 +63,9 @@ public:
 
   static std::unique_ptr<Context>
   GDR();
+
+  static std::unique_ptr<Context>
+  TCP();
 
   // ----------------------------------------------------------------------
   // List machine info about UCX valid interfaces

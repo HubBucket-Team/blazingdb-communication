@@ -76,6 +76,29 @@ public:
   UC_DTO(GDRCopyResource);
 };
 
+class UC_NOEXPORT TCPResource : public Resource {
+public:
+  const char *
+  md_name() const noexcept final {
+    static const char md_name[] = "tcp";
+    return static_cast<const char *>(md_name);
+  }
+
+  const char *
+  tl_name() const noexcept final {
+    static const char tl_name[] = "tcp";
+    return static_cast<const char *>(tl_name);
+  }
+
+  const char *
+  dev_name() const noexcept final {
+    static const char dev_name[] = "wlp2s0";
+    return static_cast<const char *>(dev_name);
+  }
+
+  UC_DTO(TCPResource);
+};
+
 }  // namespace internal
 }  // namespace uc
 }  // namespace blazingdb

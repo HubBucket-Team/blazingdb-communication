@@ -2,6 +2,7 @@
 #define BLAZINGDB_UC_UTIL_MACROS_HPP_
 
 #ifdef __GNUC__
+#define UC_EXPORT __attribute__((visibility("default")))
 #define UC_INLINE inline __attribute__((always_inline))
 #else
 #define UC_INLINE inline

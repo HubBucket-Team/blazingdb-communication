@@ -27,7 +27,7 @@ RemoteBuffer::RemoteBuffer(const void *const          data,
       md_{md},
       md_attr_{md_attr},
       trader_{trader},
-      mem_{UCT_MEM_HANDLE_NULL},
+      mem_{UC_MEM_HANDLE_NULL},
       rkey_{reinterpret_cast<uct_rkey_t>(
           new std::uint8_t[md_attr.rkey_packed_size])},
       address_{reinterpret_cast<std::uintptr_t>(data)},
@@ -42,13 +42,13 @@ RemoteBuffer::RemoteBuffer(const void *const          data,
       async_context_{async_context},
       worker_{worker},
       iface_{iface} {
-  if (0U != (md_attr.cap.reg_mem_types & UCS_BIT(UCT_MD_MEM_TYPE_CUDA))) {
+  if (0U != (md_attr.cap.reg_mem_types & UC_BIT(UCT_MD_MEM_TYPE_CUDA))) {
     CHECK_UCS(uct_md_mem_reg(md_,
                              const_cast<void *const>(data),
                              size,
                              UCT_MD_MEM_ACCESS_ALL,
                              &mem_));
-    assert(static_cast<void *>(mem_) != UCT_MEM_HANDLE_NULL);
+    assert(static_cast<void *>(mem_) != UC_MEM_HANDLE_NULL);
   }
   auto rkey_buffer = reinterpret_cast<void *>(rkey_);
   CHECK_UCS(uct_md_mkey_pack(md_, mem_, rkey_buffer));
@@ -56,7 +56,7 @@ RemoteBuffer::RemoteBuffer(const void *const          data,
 
 RemoteBuffer::~RemoteBuffer() {
   delete[] reinterpret_cast<std::uint8_t *>(rkey_);
-  rkey_ = UCT_INVALID_RKEY;
+  rkey_ = UC_INVALID_RKEY;
 }
 
 std::unique_ptr<const Record::Serialized>
@@ -72,11 +72,9 @@ RemoteBuffer::SerializedRecord() const noexcept {
 
 std::unique_ptr<Transport>
 RemoteBuffer::Link(const std::uint8_t *recordData) {
-
   std::cout << "***link-ipc-handler***\n";
   std::basic_string<uint8_t> binary(recordData, 104);
-  for (auto c : binary)
-    std::cout << (int) c << ", ";
+  for (auto c : binary) std::cout << (int)c << ", ";
   std::cout << std::endl;
 
   RemotableRecord record{data_,
@@ -89,7 +87,7 @@ RemoteBuffer::Link(const std::uint8_t *recordData) {
   AllocatedBuffer *buffer = new AllocatedBuffer{
       md_, md_attr_, data_, size_, ep_, async_context_, worker_, iface_, mem_};
   const_cast<uct_md_attr_t *>(&md_attr_)->cap.reg_mem_types =
-      ~UCS_BIT(UCT_MD_MEM_TYPE_CUDA);
+      ~UC_BIT(UCT_MD_MEM_TYPE_CUDA);
   return std::make_unique<ZCopyTransport>(
       *buffer, *this, ep_, md_attr_, async_context_, worker_, iface_);
 }

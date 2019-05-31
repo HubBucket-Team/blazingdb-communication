@@ -12,9 +12,9 @@ namespace internal {
 class UC_NOEXPORT AccessibleBuffer : public ReferenceBuffer {
 public:
   explicit AccessibleBuffer(const void *const pointer, const std::size_t size)
-      : mem_{UCT_MEM_HANDLE_NULL}, pointer_{pointer}, size_{size} {}
+      : mem_{UC_MEM_HANDLE_NULL}, pointer_{pointer}, size_{size} {}
 
-  ~AccessibleBuffer() override { mem_ = UCT_MEM_HANDLE_NULL; }
+  ~AccessibleBuffer() override { mem_ = UC_MEM_HANDLE_NULL; }
 
   const void *
   pointer() const noexcept final {
@@ -37,7 +37,7 @@ public:
   }
 
 protected:
-  uct_mem_h         mem_;
+  uct_mem_h mem_;
 
 private:
   const void *const pointer_;

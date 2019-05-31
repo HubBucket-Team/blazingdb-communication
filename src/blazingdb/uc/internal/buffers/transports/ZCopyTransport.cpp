@@ -109,17 +109,17 @@ Progress(const ucs_async_context_t &async_context,
 
 std::future<void>
 ZCopyTransport::Get() {
-  return std::async(std::launch::async,
-                    Progress,
-                    std::ref(async_context_),
-                    std::ref(worker_),
-                    std::ref(iface_),
-                    Async(sendingBuffer_,
-                          receivingBuffer_,
-                          ep_,
-                          (0U != (md_attr_.cap.reg_mem_types &
-                                  UCS_BIT(UCT_MD_MEM_TYPE_CUDA))),
-                          &completion_));
+  return std::async(
+      std::launch::async,
+      Progress,
+      std::ref(async_context_),
+      std::ref(worker_),
+      std::ref(iface_),
+      Async(sendingBuffer_,
+            receivingBuffer_,
+            ep_,
+            (0U != (md_attr_.cap.reg_mem_types & UC_BIT(UCT_MD_MEM_TYPE_CUDA))),
+            &completion_));
 }
 
 }  // namespace internal

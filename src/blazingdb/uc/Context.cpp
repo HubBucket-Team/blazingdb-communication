@@ -4,6 +4,8 @@
 #include "internal/ViewContext.hpp"
 #include "internal/resources.hpp"
 
+#include "internal/tcp/TCPContext.hpp"
+
 namespace blazingdb {
 namespace uc {
 
@@ -52,6 +54,11 @@ Context::GDR() {
   return std::make_unique<internal::ManagedContext>(resource, trader);
 }
 
+std::unique_ptr<Context>
+Context::TCP() {
+  UC_STATIC_LOCAL(internal::TCPResource, resource);
+  return std::make_unique<internal::TCPContext>(resource);
+}
 
 std::vector<Context::Capability>
 Context::LookupCapabilities() noexcept {
