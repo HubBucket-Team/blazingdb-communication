@@ -91,7 +91,12 @@ namespace test {
         column_token = 0;
     }
 
-    void gdf_column_cpp::create_gdf_column_for_ipc(gdf_dtype type, void * col_data,gdf_valid_type * valid_data, gdf_size_type num_values, gdf_size_type null_count, std::string column_name) {
+    void gdf_column_cpp::create_gdf_column_for_ipc(gdf_dtype dtype,
+                                                   void* input_data,
+                                                   gdf_valid_type* input_valid,
+                                                   std::size_t num_values,
+                                                   std::size_t null_count,
+                                                   const std::string& column_name) {
         column = blazingdb::test::make((char*)input_data, input_valid, num_values, dtype, column_name);
         column->null_count = null_count;
         allocated_size_valid = num_values * get_dtype_width(dtype);
