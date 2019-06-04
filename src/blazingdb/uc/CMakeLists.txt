@@ -51,4 +51,5 @@ blazingdb_artifact (
     api-processes-test.cpp
     api-threads-test.cpp
     context-test.cpp
+    internal/tcp/tcp-context-test.cpp
 )
