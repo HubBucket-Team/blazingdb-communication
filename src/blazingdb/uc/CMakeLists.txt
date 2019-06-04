@@ -28,6 +28,8 @@ blazingdb_artifact (
     ${GDR_STATIC_LIB}
     ${UCX_UCS_STATIC_LIB}
     ${UCX_UCM_STATIC_LIB}
+    cuda
+    /usr/local/cuda/lib64/libcudart.so
 
   PREFIX
     blazingdb/uc
@@ -47,4 +49,5 @@ blazingdb_artifact (
     api-processes-test.cpp
     api-threads-test.cpp
     context-test.cpp
+    context-stress-test.cpp
 )
