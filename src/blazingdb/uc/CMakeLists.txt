@@ -1,12 +1,15 @@
-message(STATUS "================================================> GDR LIB: ${GDR_STATIC_LIB}")
-
+message(STATUS
+  "================================================> GDR LIB:"
+  " ${GDR_STATIC_LIB}")
 
 blazingdb_artifact (
   VIRTUAL TARGET
     blazingdb-uc
 
   SOURCES
+    Capabilities.cpp
     Context.cpp
+    ContextHelpers.cpp
     internal/agents/AddressableAgent.cpp
     internal/agents/ManagedAgent.cpp
     internal/agents/ViewAgent.cpp
@@ -32,6 +35,8 @@ blazingdb_artifact (
     ${GDR_STATIC_LIB}
     ${UCX_UCS_STATIC_LIB}
     ${UCX_UCM_STATIC_LIB}
+    cuda
+    /usr/local/cuda/lib64/libcudart.so
 
   PREFIX
     blazingdb/uc
@@ -52,4 +57,5 @@ blazingdb_artifact (
     api-threads-test.cpp
     context-test.cpp
     internal/tcp/tcp-context-test.cpp
+    context-stress-test.cpp
 )

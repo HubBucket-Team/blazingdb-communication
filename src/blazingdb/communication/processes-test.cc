@@ -207,6 +207,8 @@ ExecClient() {
 
 TEST(ProcessesTest, TwoProcesses) {
   pid_t pid = fork();
+  ASSERT_NE(0, pid);
+
   if (pid) {
     ExecServer();
   } else {

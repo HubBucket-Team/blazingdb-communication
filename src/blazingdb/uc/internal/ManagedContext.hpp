@@ -28,6 +28,11 @@ public:
   virtual std::unique_ptr<uc::Agent>
   Agent() const;
 
+  const Resource &
+  resource() const noexcept {
+    return resource_;
+  }
+
   std::size_t
   serializedRecordSize() const noexcept final;
 

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <blazingdb/uc/Agent.hpp>
+#include <blazingdb/uc/Capabilities.hpp>
 #include <blazingdb/uc/Trader.hpp>
 
 namespace blazingdb {
@@ -26,6 +27,8 @@ public:
   virtual std::unique_ptr<uc::Agent>
   PeerAgent() const = 0;
 
+  /// \brief Create an agent for non-owning-peering buffers
+  /// Use when you do not want auto addresses negotiation
   virtual std::unique_ptr<uc::Agent>
   Agent() const = 0;
 
@@ -34,6 +37,8 @@ public:
 
   // ----------------------------------------------------------------------
   // Builders
+  // TODO(context_builders): port method builders to class builders
+  //                         see #Context::SmartBuilder
   using Builder = std::unique_ptr<Context>(const Trader &);
 
   static std::unique_ptr<Context>
@@ -56,6 +61,11 @@ public:
 
   static std::unique_ptr<Context>
   TCP();
+
+  // ----------------------------------------------------------------------
+  // Helpers
+  static std::unique_ptr<Context>
+  BestContext(const Capabilities &capabilities);
 
   // ----------------------------------------------------------------------
   // List machine info about UCX valid interfaces
