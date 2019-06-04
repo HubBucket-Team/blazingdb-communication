@@ -18,8 +18,9 @@ blazingdb_artifact (
     internal/ManagedContext.cpp
     internal/ViewContext.cpp
 
+    internal/tcp/TCPAgent.cpp
     internal/tcp/TCPContext.cpp
-    internal/core/Device.cpp
+    internal/tcp/TCPTransport.cpp
 
   INCLUDES
     PUBLIC /usr/local/cuda/include
