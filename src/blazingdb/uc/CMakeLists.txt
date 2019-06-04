@@ -1,12 +1,15 @@
-message(STATUS "================================================> GDR LIB: ${GDR_STATIC_LIB}")
-
+message(STATUS
+  "================================================> GDR LIB:"
+  " ${GDR_STATIC_LIB}")
 
 blazingdb_artifact (
   VIRTUAL TARGET
     blazingdb-uc
 
   SOURCES
+    Capabilities.cpp
     Context.cpp
+    ContextHelpers.cpp
     internal/agents/AddressableAgent.cpp
     internal/agents/ManagedAgent.cpp
     internal/agents/ViewAgent.cpp
