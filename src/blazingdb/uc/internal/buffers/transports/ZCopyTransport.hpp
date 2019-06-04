@@ -37,6 +37,25 @@ private:
   const uct_iface_h&         iface_;
 };
 
+
+/// \brief Relation between two buffers to transport their memory content
+class ViewTransport : public Transport {
+public:
+  explicit ViewTransport() = default;
+
+  /// \brief Share memory from own to peer
+  std::future<void> Get() final {
+     return std::async(std::launch::async, [](){ return; });
+  }
+
+  /// \brief Share memory from peer to own
+  // virtual std::future<void>
+  // Put() = 0;
+
+};
+
+
+
 }  // namespace internal
 }  // namespace uc
 }  // namespace blazingdb

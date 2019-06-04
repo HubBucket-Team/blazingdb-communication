@@ -32,6 +32,9 @@ public:
   virtual std::unique_ptr<uc::Agent>
   Agent() const = 0;
 
+  virtual std::size_t
+  serializedRecordSize() const noexcept = 0;
+
   // ----------------------------------------------------------------------
   // Builders
   // TODO(context_builders): port method builders to class builders
@@ -49,6 +52,9 @@ public:
 
   static std::unique_ptr<Context>
   IPC();
+
+  static std::unique_ptr<Context>
+  IPCView();
 
   static std::unique_ptr<Context>
   GDR();

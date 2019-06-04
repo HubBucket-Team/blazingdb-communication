@@ -11,7 +11,8 @@ endif ()
 function (blazingdb_artifact)
   set (OPTIONS OPTIONAL VIRTUAL)
   set (ONE_VALUE_ARGS PREFIX TARGET)
-  set (MULTI_VALUE_ARGS SOURCES INCLUDES LIBRARIES PUBLIC_HEADERS TESTS)
+  set (MULTI_VALUE_ARGS SOURCES INCLUDES LIBRARIES PUBLIC_HEADERS TESTS
+       LIBRARY_PATHS)
   cmake_parse_arguments (ARG "${OPTIONS}" "${ONE_VALUE_ARGS}"
     "${MULTI_VALUE_ARGS}" ${ARGN})
   if (ARG_UNPARSED_ARGUMENTS)
@@ -31,6 +32,10 @@ function (blazingdb_artifact)
 
   if (ARG_INCLUDES)
     target_include_directories (${ARG_TARGET} ${ARG_INCLUDES})
+  endif ()
+
+  if (ARG_LIBRARY_PATHS)
+    target_link_libraries (${ARG_TARGET} ${ARG_LIBRARY_PATHS})
   endif ()
 
   if (NOT ARG_PREFIX)

@@ -28,6 +28,7 @@ decaycopy(Tp &&_t) {
   return std::forward<Tp>(_t);
 }
 
+
 template <class ContextBuilder>
 static void
 Exec(ContextBuilder &&    builder,
@@ -38,7 +39,7 @@ Exec(ContextBuilder &&    builder,
      const int (&own_pipedes)[2],
      const int (&peer_pipedes)[2]) {
   cudaSetDevice(device);
-  void *     data       = CreateData(length, seed, offset);
+  const void *     data       = CreateData(length, seed, offset);
   int        pipedes[2] = {own_pipedes[0], peer_pipedes[1]};
   StubTrader trader{pipedes};
   auto       context = decaycopy(builder)(trader);

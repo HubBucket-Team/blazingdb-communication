@@ -32,10 +32,6 @@ public:
     throw std::runtime_error("Message#CreateRemoteBuffer not implemented");
   }
 
-  /*virtual void GetRemoteBuffer(const Node &) const {*/
-    /*throw std::runtime_error("Message#GetRemoteBuffer not implemented");*/
-  /*}*/
-
   static void
   GetRemoteBuffer(const Node& node);
 

@@ -15,9 +15,10 @@ class Resource;
 
 class UC_NOEXPORT ManagedContext : public Context {
 public:
+  
   explicit ManagedContext(const Resource &resource, const Trader &trader);
 
-  ~ManagedContext() final;
+  ~ManagedContext();
 
   std::unique_ptr<uc::Agent>
   OwnAgent() const final;
@@ -25,13 +26,16 @@ public:
   std::unique_ptr<uc::Agent>
   PeerAgent() const final;
 
-  std::unique_ptr<uc::Agent>
-  Agent() const final;
+  virtual std::unique_ptr<uc::Agent>
+  Agent() const;
 
   const Resource &
   resource() const noexcept {
     return resource_;
   }
+
+  std::size_t
+  serializedRecordSize() const noexcept final;
 
 private:
   const Resource &resource_;

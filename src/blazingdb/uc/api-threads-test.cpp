@@ -45,8 +45,10 @@ Run(std::promise<const Record::Serialized *> &ownPromise,
   auto &trader =
       *new StubTrader{ownPromise, peerFuture, resolvePromise, resolvedFuture};
   auto &context = *Context::Copy(trader).release();
-  auto  data    = CreateData(length, seed, offset);
-  return std::thread{Client, std::ref(name), std::ref(context), data};
+  const void * data    = CreateData(length, seed, offset);
+  // return std::thread{Client, std::ref(name), std::ref(context), data};
+  //@todo fix this after. @alex
+  return std::thread {};
 }
 
 TEST(ApiOnThreadsTest, WithCopy) {

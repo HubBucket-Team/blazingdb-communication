@@ -14,7 +14,7 @@ public:
   /// \param[in] size in bytes
   /// \return Buffer
   virtual std::unique_ptr<Buffer>
-  Register(const void *data, std::size_t size) const noexcept = 0;
+  Register(const void* &data, std::size_t size) const noexcept = 0;
 
   UC_INTERFACE(Agent);
 };

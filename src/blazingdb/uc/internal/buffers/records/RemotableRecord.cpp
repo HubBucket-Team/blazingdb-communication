@@ -85,6 +85,7 @@ RemotableRecord::SetPeer(const void *bytes) noexcept {
   }
 }
 
+// sizeof (uct_cuda_ipc_key_t) 96 + 8
 RemotableRecord::PlainSerialized::PlainSerialized(const uct_rkey_t &rkey,
                                                   const std::size_t offset,
                                                   const void *const pointer)

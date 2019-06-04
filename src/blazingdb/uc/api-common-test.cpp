@@ -21,6 +21,36 @@ Print(const std::string &name, const void *data, const std::size_t size) {
 }
 
 void *
+CreateHostData(const std::size_t    size,
+               std::uint64_t        seed,
+               const std::ptrdiff_t offset) {
+  static const std::uint64_t pn   = 1337;
+  std::uint8_t *             data = new std::uint8_t[size];
+  assert(nullptr != data);
+  auto                it  = reinterpret_cast<std::uint64_t *>(data);
+  const std::uint8_t *end = data + size;
+
+  while (reinterpret_cast<std::uint8_t *>(it + 1) <= end) {
+    *it  = seed;
+    seed = (seed << 1) | (__builtin_parityl(seed & pn) & 1);
+    ++it;
+  }
+
+  std::memcpy(
+      it,
+      &seed,
+      static_cast<std::size_t>(end - reinterpret_cast<std::uint8_t *>(it)));
+
+  void *buffer = malloc(size);
+
+  std::memcpy(buffer, data + offset, size);
+
+  delete[] data;
+
+  return buffer;
+}
+
+void *
 CreateData(const std::size_t    size,
            std::uint64_t        seed,
            const std::ptrdiff_t offset) {
@@ -59,8 +89,8 @@ CreateData(const std::size_t    size,
 void
 Client(const std::string &name,
        const Context &    context,
-       const void *const  data) {
-  void *twinData = CreateData(length, twinSeed, twinOffset);
+       const void* &data) {
+  const void *twinData = CreateData(length, twinSeed, twinOffset);
 
   auto own  = context.OwnAgent();
   auto peer = context.PeerAgent();

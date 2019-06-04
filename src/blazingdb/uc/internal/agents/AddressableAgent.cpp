@@ -22,7 +22,7 @@ AddressableAgent::AddressableAgent(const uct_md_h &           md,
       iface_{iface} {}
 
 std::unique_ptr<Buffer>
-AddressableAgent::Register(const void *const data, const std::size_t size) const
+AddressableAgent::Register(const void* &data, const std::size_t size) const
     noexcept {
   return std::make_unique<RemoteBuffer>(
       data, size, md_, md_attr_, trader_, ep_, async_context_, worker_, iface_);

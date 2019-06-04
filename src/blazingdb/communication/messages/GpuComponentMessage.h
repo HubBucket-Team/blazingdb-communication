@@ -7,6 +7,7 @@
 #include <blazingdb/communication/Configuration.h>
 
 #include <blazingdb/uc/Context.hpp>
+#include <iostream>
 
 #include "blazingdb/communication/messages/UCPool.h"
 #include <cuda_runtime_api.h>
@@ -83,11 +84,20 @@ namespace messages {
 
             auto serialized_data = data_buffer->SerializedRecord();
 
-            std::basic_string<uint8_t> response(serialized_data->Data(), serialized_data->Size());
+            std::basic_string<uint8_t> binary_buffer(serialized_data->Data(), serialized_data->Size());
+
+
+            std::cout << "***GetBufferDescriptor-ipc-handler***\n";
+            for (auto c : binary_buffer)
+                std::cout << (int) c << ", ";
+            std::cout << std::endl;
 
             UCPool::getInstance().push(data_buffer.release());
 
-            return std::string((const char *)response.c_str());
+            std::string response;
+            for(auto c: binary_buffer)
+                response += char(c);
+            return response;
         }
 
         static void LinkDataRecordAndWaitForGpuData(const void *agent_ptr, const std::uint8_t* dataRecordData, const void* data, size_t dataSize) {
@@ -121,9 +131,14 @@ namespace messages {
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
             }
+            std::hash<std::string> hasher;
+            auto hashed = hasher(result); 
+
+            std::cout << "****message sent: " << hashed << std::endl; 
+
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());
-            return std::string((const char *)result.c_str());
+            return result;
         }
 
         static CudfColumn deserializeCudfColumn(rapidjson::Value::ConstObject&& object) {
@@ -179,7 +194,7 @@ namespace messages {
 
             return ral_column;
         }
-
+        // TODO: elimitar todo rastro de simple-distribution.
         static RalColumn
         deserializeRalColumn(std::size_t&                    binary_pointer,
                              const std::string&              binary_data,
@@ -188,6 +203,7 @@ namespace messages {
           const auto& column_name_data = object["column_name"];
           std::string column_name(column_name_data.GetString(),
                                   column_name_data.GetStringLength());
+          bool is_ipc = object["is_ipc"].GetBool();
 
           std::uint64_t column_token = object["column_token"].GetUint64();
 
@@ -198,7 +214,7 @@ namespace messages {
           cudaError_t cudaStatus;
 
           void* data     = nullptr;
-          int   dataSize = 100;  // gdf_size_type
+          int   dataSize = 100;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
 
           cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);
@@ -224,15 +240,17 @@ namespace messages {
               agent, validRecordData, valid, validSize);
 
           // set gdf column
-          RalColumn ral_column;
+          RalColumn ral_column; 
+          //@todo: is ipc columnn?
+          ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
+                                                    data,
+                                                    (unsigned char*)valid,
+                                                    cudf_column.size,
+                                                    column_name);
           ral_column.set_column_token(column_token);
-
-          auto gdfColumn        = ral_column.get_gdf_column();
-          gdfColumn->data       = (char*)data;
-          gdfColumn->valid      = (uint8_t*)valid;
-          gdfColumn->null_count = cudf_column.null_count;
-          gdfColumn->dtype_info = cudf_column.dtype_info;
-
+          ral_column.get_gdf_column()->null_count = cudf_column.null_count;
+          ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
+        
           binary_pointer += 208;
 
           return ral_column;

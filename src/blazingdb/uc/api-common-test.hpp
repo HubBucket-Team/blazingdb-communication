@@ -23,9 +23,14 @@ static constexpr std::ptrdiff_t twinOffset = 4;
 using namespace blazingdb::uc;
 
 void *
+CreateHostData(const std::size_t    size,
+               std::uint64_t        seed,
+               const std::ptrdiff_t offset);
+
+void *
 CreateData(const std::size_t    size,
            std::uint64_t        seed,
            const std::ptrdiff_t offset);
 
 void
-Client(const std::string &name, const Context &context, const void *const data);
+Client(const std::string &name, const Context &context, const void* &data);

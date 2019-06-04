@@ -1,11 +1,12 @@
 #ifndef BLAZINGDB_COMMUNICATION_NETWORK_MESSAGEQUEUE_H
 #define BLAZINGDB_COMMUNICATION_NETWORK_MESSAGEQUEUE_H
 
-#include <deque>
+#include <vector>
 #include <string>
 #include <mutex>
 #include <condition_variable>
 #include <blazingdb/communication/messages/Message.h>
+#include <blazingdb/communication/messages/MessageToken.h>
 
 namespace blazingdb {
 namespace communication {
@@ -13,6 +14,7 @@ namespace network {
 
 namespace {
 using Message = blazingdb::communication::messages::Message;
+using MessageTokenType = blazingdb::communication::messages::MessageToken::TokenType;
 } // namespace
 
 class MessageQueue {
@@ -30,27 +32,18 @@ public:
     MessageQueue& operator=(const MessageQueue&) = delete;
 
 public:
-    std::shared_ptr<Message> getMessage();
+    std::shared_ptr<Message> getMessage(const MessageTokenType& messageToken);
 
     void putMessage(std::shared_ptr<Message>& message);
 
-protected:
-    void wait();
-
-    void notify();
-
 private:
-    std::shared_ptr<Message> getMessageQueue();
+    std::shared_ptr<Message> getMessageQueue(const MessageTokenType& messageToken);
 
     void putMessageQueue(std::shared_ptr<Message>& message);
 
 private:
-    std::mutex message_mutex_;
-    std::deque<std::shared_ptr<Message>> message_queue_;
-
-private:
-    int ready_{0};
-    std::mutex condition_mutex_;
+    std::mutex mutex_;
+    std::vector<std::shared_ptr<Message>> message_queue_;
     std::condition_variable condition_variable_;
 };
 

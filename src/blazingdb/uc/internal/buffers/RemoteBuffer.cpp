@@ -72,6 +72,13 @@ RemoteBuffer::SerializedRecord() const noexcept {
 
 std::unique_ptr<Transport>
 RemoteBuffer::Link(const std::uint8_t *recordData) {
+
+  std::cout << "***link-ipc-handler***\n";
+  std::basic_string<uint8_t> binary(recordData, 104);
+  for (auto c : binary)
+    std::cout << (int) c << ", ";
+  std::cout << std::endl;
+
   RemotableRecord record{data_,
                          mem_,
                          md_attr_,
