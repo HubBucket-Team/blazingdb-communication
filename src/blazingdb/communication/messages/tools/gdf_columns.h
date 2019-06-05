@@ -30,21 +30,26 @@ class CudaBuffer : public Buffer {};
 ///   }
 ///   col_name   : buffer
 /// }
-class GdfColumn {
+
+class Payload {
 public:
   virtual Buffer &
-  Payload() const noexcept = 0;
+  Deliver() const noexcept = 0;
 
-  UC_INTERFACE(GdfColumn);
+  UC_INTERFACE(Payload);
 };
+
+class DTypeInfo : public Payload {};
+
+class GdfColumn : public Payload {};
 
 /// ----------------------------------------------------------------------
 /// Builders
 
 class Builder {
 public:
-  virtual std::unique_ptr<Buffer>
-  Payload() const noexcept = 0;
+  virtual std::unique_ptr<Payload>
+  Build() const noexcept = 0;
 
   /// Experimental
   /// template <class T> Buffer & BufferFrom(T &t) scales exceptions
@@ -90,6 +95,9 @@ public:
 
   virtual GdfColumnBuilder &
   NullCount(const std::size_t size) noexcept = 0;
+
+  virtual GdfColumnBuilder &
+  DTypeInfo(const DTypeInfo &dtypeInfo) noexcept = 0;
 
   virtual GdfColumnBuilder &
   ColumnName(const HostBuffer &hostBuffer) noexcept = 0;
