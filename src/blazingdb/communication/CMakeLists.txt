@@ -21,6 +21,7 @@ blazingdb_artifact (
     messages/MessageToken.cc
     messages/DataPivot.cpp
     messages/NodeDataMessage.cc
+    messages/tools/gdf_columns.cpp
 
   INCLUDES
     PUBLIC ${PROJECT_SOURCE_DIR}/src
@@ -50,6 +51,7 @@ blazingdb_artifact (
     messages/NodeDataMessage.h
     messages/PartitionPivotsMessage.h
     messages/UCPool.h
+    messages/tools/gdf_columns.h
     Configuration.h
     ContextToken.h
     Cluster.h
@@ -75,6 +77,7 @@ blazingdb_artifact (
     configuration-test.cc
     manager-test.cc
     messages/message-test.cpp
+    messages/tools/gdf_columns-test.cpp
     node-test.cc
     network/integration-server-client-test.cc
     processes-test.cc
