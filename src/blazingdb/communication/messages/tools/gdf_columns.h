@@ -124,6 +124,22 @@ public:
   UC_INTERFACE(GdfColumnsBuilder);
 };
 
+/// ----------------------------------------------------------------------
+/// Collector
+
+class Collector {
+public:
+  virtual std::unique_ptr<Payload>
+  Collect(const Buffer &buffer) const = 0;
+
+  /// ----------------------------------------------------------------------
+  /// Builders
+  static std::unique_ptr<Collector>
+  Make();
+};
+
+class GdfColumnCollector : public Collector {};
+
 }  // namespace gdf_columns
 }  // namespace tools
 }  // namespace messages
