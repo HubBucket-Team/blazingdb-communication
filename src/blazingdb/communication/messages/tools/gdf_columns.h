@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <blazingdb/uc/util/macros.hpp>
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -13,7 +15,8 @@ class Buffer {};
 class HostBuffer : public Buffer {};
 class CudaBuffer : public Buffer {};
 
-class GdfColumn {};
+/// ----------------------------------------------------------------------
+/// Payloads
 
 /// gdf_column {
 ///   data       : buffer
@@ -27,6 +30,29 @@ class GdfColumn {};
 ///   }
 ///   col_name   : buffer
 /// }
+class GdfColumn {};
+
+/// ----------------------------------------------------------------------
+/// Builders
+
+class PayloadBuilder {};
+
+class DTypeInfoBuilder {
+public:
+  /// ----------------------------------------------------------------------
+  /// Member serializers
+  virtual DTypeInfoBuilder &
+  TimeUnit(const std::int_fast32_t timeUnit) noexcept = 0;
+
+  virtual DTypeInfoBuilder &
+  Category(const CudaBuffer &cudaBuffer) noexcept = 0;
+
+  /// ----------------------------------------------------------------------
+  /// Builders
+  static std::unique_ptr<DTypeInfoBuilder>
+  Make();
+};
+
 class GdfColumnBuilder {
 public:
   /// ----------------------------------------------------------------------
