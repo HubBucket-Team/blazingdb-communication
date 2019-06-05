@@ -247,7 +247,9 @@ namespace messages {
                                                     data,
                                                     (unsigned char*)valid,
                                                     cudf_column.size,
+                                                    cudf_column.null_count,
                                                     column_name);
+
           ral_column.set_column_token(column_token);
           ral_column.get_gdf_column()->null_count = cudf_column.null_count;
           ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
