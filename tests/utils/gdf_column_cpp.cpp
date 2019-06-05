@@ -95,8 +95,10 @@ namespace test {
                                                    void* input_data,
                                                    gdf_valid_type* input_valid,
                                                    std::size_t num_values,
+                                                   std::size_t null_count,
                                                    const std::string& column_name) {
         column = blazingdb::test::make((char*)input_data, input_valid, num_values, dtype, column_name);
+        column->null_count = null_count;
         allocated_size_valid = num_values * get_dtype_width(dtype);
         allocated_size_data = num_values;
         this->column_name = column_name;
