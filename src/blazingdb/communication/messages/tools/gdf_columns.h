@@ -39,9 +39,13 @@ public:
   UC_INTERFACE(Payload);
 };
 
-class DTypeInfo : public Payload {};
+class DTypeInfo : public Payload {
+  UC_INTERFACE(DTypeInfo);
+};
 
-class GdfColumn : public Payload {};
+class GdfColumn : public Payload {
+  UC_INTERFACE(GdfColumn);
+};
 
 /// ----------------------------------------------------------------------
 /// Builders
@@ -75,6 +79,8 @@ public:
   /// Builders
   static std::unique_ptr<DTypeInfoBuilder>
   Make();
+
+  UC_INTERFACE(DTypeInfoBuilder);
 };
 
 class GdfColumnBuilder : public Builder {
@@ -106,12 +112,16 @@ public:
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
   Make();
+
+  UC_INTERFACE(GdfColumnBuilder);
 };
 
 class GdfColumnsBuilder {
 public:
   static std::unique_ptr<GdfColumnsBuilder>
   Make();
+
+  UC_INTERFACE(GdfColumnsBuilder);
 };
 
 }  // namespace gdf_columns
