@@ -30,14 +30,29 @@ class CudaBuffer : public Buffer {};
 ///   }
 ///   col_name   : buffer
 /// }
-class GdfColumn {};
+class GdfColumn {
+  UC_INTERFACE(GdfColumn);
+};
 
 /// ----------------------------------------------------------------------
 /// Builders
 
-class PayloadBuilder {};
+class Builder {
+public:
+  virtual std::unique_ptr<Buffer>
+  Build() const noexcept = 0;
 
-class DTypeInfoBuilder {
+  /// Experimental
+  /// template <class T> Buffer & BufferFrom(T &t) scales exceptions
+  virtual Builder &
+  LoadFrom(const Buffer &) {
+    throw std::runtime_error("Not Implemented");
+  }
+
+  UC_INTERFACE(Builder);
+};
+
+class DTypeInfoBuilder : public Builder {
 public:
   /// ----------------------------------------------------------------------
   /// Member serializers
@@ -53,7 +68,7 @@ public:
   Make();
 };
 
-class GdfColumnBuilder {
+class GdfColumnBuilder : public Builder {
 public:
   /// ----------------------------------------------------------------------
   /// Member serializers
