@@ -136,9 +136,13 @@ public:
   /// Builders
   static std::unique_ptr<Collector>
   Make();
+
+  UC_INTERFACE(Collector);
 };
 
-class GdfColumnCollector : public Collector {};
+class GdfColumnCollector : public Collector {
+  UC_INTERFACE(GdfColumnCollector);
+};
 
 }  // namespace gdf_columns
 }  // namespace tools
