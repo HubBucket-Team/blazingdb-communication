@@ -52,7 +52,6 @@ Context::GDR() {
   return std::make_unique<internal::ManagedContext>(resource, trader);
 }
 
-
 std::vector<Context::Capability>
 Context::LookupCapabilities() noexcept {
   uct_md_resource_desc_t *md_resources;
