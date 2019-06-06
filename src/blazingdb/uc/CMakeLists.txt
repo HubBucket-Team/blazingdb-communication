@@ -50,6 +50,7 @@ blazingdb_artifact (
     Trader.hpp
     Transport.hpp
     util/macros.hpp
+    Capabilities.hpp
 
   TESTS
     api-common-test.cpp
