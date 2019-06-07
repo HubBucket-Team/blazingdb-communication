@@ -42,11 +42,7 @@ public:
   Build() const noexcept final;
 
 private:
-  // TODO: Now we use IPC by default. Get as a paremeter from builder.
-  std::unique_ptr<blazingdb::uc::Context> context_;
-  std::unique_ptr<blazingdb::uc::Agent>   agent_;
-
-  std::unique_ptr<blazingdb::uc::Buffer> dataBuffer_;
+  CudaBuffer *dataCudaBuffer_;
 
   UC_CONCRETE(GdfColumnWithHostAllocationBuilder);
 };

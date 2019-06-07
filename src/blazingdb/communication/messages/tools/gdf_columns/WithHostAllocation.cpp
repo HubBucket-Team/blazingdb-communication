@@ -1,5 +1,7 @@
 #include "WithHostAllocation.hpp"
 
+#include <cstring>
+
 #include "inhost/InHostGdfColumnPayload.hpp"
 
 namespace blazingdb {
@@ -8,14 +10,13 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder()
-    : context_{blazingdb::uc::Context::IPC()}, agent_{context_->Agent()} {}
+GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder() =
+    default;
 
 GdfColumnBuilder &
 GdfColumnWithHostAllocationBuilder::Data(
     const CudaBuffer &cudaBuffer) noexcept {
-  const void *data = cudaBuffer.Data();
-  dataBuffer_      = agent_->Register(data, cudaBuffer.Size());
+  // dataCudaBuffer_ = cudaBuffer;
   return *this;
 }
 
@@ -58,11 +59,18 @@ GdfColumnWithHostAllocationBuilder::Build() const noexcept {
   std::string payload;
   payload.resize(1000);
 
+  // TODO: Now we use IPC by default. Get as a paremeter from builder.
+  std::unique_ptr<blazingdb::uc::Context> context;
+  std::unique_ptr<blazingdb::uc::Agent>   agent_;
+
+  std::unique_ptr<blazingdb::uc::Buffer> dataBuffer_;
+  const void *                           data = dataCudaBuffer_->Data();
+  dataBuffer_     = agent_->Register(data, dataCudaBuffer_->Size());
   auto dataRecord = dataBuffer_->SerializedRecord();
 
   std::memcpy(&payload[0], dataRecord->Data(), dataRecord->Size());
 
-  return std::make_unique<InHostGdfColumnPayload>(std::move(context_),
+  return std::make_unique<InHostGdfColumnPayload>(std::move(context),
                                                   std::move(payload));
 }
 
