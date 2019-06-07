@@ -64,26 +64,26 @@ class DTypeInfoPayload : public Payload {
 
 class GdfColumnPayload : public Payload {
 public:
-  // virtual const UCBuffer &
-  // Data() const noexcept = 0;
+  virtual const UCBuffer &
+  Data() const noexcept = 0;
 
-  // virtual GdfColumnBuilder &
-  // Valid(const CudaBuffer &cudaBuffer) noexcept = 0;
+  virtual UCBuffer &
+  Valid() const noexcept = 0;
 
-  // virtual GdfColumnBuilder &
-  // Size(const std::size_t size) noexcept = 0;
+  virtual std::size_t
+  Size() const noexcept = 0;
 
-  // virtual GdfColumnBuilder &
-  // DType(const std::int_fast32_t dtype) noexcept = 0;
+  virtual std::int_fast32_t
+  DType() noexcept = 0;
 
-  // virtual GdfColumnBuilder &
-  // NullCount(const std::size_t size) noexcept = 0;
+  virtual std::size_t
+  NullCount() const noexcept = 0;
 
-  // virtual GdfColumnBuilder &
-  // DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept = 0;
+  virtual DTypeInfoPayload &
+  DTypeInfo() const noexcept = 0;
 
-  // virtual GdfColumnBuilder &
-  // ColumnName(const HostBuffer &hostBuffer) noexcept = 0;
+  virtual std::string
+  ColumnName() const noexcept = 0;
 
   UC_INTERFACE(GdfColumnPayload);
 };
