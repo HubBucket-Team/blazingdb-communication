@@ -11,9 +11,28 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class Buffer {};
+class Buffer {
+public:
+  virtual const void *
+  Data() const noexcept = 0;
+
+  virtual std::size_t
+  Size() const noexcept = 0;
+
+  UC_INTERFACE(Buffer);
+};
+
 class HostBuffer : public Buffer {};
-class CudaBuffer : public Buffer {};
+
+class CudaBuffer : public Buffer {
+public:
+  static std::unique_ptr<CudaBuffer>
+  Make(const void *const data, const std::size_t size);
+
+  UC_INTERFACE(CudaBuffer);
+};
+
+class UCBuffer : public Buffer {};
 
 /// ----------------------------------------------------------------------
 /// Payloads
@@ -33,18 +52,40 @@ class CudaBuffer : public Buffer {};
 
 class Payload {
 public:
-  virtual Buffer &
+  virtual const Buffer &
   Deliver() const noexcept = 0;
 
   UC_INTERFACE(Payload);
 };
 
-class DTypeInfo : public Payload {
-  UC_INTERFACE(DTypeInfo);
+class DTypeInfoPayload : public Payload {
+  UC_INTERFACE(DTypeInfoPayload);
 };
 
-class GdfColumn : public Payload {
-  UC_INTERFACE(GdfColumn);
+class GdfColumnPayload : public Payload {
+public:
+  //virtual const UCBuffer &
+  //Data() const noexcept = 0;
+
+  // virtual GdfColumnBuilder &
+  // Valid(const CudaBuffer &cudaBuffer) noexcept = 0;
+
+  // virtual GdfColumnBuilder &
+  // Size(const std::size_t size) noexcept = 0;
+
+  // virtual GdfColumnBuilder &
+  // DType(const std::int_fast32_t dtype) noexcept = 0;
+
+  // virtual GdfColumnBuilder &
+  // NullCount(const std::size_t size) noexcept = 0;
+
+  // virtual GdfColumnBuilder &
+  // DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept = 0;
+
+  // virtual GdfColumnBuilder &
+  // ColumnName(const HostBuffer &hostBuffer) noexcept = 0;
+
+  UC_INTERFACE(GdfColumnPayload);
 };
 
 /// ----------------------------------------------------------------------
@@ -103,7 +144,7 @@ public:
   NullCount(const std::size_t size) noexcept = 0;
 
   virtual GdfColumnBuilder &
-  DTypeInfo(const DTypeInfo &dtypeInfo) noexcept = 0;
+  DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept = 0;
 
   virtual GdfColumnBuilder &
   ColumnName(const HostBuffer &hostBuffer) noexcept = 0;
@@ -111,7 +152,7 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
-  Make();
+  MakeWithHostAllocation();
 
   UC_INTERFACE(GdfColumnBuilder);
 };
@@ -130,17 +171,16 @@ public:
 class Collector {
 public:
   virtual std::unique_ptr<Payload>
-  Collect(const Buffer &buffer) const = 0;
-
-  /// ----------------------------------------------------------------------
-  /// Builders
-  static std::unique_ptr<Collector>
-  Make();
+  Apply() const = 0;
 
   UC_INTERFACE(Collector);
 };
 
 class GdfColumnCollector : public Collector {
+public:
+  static std::unique_ptr<Collector>
+  Make(const Buffer &buffer);
+
   UC_INTERFACE(GdfColumnCollector);
 };
 

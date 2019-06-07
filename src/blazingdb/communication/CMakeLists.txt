@@ -22,6 +22,10 @@ blazingdb_artifact (
     messages/DataPivot.cpp
     messages/NodeDataMessage.cc
     messages/tools/gdf_columns.cpp
+    messages/tools/gdf_columns/WithHostAllocation.cpp
+    messages/tools/gdf_columns/BufferBase.cpp
+    messages/tools/gdf_columns/collectors/InHostCollector.cpp
+    messages/tools/gdf_columns/inhost/InHostGdfColumnPayload.cpp
 
   INCLUDES
     PUBLIC ${PROJECT_SOURCE_DIR}/src

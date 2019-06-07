@@ -1,5 +1,105 @@
 #include "gdf_columns.h"
 
+#include <cuda_runtime_api.h>
+
 #include <gtest/gtest.h>
 
-TEST(GdfColumnsTest, FirstTest) { FAIL(); }
+namespace {
+class GdfColumnFixture {
+  using CudaBuffer =
+      blazingdb::communication::messages::tools::gdf_columns::CudaBuffer;
+
+public:
+  explicit GdfColumnFixture(const void *const       data,
+                            const std::size_t       dataSize,
+                            const void *const       valid,
+                            const std::size_t       validSize,
+                            const std::size_t       size,
+                            const std::int_fast32_t dtype)
+      : data_{CudaBuffer::Make(data, dataSize)},
+        valid_{CudaBuffer::Make(valid, validSize)},
+        size_{size},
+        dtype_{dtype} {}
+
+  const CudaBuffer &
+  data() const noexcept {
+    return *data_;
+  }
+
+  const CudaBuffer &
+  valid() const noexcept {
+    return *valid_;
+  }
+
+  std::size_t
+  size() const noexcept {
+    return size_;
+  }
+
+  std::int_fast32_t
+  dtype() const noexcept {
+    return dtype_;
+  }
+
+private:
+  std::unique_ptr<CudaBuffer> data_;
+  std::unique_ptr<CudaBuffer> valid_;
+  std::size_t                 size_;
+  std::int_fast32_t           dtype_;
+};
+}  // namespace
+
+static inline void *
+CreateCudaSequence(const std::size_t size) {
+  cudaError_t cudaError;
+
+  void *data;
+  cudaError = cudaMalloc(&data, size);
+  assert(cudaSuccess == cudaError);
+
+  std::vector<std::uint8_t> host(size);
+  std::generate(host.begin(), host.end(), [n = 1]() mutable { return n++; });
+  cudaError = cudaMemcpy(data, host.data(), size, cudaMemcpyHostToDevice);
+  assert(cudaSuccess == cudaError);
+
+  cudaError = cudaDeviceSynchronize();
+  assert(cudaSuccess == cudaError);
+
+  return data;
+}
+
+static inline GdfColumnFixture
+CreateBasicGdfColumnFixture() {
+  const std::size_t dataSize = 2000;
+  const void *const data     = CreateCudaSequence(dataSize);
+
+  std::size_t validSize = 1000;
+  void *      valid     = CreateCudaSequence(validSize);
+
+  const std::size_t size = 500;
+
+  const std::int_fast32_t dtype = 3;
+
+  return GdfColumnFixture{data, dataSize, valid, validSize, size, dtype};
+}
+
+TEST(GdfColumnBuilderTest, CheckPayload) {
+  auto fixture = CreateBasicGdfColumnFixture();
+
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnBuilder;
+  auto builder = GdfColumnBuilder::MakeWithHostAllocation();
+
+  auto payload = builder->Data(fixture.data())
+                     .Valid(fixture.valid())
+                     .Size(fixture.size())
+                     .DType(fixture.dtype())
+                     .Build();
+
+  auto &buffer = payload->Deliver();
+
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnCollector;
+  auto collector = GdfColumnCollector::Make(buffer);
+  auto result    = collector->Apply();
+}
