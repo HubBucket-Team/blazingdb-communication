@@ -8,6 +8,9 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
+GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder() =
+    default;
+
 GdfColumnBuilder &
 GdfColumnWithHostAllocationBuilder::Data(
     const CudaBuffer &cudaBuffer) noexcept {

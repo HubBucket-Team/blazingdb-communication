@@ -13,6 +13,8 @@ namespace gdf_columns {
 
 class GdfColumnWithHostAllocationBuilder : public GdfColumnBuilder {
 public:
+  explicit GdfColumnWithHostAllocationBuilder();
+
   GdfColumnBuilder &
   Data(const CudaBuffer &cudaBuffer) noexcept final;
 

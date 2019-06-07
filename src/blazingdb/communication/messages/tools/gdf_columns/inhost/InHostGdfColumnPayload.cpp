@@ -6,9 +6,11 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-std::unique_ptr<Buffer>
+InHostGdfColumnPayload::InHostGdfColumnPayload() : buffer_{nullptr, 0} {};
+
+const Buffer&
 InHostGdfColumnPayload::Deliver() const noexcept {
-  return nullptr;
+  return buffer_;
 }
 
 }  // namespace gdf_columns

@@ -64,8 +64,8 @@ class DTypeInfoPayload : public Payload {
 
 class GdfColumnPayload : public Payload {
 public:
-  //virtual const UCBuffer &
-  //Data() const noexcept = 0;
+  // virtual const UCBuffer &
+  // Data() const noexcept = 0;
 
   // virtual GdfColumnBuilder &
   // Valid(const CudaBuffer &cudaBuffer) noexcept = 0;

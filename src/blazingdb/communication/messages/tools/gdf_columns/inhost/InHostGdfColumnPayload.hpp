@@ -2,6 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_INHOST_INHOSTGDFCOLUMNPAYLOAD_HPP_
 
 #include "../../gdf_columns.h"
+#include "../BufferBase.hpp"
 
 #include <blazingdb/uc/internal/macros.hpp>
 
@@ -13,8 +14,13 @@ namespace gdf_columns {
 
 class InHostGdfColumnPayload : public GdfColumnPayload {
 public:
-  std::unique_ptr<Buffer>
+  explicit InHostGdfColumnPayload();
+
+  const Buffer&
   Deliver() const noexcept final;
+
+private:
+  BufferBase buffer_;
 
   UC_CONCRETE(InHostGdfColumnPayload);
 };
