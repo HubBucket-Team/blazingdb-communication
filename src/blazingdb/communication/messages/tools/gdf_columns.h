@@ -22,9 +22,16 @@ public:
   UC_INTERFACE(Buffer);
 };
 
-class HostBuffer : public Buffer {};
+class NullableBuffer : public Buffer {
+public:
+  UC_INTERFACE(NullableBuffer);
+};
 
-class CudaBuffer : public Buffer {
+class HostBuffer : public NullableBuffer {
+  UC_INTERFACE(HostBuffer);
+};
+
+class CudaBuffer : public NullableBuffer {
 public:
   static std::unique_ptr<CudaBuffer>
   Make(const void *const data, const std::size_t size);
@@ -32,7 +39,9 @@ public:
   UC_INTERFACE(CudaBuffer);
 };
 
-class UCBuffer : public HostBuffer {};
+class UCBuffer : public HostBuffer {
+  UC_INTERFACE(UCBuffer);
+};
 
 /// ----------------------------------------------------------------------
 /// Payloads

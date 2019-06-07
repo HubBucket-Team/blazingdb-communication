@@ -12,7 +12,8 @@ namespace gdf_columns {
 
 std::unique_ptr<CudaBuffer>
 CudaBuffer::Make(const void *const data, const std::size_t size) {
-  return std::make_unique<BufferBase>(data, size);
+  Buffer *buffer = new BufferBase(data, size);
+  return std::unique_ptr<CudaBuffer>(static_cast<CudaBuffer *>(buffer));
 }
 
 std::unique_ptr<GdfColumnBuilder>
