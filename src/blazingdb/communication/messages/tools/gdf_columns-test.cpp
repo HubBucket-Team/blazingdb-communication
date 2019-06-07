@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <blazingdb/uc/Context.hpp>
+
 namespace {
 class GdfColumnFixture {
   using CudaBuffer =
@@ -86,9 +88,12 @@ CreateBasicGdfColumnFixture() {
 TEST(GdfColumnBuilderTest, CheckPayload) {
   auto fixture = CreateBasicGdfColumnFixture();
 
+  std::unique_ptr<blazingdb::uc::Context> context = blazingdb::uc::Context::IPC();
+  std::unique_ptr<blazingdb::uc::Agent>   agent = context->Agent();
+
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnBuilder;
-  auto builder = GdfColumnBuilder::MakeWithHostAllocation();
+  auto builder = GdfColumnBuilder::MakeWithHostAllocation(*agent);
 
   auto payload = builder->Data(fixture.data())
                      .Valid(fixture.valid())

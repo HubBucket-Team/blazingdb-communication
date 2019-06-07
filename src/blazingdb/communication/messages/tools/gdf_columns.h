@@ -5,6 +5,8 @@
 
 #include <blazingdb/uc/util/macros.hpp>
 
+#include <blazingdb/uc/Agent.hpp>
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -152,7 +154,7 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
-  MakeWithHostAllocation();
+  MakeWithHostAllocation(blazingdb::uc::Agent&);
 
   UC_INTERFACE(GdfColumnBuilder);
 };
