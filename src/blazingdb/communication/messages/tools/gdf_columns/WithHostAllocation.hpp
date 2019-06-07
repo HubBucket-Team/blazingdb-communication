@@ -43,6 +43,7 @@ public:
 
 private:
   CudaBuffer *dataCudaBuffer_;
+  CudaBuffer *validCudaBuffer_;
 
   UC_CONCRETE(GdfColumnWithHostAllocationBuilder);
 };
