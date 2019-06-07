@@ -3,6 +3,7 @@
 
 #include "../gdf_columns.h"
 
+#include <blazingdb/uc/API.hpp>
 #include <blazingdb/uc/internal/macros.hpp>
 
 namespace blazingdb {
@@ -19,6 +20,7 @@ public:
   Data(const CudaBuffer &cudaBuffer) noexcept final;
 
   GdfColumnBuilder &
+
   Valid(const CudaBuffer &cudaBuffer) noexcept final;
 
   GdfColumnBuilder &
@@ -38,6 +40,13 @@ public:
 
   std::unique_ptr<Payload>
   Build() const noexcept final;
+
+private:
+  // TODO: Now we use IPC by default. Get as a paremeter from builder.
+  std::unique_ptr<blazingdb::uc::Context> context_;
+  std::unique_ptr<blazingdb::uc::Agent>   agent_;
+
+  std::unique_ptr<blazingdb::uc::Buffer> dataBuffer_;
 
   UC_CONCRETE(GdfColumnWithHostAllocationBuilder);
 };

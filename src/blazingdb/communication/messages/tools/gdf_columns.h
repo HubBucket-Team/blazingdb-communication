@@ -32,7 +32,7 @@ public:
   UC_INTERFACE(CudaBuffer);
 };
 
-class UCBuffer : public Buffer {};
+class UCBuffer : public HostBuffer {};
 
 /// ----------------------------------------------------------------------
 /// Payloads

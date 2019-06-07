@@ -4,6 +4,7 @@
 #include "../../gdf_columns.h"
 #include "../BufferBase.hpp"
 
+#include <blazingdb/uc/API.hpp>
 #include <blazingdb/uc/internal/macros.hpp>
 
 namespace blazingdb {
@@ -14,7 +15,9 @@ namespace gdf_columns {
 
 class InHostGdfColumnPayload : public GdfColumnPayload {
 public:
-  explicit InHostGdfColumnPayload();
+  explicit InHostGdfColumnPayload(
+      std::unique_ptr<blazingdb::uc::Context>&& context,
+      const std::string&&                       payload);
 
   const UCBuffer&
   Data() const noexcept final;
@@ -45,6 +48,10 @@ private:
   DTypeInfoPayload* dtypeInfoPayload_;
 
   BufferBase buffer_;
+
+  std::unique_ptr<blazingdb::uc::Context> context_;
+
+  const std::string payload_;
 
   UC_CONCRETE(InHostGdfColumnPayload);
 };

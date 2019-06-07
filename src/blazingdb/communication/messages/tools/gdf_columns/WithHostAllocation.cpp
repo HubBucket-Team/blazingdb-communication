@@ -8,12 +8,14 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder() =
-    default;
+GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder()
+    : context_{blazingdb::uc::Context::IPC()}, agent_{context_->Agent()} {}
 
 GdfColumnBuilder &
 GdfColumnWithHostAllocationBuilder::Data(
     const CudaBuffer &cudaBuffer) noexcept {
+  const void *data = cudaBuffer.Data();
+  dataBuffer_      = agent_->Register(data, cudaBuffer.Size());
   return *this;
 }
 
@@ -53,7 +55,15 @@ GdfColumnWithHostAllocationBuilder::ColumnName(
 
 std::unique_ptr<Payload>
 GdfColumnWithHostAllocationBuilder::Build() const noexcept {
-  return std::make_unique<InHostGdfColumnPayload>();
+  std::string payload;
+  payload.resize(1000);
+
+  auto dataRecord = dataBuffer_->SerializedRecord();
+
+  std::memcpy(&payload[0], dataRecord->Data(), dataRecord->Size());
+
+  return std::make_unique<InHostGdfColumnPayload>(std::move(context_),
+                                                  std::move(payload));
 }
 
 }  // namespace gdf_columns

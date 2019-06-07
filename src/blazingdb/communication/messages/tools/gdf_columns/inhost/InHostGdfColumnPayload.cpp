@@ -6,11 +6,37 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-InHostGdfColumnPayload::InHostGdfColumnPayload() : buffer_{nullptr, 0} {};
+class ConcreteUCBuffer : public UCBuffer {
+public:
+  explicit ConcreteUCBuffer(const void* const data, const std::size_t size)
+      : data_{data}, size_{size} {}
+
+  const void*
+  Data() const noexcept final {
+    return data_;
+  }
+
+  std::size_t
+  Size() const noexcept {
+    return size_;
+  }
+
+private:
+  const void* const data_;
+  const std::size_t size_;
+};
+
+InHostGdfColumnPayload::InHostGdfColumnPayload(
+    std::unique_ptr<blazingdb::uc::Context>&& context,
+    const std::string&&                       payload)
+    : buffer_{nullptr, 0},
+      context_{std::move(context)},
+      payload_{std::move(payload)} {};
 
 const UCBuffer&
 InHostGdfColumnPayload::Data() const noexcept {
-  return *ucBuffer_;
+  static ConcreteUCBuffer buffer(&payload_[0], 104);
+  return buffer;
 }
 
 UCBuffer&
