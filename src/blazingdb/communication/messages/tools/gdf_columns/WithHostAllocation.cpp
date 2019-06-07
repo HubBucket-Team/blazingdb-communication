@@ -10,8 +10,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder() =
-    default;
+GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent& agent) : agent_(agent) {}
 
 GdfColumnBuilder &
 GdfColumnWithHostAllocationBuilder::Data(

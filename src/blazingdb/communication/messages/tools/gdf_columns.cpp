@@ -17,8 +17,8 @@ CudaBuffer::Make(const void *const data, const std::size_t size) {
 }
 
 std::unique_ptr<GdfColumnBuilder>
-GdfColumnBuilder::MakeWithHostAllocation() {
-  return std::make_unique<GdfColumnWithHostAllocationBuilder>();
+GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent& agent) {
+  return std::make_unique<GdfColumnWithHostAllocationBuilder>(agent);
 }
 
 std::unique_ptr<Collector>
