@@ -1,5 +1,7 @@
 #include "gdf_columns.h"
 
+#include <array>
+
 #include <cuda_runtime_api.h>
 
 #include <blazingdb/uc/Context.hpp>
@@ -156,20 +158,40 @@ public:
   MOCK_CONST_METHOD0(SizeMember, std::size_t());
 };
 
-TEST(GdfColumnsBuilderTest, AddPayloads) {
+static inline void
+ExpectCall(MockBuffer &mock, const std::string &&content) {
+  EXPECT_CALL(mock, DataMember)
+      .WillRepeatedly(::testing::Return(content.c_str()));
+  EXPECT_CALL(mock, SizeMember)
+      .WillRepeatedly(::testing::Return(content.length()));
+}
+
+static inline void
+ExpectCall(MockPayload &mock, const MockBuffer &buffer) {
+  EXPECT_CALL(mock, MockDeliver).WillOnce(::testing::ReturnRef(buffer));
+}
+
+TEST(GdfColumnCollectorTest, AddPayloads) {
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnCollector;
-  auto builder = GdfColumnCollector::MakeInHost();
+  auto collector = GdfColumnCollector::MakeInHost();
 
-  std::vector<std::unique_ptr<MockPayload>> payloads;
-  static const std::size_t                  payloadsSize = 10;
-  payloads.resize(payloadsSize);
+  MockPayload payload1, payload2, payload3;
+  MockBuffer  buffer1, buffer2, buffer3;
 
-  MockBuffer buffer;
-  EXPECT_CALL(buffer, DataMember).WillRepeatedly(::testing::Return(nullptr));
-  EXPECT_CALL(buffer, SizeMember).WillRepeatedly(::testing::Return(0));
+  ExpectCall(buffer1, "11111");
+  ExpectCall(buffer2, "22222");
+  ExpectCall(buffer3, "33333");
 
-  for (auto &payload : payloads) {
-    EXPECT_CALL(*payload, MockDeliver).WillOnce(::testing::ReturnRef(buffer));
-  }
+  ExpectCall(payload1, buffer1);
+  ExpectCall(payload2, buffer2);
+  ExpectCall(payload3, buffer3);
+
+  collector->Add(payload1);
+  collector->Add(payload2);
+  collector->Add(payload3);
+
+  EXPECT_EQ(3, collector->Length());
+
+  auto buffer = collector->Collect();
 }
