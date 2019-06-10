@@ -86,6 +86,8 @@ CreateBasicGdfColumnFixture() {
   return GdfColumnFixture{data, dataSize, valid, validSize, size, dtype};
 }
 
+// Tests for gdf column builder
+
 TEST(GdfColumnBuilderTest, CheckPayload) {
   auto fixture = CreateBasicGdfColumnFixture();
 
@@ -110,6 +112,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   auto collector = GdfColumnCollector::Make(buffer);
   auto result    = collector->Apply();
 }
+
+// Tests for gdf column collection builder
 
 class MockAgent : public blazingdb::uc::Agent {
 public:
