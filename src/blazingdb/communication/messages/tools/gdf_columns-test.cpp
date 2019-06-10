@@ -141,10 +141,39 @@ public:
   MOCK_CONST_METHOD0(MockDeliver, const Buffer &());
 };
 
+class MockBuffer
+    : public blazingdb::communication::messages::tools::gdf_columns::Buffer {
+public:
+  const void *
+  Data() const noexcept final {
+    return DataMember();
+  }
+
+  std::size_t
+  Size() const noexcept final {
+    return SizeMember();
+  }
+
+  MOCK_CONST_METHOD0(DataMember, const void *());
+  MOCK_CONST_METHOD0(SizeMember, std::size_t());
+};
+
 TEST(GdfColumnsBuilderTest, AddPayloads) {
   MockAgent agent;
 
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnsBuilder;
   auto builder = GdfColumnsBuilder::Make(agent);
+
+  std::vector<std::unique_ptr<MockPayload>>        payloads;
+  static const std::vector<MockPayload>::size_type payloadsSize = 10;
+  payloads.resize(payloadsSize);
+
+  MockBuffer buffer;
+  EXPECT_CALL(buffer, DataMember).WillRepeatedly(::testing::Return(nullptr));
+  EXPECT_CALL(buffer, SizeMember).WillRepeatedly(::testing::Return(0));
+
+  for (auto &payload : payloads) {
+    EXPECT_CALL(*payload, MockDeliver).WillOnce(::testing::ReturnRef(buffer));
+  }
 }
