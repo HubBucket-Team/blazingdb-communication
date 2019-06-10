@@ -11,7 +11,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class InHostCollector : public Collector {
+class InHostCollector : public Specialized {
 public:
   explicit InHostCollector(const Buffer& buffer);
 

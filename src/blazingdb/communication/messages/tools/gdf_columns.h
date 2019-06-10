@@ -120,14 +120,6 @@ public:
   UC_INTERFACE(Builder);
 };
 
-class CollectionBuilder : public Builder {
-public:
-  virtual CollectionBuilder &
-  Add(const Payload &payload) noexcept = 0;
-
-  UC_INTERFACE(CollectionBuilder);
-};
-
 class DTypeInfoBuilder : public Builder {
 public:
   /// ----------------------------------------------------------------------
@@ -179,31 +171,45 @@ public:
   UC_INTERFACE(GdfColumnBuilder);
 };
 
-class GdfColumnsBuilder : public CollectionBuilder {
-public:
-  static std::unique_ptr<GdfColumnsBuilder>
-  Make(const blazingdb::uc::Agent &agent);
-
-  UC_INTERFACE(GdfColumnsBuilder);
-};
-
 /// ----------------------------------------------------------------------
-/// Collector
+/// Collectors
 
 class Collector {
 public:
-  virtual std::unique_ptr<Payload>
-  Apply() const = 0;
+  virtual std::unique_ptr<Buffer>
+  Collect() const noexcept = 0;
+
+  virtual Collector &
+  Add(const Payload &payload) noexcept = 0;
 
   UC_INTERFACE(Collector);
 };
 
 class GdfColumnCollector : public Collector {
 public:
-  static std::unique_ptr<Collector>
-  Make(const Buffer &buffer);
+  static std::unique_ptr<GdfColumnCollector>
+  MakeInHost();
 
   UC_INTERFACE(GdfColumnCollector);
+};
+
+/// ----------------------------------------------------------------------
+/// Specializeds
+
+class Specialized {
+public:
+  virtual std::unique_ptr<Payload>
+  Apply() const = 0;
+
+  UC_INTERFACE(Specialized);
+};
+
+class GdfColumnSpecialized : public Specialized {
+public:
+  static std::unique_ptr<Specialized>
+  Make(const Buffer &buffer);
+
+  UC_INTERFACE(GdfColumnSpecialized);
 };
 
 }  // namespace gdf_columns

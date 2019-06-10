@@ -3,6 +3,7 @@
 #include "gdf_columns/BufferBase.hpp"
 #include "gdf_columns/WithHostAllocation.hpp"
 #include "gdf_columns/collectors/InHostCollector.hpp"
+#include "gdf_columns/inhost/InHostGdfColumnCollector.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -20,13 +21,13 @@ GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent &agent) {
   return std::make_unique<GdfColumnWithHostAllocationBuilder>(agent);
 }
 
-std::unique_ptr<GdfColumnsBuilder>
-GdfColumnsBuilder::Make(const blazingdb::uc::Agent &agent) {
-  return nullptr;
+std::unique_ptr<GdfColumnCollector>
+GdfColumnCollector::MakeInHost() {
+  return std::make_unique<InHostGdfColumnCollector>();
 }
 
-std::unique_ptr<Collector>
-GdfColumnCollector::Make(const Buffer &buffer) {
+std::unique_ptr<Specialized>
+GdfColumnSpecialized::Make(const Buffer &buffer) {
   return std::make_unique<InHostCollector>(buffer);
 }
 

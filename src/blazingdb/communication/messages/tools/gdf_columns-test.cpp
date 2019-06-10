@@ -88,11 +88,25 @@ CreateBasicGdfColumnFixture() {
 
 // Tests for gdf column builder
 
+class MockAgent : public blazingdb::uc::Agent {
+public:
+  using Buffer = blazingdb::uc::Buffer;
+
+  std::unique_ptr<Buffer>
+  Register(const void *&data, std::size_t size) const noexcept final {
+    MockRegister(data, size);
+  }
+
+  MOCK_CONST_METHOD2(MockRegister,
+                     std::unique_ptr<Buffer>(const void *&, std::size_t));
+};
+
 TEST(GdfColumnBuilderTest, CheckPayload) {
   auto fixture = CreateBasicGdfColumnFixture();
 
   std::unique_ptr<blazingdb::uc::Context> context =
       blazingdb::uc::Context::IPC();
+  // TODO: use mock instead this
   std::unique_ptr<blazingdb::uc::Agent> agent = context->Agent();
 
   using blazingdb::communication::messages::tools::gdf_columns::
@@ -107,26 +121,10 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   auto &buffer = payload->Deliver();
 
-  using blazingdb::communication::messages::tools::gdf_columns::
-      GdfColumnCollector;
-  auto collector = GdfColumnCollector::Make(buffer);
-  auto result    = collector->Apply();
+  // TODO: do something with buffer
 }
 
 // Tests for gdf column collection builder
-
-class MockAgent : public blazingdb::uc::Agent {
-public:
-  using Buffer = blazingdb::uc::Buffer;
-
-  std::unique_ptr<Buffer>
-  Register(const void *&data, std::size_t size) const noexcept final {
-    MockRegister(data, size);
-  }
-
-  MOCK_CONST_METHOD2(MockRegister,
-                     std::unique_ptr<Buffer>(const void *&, std::size_t));
-};
 
 class MockPayload
     : public blazingdb::communication::messages::tools::gdf_columns::Payload {
@@ -159,14 +157,12 @@ public:
 };
 
 TEST(GdfColumnsBuilderTest, AddPayloads) {
-  MockAgent agent;
-
   using blazingdb::communication::messages::tools::gdf_columns::
-      GdfColumnsBuilder;
-  auto builder = GdfColumnsBuilder::Make(agent);
+      GdfColumnCollector;
+  auto builder = GdfColumnCollector::MakeInHost();
 
-  std::vector<std::unique_ptr<MockPayload>>        payloads;
-  static const std::vector<MockPayload>::size_type payloadsSize = 10;
+  std::vector<std::unique_ptr<MockPayload>> payloads;
+  static const std::size_t                  payloadsSize = 10;
   payloads.resize(payloadsSize);
 
   MockBuffer buffer;
