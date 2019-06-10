@@ -26,6 +26,8 @@ public:
 
 class NullableBuffer : public Buffer {
 public:
+  virtual bool IsNull() const noexcept = 0;
+
   UC_INTERFACE(NullableBuffer);
 };
 
@@ -163,7 +165,7 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
-  MakeWithHostAllocation(blazingdb::uc::Agent&);
+  MakeWithHostAllocation(blazingdb::uc::Agent &);
 
   UC_INTERFACE(GdfColumnBuilder);
 };

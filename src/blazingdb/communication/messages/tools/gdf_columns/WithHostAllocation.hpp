@@ -14,7 +14,7 @@ namespace gdf_columns {
 
 class GdfColumnWithHostAllocationBuilder : public GdfColumnBuilder {
 public:
-  explicit GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent&);
+  explicit GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent &);
 
   GdfColumnBuilder &
   Data(const CudaBuffer &cudaBuffer) noexcept final;
@@ -41,9 +41,9 @@ public:
   Build() const noexcept final;
 
 private:
-  CudaBuffer *dataCudaBuffer_;
-  CudaBuffer *validCudaBuffer_;
-  blazingdb::uc::Agent& agent_;
+  CudaBuffer *          dataCudaBuffer_;
+  CudaBuffer *          validCudaBuffer_;
+  blazingdb::uc::Agent &agent_;
 
   UC_CONCRETE(GdfColumnWithHostAllocationBuilder);
 };

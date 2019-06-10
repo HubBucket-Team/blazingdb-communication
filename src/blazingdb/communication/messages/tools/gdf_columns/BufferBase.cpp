@@ -19,6 +19,16 @@ BufferBase::Size() const noexcept {
   return size_;
 }
 
+bool
+BufferBase::IsNull() const noexcept {
+  return data_ == nullptr;
+}
+
+std::unique_ptr<BufferBase>
+BufferBase::MakeNull() noexcept {
+  return std::make_unique<BufferBase>(nullptr, 0);
+}
+
 }  // namespace gdf_columns
 }  // namespace tools
 }  // namespace messages

@@ -4,6 +4,35 @@
 #include <iostream>
 #include <sstream>
 
+inline namespace pm {
+
+template <class T, class U>
+static inline std::unique_ptr<T>
+static_unique_cast(const std::unique_ptr<U> &r) noexcept {
+  auto p = static_cast<typename std::unique_ptr<T>::element_type *>(r.get());
+  return std::unique_ptr<T>(r, p);
+}
+
+template <class T, class U>
+static inline std::unique_ptr<T>
+dynamic_unique_cast(const std::unique_ptr<U> &r) noexcept {
+  if (auto p =
+          dynamic_cast<typename std::unique_ptr<T>::element_type *>(r.get())) {
+    return std::unique_ptr<T>(r, p);
+  } else {
+    return std::unique_ptr<T>();
+  }
+}
+
+template <class T, class U, class V, class... Args>
+static inline std::unique_ptr<T>
+make_unique(Args &&... args) {
+  return std::unique_ptr<T>(
+      static_cast<T *>(static_cast<V *>(new U(std::forward<Args>(args)...))));
+}
+
+}  // namespace pm
+
 namespace gsl {
 template <class T, class = std::enable_if_t<std::is_pointer<T>::value>>
 using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this

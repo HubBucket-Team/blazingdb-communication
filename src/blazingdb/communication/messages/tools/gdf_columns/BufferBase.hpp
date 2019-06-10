@@ -11,7 +11,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class BufferBase : public Buffer {
+class BufferBase : public NullableBuffer {
 public:
   explicit BufferBase(const void* const data, const std::size_t size);
 
@@ -20,6 +20,12 @@ public:
 
   std::size_t
   Size() const noexcept final;
+
+  bool
+  IsNull() const noexcept final;
+
+  static std::unique_ptr<BufferBase>
+  MakeNull() noexcept;
 
 private:
   const void* const data_;

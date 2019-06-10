@@ -12,12 +12,11 @@ namespace gdf_columns {
 
 std::unique_ptr<CudaBuffer>
 CudaBuffer::Make(const void *const data, const std::size_t size) {
-  Buffer *buffer = new BufferBase(data, size);
-  return std::unique_ptr<CudaBuffer>(static_cast<CudaBuffer *>(buffer));
+  return pm::make_unique<CudaBuffer, BufferBase, Buffer>(data, size);
 }
 
 std::unique_ptr<GdfColumnBuilder>
-GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent& agent) {
+GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent &agent) {
   return std::make_unique<GdfColumnWithHostAllocationBuilder>(agent);
 }
 
