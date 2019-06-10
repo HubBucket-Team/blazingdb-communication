@@ -1,6 +1,7 @@
 #include "gdf_columns.h"
 
 #include <array>
+#include <cstring>
 
 #include <cuda_runtime_api.h>
 
@@ -135,10 +136,10 @@ public:
 
   const Buffer &
   Deliver() const noexcept final {
-    return MockDeliver();
+    return DeliverMember();
   }
 
-  MOCK_CONST_METHOD0(MockDeliver, const Buffer &());
+  MOCK_CONST_METHOD0(DeliverMember, const Buffer &());
 };
 
 class MockBuffer
@@ -168,7 +169,7 @@ ExpectCall(MockBuffer &mock, const std::string &&content) {
 
 static inline void
 ExpectCall(MockPayload &mock, const MockBuffer &buffer) {
-  EXPECT_CALL(mock, MockDeliver).WillOnce(::testing::ReturnRef(buffer));
+  EXPECT_CALL(mock, DeliverMember).WillOnce(::testing::ReturnRef(buffer));
 }
 
 TEST(GdfColumnCollectorTest, AddPayloads) {
@@ -194,4 +195,7 @@ TEST(GdfColumnCollectorTest, AddPayloads) {
   EXPECT_EQ(3, collector->Length());
 
   auto buffer = collector->Collect();
+
+  EXPECT_EQ(15, buffer->Size());
+  EXPECT_EQ(0, std::memcmp("111112222233333", buffer->Data(), 15));
 }
