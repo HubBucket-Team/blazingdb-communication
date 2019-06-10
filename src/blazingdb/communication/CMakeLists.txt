@@ -24,6 +24,8 @@ blazingdb_artifact (
     messages/tools/gdf_columns.cpp
     messages/tools/gdf_columns/WithHostAllocation.cpp
     messages/tools/gdf_columns/BufferBase.cpp
+    messages/tools/gdf_columns/buffers/DetachedBuffer.cpp
+    messages/tools/gdf_columns/buffers/DetachedBufferBuilder.cpp
     messages/tools/gdf_columns/collectors/InHostCollector.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnCollector.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnPayload.cpp

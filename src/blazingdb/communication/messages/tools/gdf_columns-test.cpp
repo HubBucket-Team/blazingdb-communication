@@ -172,7 +172,7 @@ ExpectCall(MockPayload &mock, const MockBuffer &buffer) {
   EXPECT_CALL(mock, DeliverMember).WillOnce(::testing::ReturnRef(buffer));
 }
 
-TEST(GdfColumnCollectorTest, AddPayloads) {
+TEST(GdfColumnCollectorTest, CollectPayloads) {
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnCollector;
   auto collector = GdfColumnCollector::MakeInHost();
