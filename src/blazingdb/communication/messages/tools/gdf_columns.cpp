@@ -20,6 +20,11 @@ GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent &agent) {
   return std::make_unique<GdfColumnWithHostAllocationBuilder>(agent);
 }
 
+std::unique_ptr<GdfColumnsBuilder>
+GdfColumnsBuilder::Make(const blazingdb::uc::Agent &agent) {
+  return nullptr;
+}
+
 std::unique_ptr<Collector>
 GdfColumnCollector::Make(const Buffer &buffer) {
   return std::make_unique<InHostCollector>(buffer);

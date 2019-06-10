@@ -2,9 +2,10 @@
 
 #include <cuda_runtime_api.h>
 
-#include <gtest/gtest.h>
-
 #include <blazingdb/uc/Context.hpp>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace {
 class GdfColumnFixture {
@@ -88,8 +89,9 @@ CreateBasicGdfColumnFixture() {
 TEST(GdfColumnBuilderTest, CheckPayload) {
   auto fixture = CreateBasicGdfColumnFixture();
 
-  std::unique_ptr<blazingdb::uc::Context> context = blazingdb::uc::Context::IPC();
-  std::unique_ptr<blazingdb::uc::Agent>   agent = context->Agent();
+  std::unique_ptr<blazingdb::uc::Context> context =
+      blazingdb::uc::Context::IPC();
+  std::unique_ptr<blazingdb::uc::Agent> agent = context->Agent();
 
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnBuilder;
@@ -107,4 +109,38 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
       GdfColumnCollector;
   auto collector = GdfColumnCollector::Make(buffer);
   auto result    = collector->Apply();
+}
+
+class MockAgent : public blazingdb::uc::Agent {
+public:
+  using Buffer = blazingdb::uc::Buffer;
+
+  std::unique_ptr<Buffer>
+  Register(const void *&data, std::size_t size) const noexcept final {
+    MockRegister(data, size);
+  }
+
+  MOCK_CONST_METHOD2(MockRegister,
+                     std::unique_ptr<Buffer>(const void *&, std::size_t));
+};
+
+class MockPayload
+    : public blazingdb::communication::messages::tools::gdf_columns::Payload {
+public:
+  using Buffer = blazingdb::communication::messages::tools::gdf_columns::Buffer;
+
+  const Buffer &
+  Deliver() const noexcept final {
+    return MockDeliver();
+  }
+
+  MOCK_CONST_METHOD0(MockDeliver, const Buffer &());
+};
+
+TEST(GdfColumnsBuilderTest, AddPayloads) {
+  MockAgent agent;
+
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnsBuilder;
+  auto builder = GdfColumnsBuilder::Make(agent);
 }

@@ -26,7 +26,8 @@ public:
 
 class NullableBuffer : public Buffer {
 public:
-  virtual bool IsNull() const noexcept = 0;
+  virtual bool
+  IsNull() const noexcept = 0;
 
   UC_INTERFACE(NullableBuffer);
 };
@@ -119,6 +120,14 @@ public:
   UC_INTERFACE(Builder);
 };
 
+class CollectionBuilder : public Builder {
+public:
+  virtual CollectionBuilder &
+  Add(const Payload &payload) noexcept = 0;
+
+  UC_INTERFACE(CollectionBuilder);
+};
+
 class DTypeInfoBuilder : public Builder {
 public:
   /// ----------------------------------------------------------------------
@@ -170,10 +179,10 @@ public:
   UC_INTERFACE(GdfColumnBuilder);
 };
 
-class GdfColumnsBuilder {
+class GdfColumnsBuilder : public CollectionBuilder {
 public:
   static std::unique_ptr<GdfColumnsBuilder>
-  Make();
+  Make(const blazingdb::uc::Agent &agent);
 
   UC_INTERFACE(GdfColumnsBuilder);
 };
