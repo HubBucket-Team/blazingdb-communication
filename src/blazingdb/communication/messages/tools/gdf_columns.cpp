@@ -4,6 +4,7 @@
 #include "gdf_columns/WithHostAllocation.hpp"
 #include "gdf_columns/collectors/InHostCollector.hpp"
 #include "gdf_columns/inhost/InHostGdfColumnCollector.hpp"
+#include "gdf_columns/inhost/InHostGdfColumnDispatcher.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -24,6 +25,11 @@ GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent &agent) {
 std::unique_ptr<GdfColumnCollector>
 GdfColumnCollector::MakeInHost() {
   return std::make_unique<InHostGdfColumnCollector>();
+}
+
+std::unique_ptr<GdfColumnDispatcher>
+GdfColumnDispatcher::MakeInHost(const Buffer &buffer) {
+  return std::make_unique<InHostGdfColumnDispatcher>(buffer);
 }
 
 std::unique_ptr<Specialized>

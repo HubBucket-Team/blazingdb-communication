@@ -211,6 +211,25 @@ public:
 };
 
 /// ----------------------------------------------------------------------
+/// Dispatchers
+
+class Dispatcher {
+public:
+  virtual std::unique_ptr<Collector>
+  Dispatch() const = 0;
+
+  UC_INTERFACE(Dispatcher);
+};
+
+class GdfColumnDispatcher : public Dispatcher {
+public:
+  static std::unique_ptr<GdfColumnDispatcher>
+  MakeInHost(const Buffer &buffer);
+
+  UC_INTERFACE(GdfColumnDispatcher);
+};
+
+/// ----------------------------------------------------------------------
 /// Specializeds
 
 class Specialized {

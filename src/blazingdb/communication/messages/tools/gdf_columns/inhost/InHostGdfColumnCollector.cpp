@@ -1,6 +1,7 @@
 #include "InHostGdfColumnCollector.hpp"
 
 #include "../buffers/DetachedBufferBuilder.hpp"
+#include "../buffers/ValueBuffer.hpp"
 
 #include <algorithm>
 
@@ -15,10 +16,17 @@ InHostGdfColumnCollector::InHostGdfColumnCollector() = default;
 std::unique_ptr<Buffer>
 InHostGdfColumnCollector::Collect() const noexcept {
   DetachedBufferBuilder builder;
+
+  const std::size_t length = Length();
+  ValueBuffer       buffer{length};
+
+  builder.Add(buffer);
+
   std::for_each(
       payloads_.cbegin(), payloads_.cend(), [&builder](const Payload *payload) {
         builder.Add(payload->Deliver());
       });
+
   return builder.Build();
 }
 

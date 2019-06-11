@@ -172,6 +172,35 @@ ExpectCall(MockPayload &mock, const MockBuffer &buffer) {
   EXPECT_CALL(mock, DeliverMember).WillOnce(::testing::ReturnRef(buffer));
 }
 
+static inline void
+ExpectCall(MockPayload &       mockPayload,
+           MockBuffer &        mockBuffer,
+           const std::string &&content) {
+  ExpectCall(mockBuffer, std::move(content));
+  ExpectCall(mockPayload, mockBuffer);
+}
+
+static inline void
+CheckReturned(
+    const blazingdb::communication::messages::tools::gdf_columns::Buffer
+        &buffer) {
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnDispatcher;
+  auto dispatcher = GdfColumnDispatcher::MakeInHost(buffer);
+
+  auto collector = dispatcher->Dispatch();
+
+  EXPECT_EQ(3, collector->Length());
+
+  EXPECT_EQ(5, collector->Get(0).Deliver().Size());
+  EXPECT_EQ(5, collector->Get(1).Deliver().Size());
+  EXPECT_EQ(5, collector->Get(2).Deliver().Size());
+
+  EXPECT_FALSE(std::memcmp("11111", collector->Get(0).Deliver().Data(), 5));
+  EXPECT_FALSE(std::memcmp("22222", collector->Get(1).Deliver().Data(), 5));
+  EXPECT_FALSE(std::memcmp("33333", collector->Get(2).Deliver().Data(), 5));
+}
+
 TEST(GdfColumnCollectorTest, CollectPayloads) {
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnCollector;
@@ -180,13 +209,9 @@ TEST(GdfColumnCollectorTest, CollectPayloads) {
   MockPayload payload1, payload2, payload3;
   MockBuffer  buffer1, buffer2, buffer3;
 
-  ExpectCall(buffer1, "11111");
-  ExpectCall(buffer2, "22222");
-  ExpectCall(buffer3, "33333");
-
-  ExpectCall(payload1, buffer1);
-  ExpectCall(payload2, buffer2);
-  ExpectCall(payload3, buffer3);
+  ExpectCall(payload1, buffer1, "11111");
+  ExpectCall(payload2, buffer2, "22222");
+  ExpectCall(payload3, buffer3, "33333");
 
   collector->Add(payload1);
   collector->Add(payload2);
@@ -196,6 +221,5 @@ TEST(GdfColumnCollectorTest, CollectPayloads) {
 
   auto buffer = collector->Collect();
 
-  EXPECT_EQ(15, buffer->Size());
-  EXPECT_EQ(0, std::memcmp("111112222233333", buffer->Data(), 15));
+  CheckReturned(*buffer);
 }
