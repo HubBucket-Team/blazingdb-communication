@@ -3,7 +3,8 @@
 
 #include <cmath>
 
-#include "blazingdb/communication/messages/BaseComponentMessage.h"
+#include <blazingdb/communication/messages/BaseComponentMessage.h>
+#include <blazingdb/communication/messages/tools/gdf_columns.h>
 #include <blazingdb/communication/Configuration.h>
 
 #include <blazingdb/uc/Context.hpp>
@@ -126,15 +127,55 @@ namespace messages {
 
             auto agent  = context->Agent();
 
+            using blazingdb::communication::messages::tools::gdf_columns::
+                GdfColumnCollector;
+
+            std::unique_ptr<GdfColumnCollector> columnCollector =
+                GdfColumnCollector::MakeInHost();
+
             for (const auto& column : columns) {
-                auto* column_ptr =  column.get_gdf_column();
-                result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
-                result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
+              auto* column_ptr = column.get_gdf_column();
+
+              using blazingdb::communication::messages::tools::gdf_columns::
+                  GdfColumnBuilder;
+
+              std::unique_ptr<GdfColumnBuilder> builder =
+                  GdfColumnBuilder::MakeWithHostAllocation(*agent);
+
+              using blazingdb::communication::messages::tools::gdf_columns::
+                  CudaBuffer;
+
+              const std::unique_ptr<const CudaBuffer> dataBuffer =
+                  CudaBuffer::Make(column_ptr->data, 0);
+              const std::unique_ptr<const CudaBuffer> validBuffer =
+                  CudaBuffer::Make(column_ptr->valid, 0);
+
+              using blazingdb::communication::messages::tools::gdf_columns::
+                  Payload;
+
+              std::unique_ptr<Payload> columnPayload =
+                  builder->Data(*dataBuffer)
+                      .Valid(*validBuffer)
+                      .Size(column_ptr->size)
+                      .Build();
+
+              columnCollector->Add(*columnPayload);
             }
             std::hash<std::string> hasher;
-            auto hashed = hasher(result); 
+            auto hashed = hasher(result);
 
-            std::cout << "****message sent: " << hashed << std::endl; 
+            std::cout << "****message sent: " << hashed << std::endl;
+
+            using blazingdb::communication::messages::tools::gdf_columns::
+                Buffer;
+
+            const std::unique_ptr<const Buffer> buffer =
+                columnCollector->Collect();
+
+            result =
+                std::string{static_cast<const std::string::value_type* const>(
+                                buffer->Data()),
+                            buffer->Size()};
 
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());
@@ -240,7 +281,7 @@ namespace messages {
               agent, validRecordData, valid, validSize);
 
           // set gdf column
-          RalColumn ral_column; 
+          RalColumn ral_column;
           //@todo: is ipc columnn?
           ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
                                                     data,
@@ -250,7 +291,7 @@ namespace messages {
           ral_column.set_column_token(column_token);
           ral_column.get_gdf_column()->null_count = cudf_column.null_count;
           ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
-        
+
           binary_pointer += 208;
 
           return ral_column;
