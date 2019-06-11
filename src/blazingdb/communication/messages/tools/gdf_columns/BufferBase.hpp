@@ -11,7 +11,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class BufferBase : public NullableBuffer {
+class UC_NOEXPORT BufferBase : public NullableBuffer {
 public:
   explicit BufferBase(const void* const data, const std::size_t size);
 

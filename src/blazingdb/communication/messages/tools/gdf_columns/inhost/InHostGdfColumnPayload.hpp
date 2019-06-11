@@ -13,7 +13,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class InHostGdfColumnPayload : public GdfColumnPayload {
+class UC_NOEXPORT InHostGdfColumnPayload : public GdfColumnPayload {
 public:
   explicit InHostGdfColumnPayload(
       std::unique_ptr<blazingdb::uc::Context>&& context,

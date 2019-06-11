@@ -12,7 +12,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class GdfColumnWithHostAllocationBuilder : public GdfColumnBuilder {
+class UC_NOEXPORT GdfColumnWithHostAllocationBuilder : public GdfColumnBuilder {
 public:
   explicit GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent &);
 

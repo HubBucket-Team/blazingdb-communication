@@ -3,6 +3,8 @@
 
 #include "../../gdf_columns.h"
 
+#include <vector>
+
 #include <blazingdb/uc/internal/macros.hpp>
 
 namespace blazingdb {
@@ -20,6 +22,15 @@ public:
 
   Collector &
   Add(const Payload &payload) noexcept final;
+
+  std::size_t
+  Length() const noexcept final;
+
+  const Payload &
+  Get(std::size_t index) const final;
+
+private:
+  std::vector<const Payload *> payloads_;
 
   UC_CONCRETE(InHostGdfColumnCollector);
 };

@@ -13,6 +13,9 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
+/// ----------------------------------------------------------------------
+/// Buffers
+
 class Buffer {
 public:
   virtual const void *
@@ -176,11 +179,25 @@ public:
 
 class Collector {
 public:
+  // collection
+
   virtual std::unique_ptr<Buffer>
   Collect() const noexcept = 0;
 
   virtual Collector &
   Add(const Payload &payload) noexcept = 0;
+
+  // collected
+
+  virtual std::size_t
+  Length() const noexcept = 0;
+
+  virtual const Payload &
+  Get(std::size_t index) const = 0;
+
+  const Payload &operator[](const std::size_t index) const {
+    return Get(index);
+  }
 
   UC_INTERFACE(Collector);
 };
@@ -191,6 +208,25 @@ public:
   MakeInHost();
 
   UC_INTERFACE(GdfColumnCollector);
+};
+
+/// ----------------------------------------------------------------------
+/// Dispatchers
+
+class Dispatcher {
+public:
+  virtual std::unique_ptr<Collector>
+  Dispatch() const = 0;
+
+  UC_INTERFACE(Dispatcher);
+};
+
+class GdfColumnDispatcher : public Dispatcher {
+public:
+  static std::unique_ptr<GdfColumnDispatcher>
+  MakeInHost(const Buffer &buffer);
+
+  UC_INTERFACE(GdfColumnDispatcher);
 };
 
 /// ----------------------------------------------------------------------
