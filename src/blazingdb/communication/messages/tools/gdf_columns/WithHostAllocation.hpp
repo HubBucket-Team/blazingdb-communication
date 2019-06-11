@@ -12,6 +12,28 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
+class UC_NOEXPORT DTypeInfoWithHostAllocationBuilder : public DTypeInfoBuilder {
+public:
+  explicit DTypeInfoWithHostAllocationBuilder(blazingdb::uc::Agent &);
+
+  DTypeInfoBuilder &
+  TimeUnit(const std::int_fast32_t timeUnit) noexcept final;
+
+  DTypeInfoBuilder &
+  Category(const CudaBuffer &cudaBuffer) noexcept final;
+
+  std::unique_ptr<Payload>
+  Build() const noexcept final;
+
+private:
+  std::int_fast32_t     timeUnit_;
+  CudaBuffer *          categoryCudaBuffer_;
+
+  blazingdb::uc::Agent &agent_;
+
+  UC_CONCRETE(DTypeInfoWithHostAllocationBuilder);
+};
+
 class UC_NOEXPORT GdfColumnWithHostAllocationBuilder : public GdfColumnBuilder {
 public:
   explicit GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent &);

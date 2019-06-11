@@ -10,6 +10,49 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
+DTypeInfoWithHostAllocationBuilder::DTypeInfoWithHostAllocationBuilder(blazingdb::uc::Agent& agent) : agent_(agent) {}
+
+DTypeInfoBuilder &
+DTypeInfoWithHostAllocationBuilder::TimeUnit(
+    const std::int_fast32_t timeUnit) noexcept {
+  timeUnit_ = timeUnit;
+  return *this;
+}
+
+DTypeInfoBuilder &
+DTypeInfoWithHostAllocationBuilder::Category(
+    const CudaBuffer &cudaBuffer) noexcept {
+  // categoryCudaBuffer_ = cudaBuffer;
+  return *this;
+}
+
+std::unique_ptr<Payload>
+DTypeInfoWithHostAllocationBuilder::Build() const noexcept {
+  std::string payload;
+  payload.resize(1000);
+
+  // TODO: Now we use IPC by default. Get as a paremeter from builder.
+  std::unique_ptr<blazingdb::uc::Context> context =
+      blazingdb::uc::Context::IPC();
+  std::unique_ptr<blazingdb::uc::Agent> agent_ = context->Agent();
+
+  std::unique_ptr<blazingdb::uc::Buffer> categoryBuffer_;
+  const void *                           category = categoryCudaBuffer_->Data();
+  categoryBuffer_     = agent_->Register(category, categoryCudaBuffer_->Size());
+  auto categoryRecord = categoryBuffer_->SerializedRecord();
+
+  size_t offset = 0;
+  std::memcpy(&payload[offset], &timeUnit_, sizeof(timeUnit_));
+
+  offset += sizeof(timeUnit_);
+  std::memcpy(&payload[offset], categoryRecord->Data(), categoryRecord->Size());
+
+  offset += categoryRecord->Size();
+
+  // return std::make_unique<InHostDTypeInfoPayload>(std::move(context),
+  //                                                 std::move(payload));
+}
+
 GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent& agent) : agent_(agent) {}
 
 GdfColumnBuilder &
