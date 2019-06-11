@@ -37,6 +37,13 @@ GdfColumnSpecialized::Make(const Buffer &buffer) {
   return std::make_unique<InHostCollector>(buffer);
 }
 
+std::string
+StringFrom(const Buffer &buffer) {
+  return std::string{
+      static_cast<const std::string::value_type *const>(buffer.Data()),
+      buffer.Size()};
+}
+
 }  // namespace gdf_columns
 }  // namespace tools
 }  // namespace messages

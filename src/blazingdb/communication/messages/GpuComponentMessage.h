@@ -127,55 +127,16 @@ namespace messages {
 
             auto agent  = context->Agent();
 
-            using blazingdb::communication::messages::tools::gdf_columns::
-                GdfColumnCollector;
+            auto collector = blazingdb::communication::messages::tools::
+                gdf_columns::CollectorFrom(columns, *agent);
 
-            std::unique_ptr<GdfColumnCollector> columnCollector =
-                GdfColumnCollector::MakeInHost();
-
-            for (const auto& column : columns) {
-              auto* column_ptr = column.get_gdf_column();
-
-              using blazingdb::communication::messages::tools::gdf_columns::
-                  GdfColumnBuilder;
-
-              std::unique_ptr<GdfColumnBuilder> builder =
-                  GdfColumnBuilder::MakeWithHostAllocation(*agent);
-
-              using blazingdb::communication::messages::tools::gdf_columns::
-                  CudaBuffer;
-
-              const std::unique_ptr<const CudaBuffer> dataBuffer =
-                  CudaBuffer::Make(column_ptr->data, 0);
-              const std::unique_ptr<const CudaBuffer> validBuffer =
-                  CudaBuffer::Make(column_ptr->valid, 0);
-
-              using blazingdb::communication::messages::tools::gdf_columns::
-                  Payload;
-
-              std::unique_ptr<Payload> columnPayload =
-                  builder->Data(*dataBuffer)
-                      .Valid(*validBuffer)
-                      .Size(column_ptr->size)
-                      .Build();
-
-              columnCollector->Add(*columnPayload);
-            }
             std::hash<std::string> hasher;
-            auto hashed = hasher(result);
+            auto                   hashed = hasher(result);
 
             std::cout << "****message sent: " << hashed << std::endl;
 
-            using blazingdb::communication::messages::tools::gdf_columns::
-                Buffer;
-
-            const std::unique_ptr<const Buffer> buffer =
-                columnCollector->Collect();
-
-            result =
-                std::string{static_cast<const std::string::value_type* const>(
-                                buffer->Data()),
-                            buffer->Size()};
+            result = blazingdb::communication::messages::tools::gdf_columns::
+                StringFrom(*collector->Collect());
 
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());

@@ -2,6 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_H_
 
 #include <memory>
+#include <vector>
 
 #include <blazingdb/uc/util/macros.hpp>
 
@@ -247,6 +248,41 @@ public:
 
   UC_INTERFACE(GdfColumnSpecialized);
 };
+
+/// ----------------------------------------------------------------------
+/// Utils
+
+template <class Column>
+std::unique_ptr<Collector>
+CollectorFrom(const std::vector<Column> &columns, blazingdb::uc::Agent &agent) {
+  std::unique_ptr<GdfColumnCollector> collector =
+      GdfColumnCollector::MakeInHost();
+
+  for (const auto &column : columns) {
+    auto *column_ptr = column.get_gdf_column();
+
+    std::unique_ptr<GdfColumnBuilder> builder =
+        GdfColumnBuilder::MakeWithHostAllocation(agent);
+
+    const std::unique_ptr<const CudaBuffer> dataBuffer =
+        CudaBuffer::Make(column_ptr->data, 0);
+    const std::unique_ptr<const CudaBuffer> validBuffer =
+        CudaBuffer::Make(column_ptr->valid, 0);
+
+    std::unique_ptr<Payload> columnPayload = builder->Data(*dataBuffer)
+                                                 .Valid(*validBuffer)
+                                                 .Size(column_ptr->size)
+                                                 .Build();
+
+    collector->Add(*columnPayload);
+  }
+
+  return collector;
+}
+
+
+std::string
+StringFrom(const Buffer &buffer);
 
 }  // namespace gdf_columns
 }  // namespace tools
