@@ -7,6 +7,7 @@
 #include "gdf_columns/inhost/InHostGdfColumnBuilder.hpp"
 #include "gdf_columns/inhost/InHostGdfColumnCollector.hpp"
 #include "gdf_columns/inhost/InHostGdfColumnDispatcher.hpp"
+#include "gdf_columns/inhost/InHostGdfColumnSpecialized.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -40,8 +41,8 @@ GdfColumnDispatcher::MakeInHost(const Buffer &buffer) {
 }
 
 std::unique_ptr<Specialized>
-GdfColumnSpecialized::Make(const Buffer &buffer) {
-  return std::make_unique<InHostCollector>(buffer);
+GdfColumnSpecialized::MakeInHost(const Buffer &buffer) {
+  return std::make_unique<InHostGdfColumnSpecialized>(buffer);
 }
 
 std::string

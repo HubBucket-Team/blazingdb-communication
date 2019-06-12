@@ -247,7 +247,7 @@ public:
 class GdfColumnSpecialized : public Specialized {
 public:
   static std::unique_ptr<Specialized>
-  Make(const Buffer &buffer);
+  MakeInHost(const Buffer &buffer);
 
   UC_INTERFACE(GdfColumnSpecialized);
 };

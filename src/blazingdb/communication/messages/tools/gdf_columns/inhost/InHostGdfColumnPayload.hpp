@@ -2,9 +2,9 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_INHOST_INHOSTGDFCOLUMNPAYLOAD_HPP_
 
 #include "../../gdf_columns.h"
-#include "../BufferBase.hpp"
 
-#include <blazingdb/uc/API.hpp>
+#include "../buffers/StringReferenceBuffer.hpp"
+
 #include <blazingdb/uc/internal/macros.hpp>
 
 namespace blazingdb {
@@ -12,26 +12,6 @@ namespace communication {
 namespace messages {
 namespace tools {
 namespace gdf_columns {
-
-class UC_NOEXPORT StringRefBuffer : public Buffer {
-  UC_CONCRETE(StringRefBuffer);
-
-public:
-  explicit StringRefBuffer(const std::string& content) : content_{content} {}
-
-  const void*
-  Data() const noexcept final {
-    return content_.data();
-  }
-
-  std::size_t
-  Size() const noexcept final {
-    return content_.length();
-  }
-
-private:
-  const std::string& content_;
-};
 
 class UC_NOEXPORT InHostGdfColumnPayload : public GdfColumnPayload {
 public:
@@ -62,8 +42,8 @@ public:
   Deliver() const noexcept final;
 
 private:
-  const std::string     content_;
-  const StringRefBuffer buffer_;
+  const std::string           content_;
+  const StringReferenceBuffer buffer_;
 
   UC_CONCRETE(InHostGdfColumnPayload);
 };

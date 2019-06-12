@@ -1,4 +1,5 @@
 #include "InHostGdfColumnBuilder.hpp"
+#include "InHostGdfColumnBuilderHelpers.hpp"
 
 #include <cstring>
 
@@ -13,42 +14,6 @@ namespace gdf_columns {
 InHostGdfColumnBuilder::InHostGdfColumnBuilder(blazingdb::uc::Agent &agent)
     : agent_{agent} {}
 
-template <class T>
-static inline void
-Write(std::ostream &ostream, const T type) {
-  ostream.write(reinterpret_cast<const char *>(&type), sizeof(T));
-}
-
-template <class T>
-static inline void
-Write(std::ostream &ostream, const T *type, const std::size_t size) {
-  ostream.write(reinterpret_cast<const char *>(type), size);
-}
-
-static inline void
-Write(std::ostream &                           ostream,
-      const blazingdb::uc::Record::Serialized &serialized) {
-  Write(ostream, serialized.Size());
-  Write(ostream, serialized.Data(), serialized.Size());
-}
-
-static inline std::unique_ptr<blazingdb::uc::Buffer>
-Write(std::ostream &        ostream,
-      blazingdb::uc::Agent &agent,
-      const CudaBuffer &    cudaBuffer) {
-  using blazingdb::uc::Buffer;
-  using SerializedRecord = blazingdb::uc::Record::Serialized;
-
-  const void *            pointer = cudaBuffer.Data();
-  std::unique_ptr<Buffer> buffer  = agent.Register(pointer, cudaBuffer.Size());
-  std::unique_ptr<const SerializedRecord> serializedRecord =
-      buffer->SerializedRecord();
-
-  Write(ostream, *serializedRecord);
-
-  return buffer;
-}
-
 std::unique_ptr<Payload>
 InHostGdfColumnBuilder::Build() const noexcept {
   std::ostringstream ostream;
@@ -58,12 +23,12 @@ InHostGdfColumnBuilder::Build() const noexcept {
   //  TODO: each Write should be return a ticket about resouces ownership
 
   std::unique_ptr<BUBuffer> dataBuffer =
-      Write(ostream, agent_, *dataCudaBuffer_);
+      inhost_helpers::Write(ostream, agent_, *dataCudaBuffer_);
 
   std::unique_ptr<BUBuffer> validBuffer =
-      Write(ostream, agent_, *validCudaBuffer_);
+      inhost_helpers::Write(ostream, agent_, *validCudaBuffer_);
 
-  Write(ostream, size_);
+  inhost_helpers::Write(ostream, size_);
 
   ostream.flush();
   std::string content = ostream.str();

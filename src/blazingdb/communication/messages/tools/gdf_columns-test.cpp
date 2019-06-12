@@ -169,14 +169,11 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   auto &buffer = payload->Deliver();
 
-  EXPECT_EQ(
-      0,
-      std::memcmp(
-          "12345", (reinterpret_cast<const char *>(buffer.Data()) + 21), 5));
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnSpecialized;
+  auto specialized = GdfColumnSpecialized::MakeInHost(buffer);
 
-  std::cout << ">>>>     "
-            << (*reinterpret_cast<const std::size_t *>(buffer.Data()))
-            << std::endl;
+  auto resultPayload = specialized->Apply();
 }
 
 // Tests for gdf column collection builder
