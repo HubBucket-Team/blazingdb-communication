@@ -34,6 +34,7 @@ blazingdb_artifact (
     messages/tools/gdf_columns/inhost/InHostGdfColumnCollector.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnDispatcher.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnPayload.cpp
+    messages/tools/gdf_columns/inhost/InHostGdfColumnSpecialized.cpp
 
   INCLUDES
     PUBLIC ${PROJECT_SOURCE_DIR}/src

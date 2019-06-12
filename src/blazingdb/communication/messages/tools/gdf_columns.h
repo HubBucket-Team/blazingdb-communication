@@ -268,6 +268,7 @@ DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
     std::unique_ptr<GdfColumnBuilder> builder =
         GdfColumnBuilder::MakeWithHostAllocation(agent);
 
+    // TODO: Add other members y compute correct buffer size
     const std::unique_ptr<const CudaBuffer> dataBuffer =
         CudaBuffer::Make(gdfColumn.data, 0);
     const std::unique_ptr<const CudaBuffer> validBuffer =
@@ -278,10 +279,11 @@ DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
                                                  .Size(gdfColumn.size)
                                                  .Build();
 
+    // TODO: support different buffer sizes (of payloads) in GdfColumnCollector
     collector->Add(*columnPayload);
   }
 
-  return collector;
+  return collector; // TODO: return as std::string
 }
 
 std::string
@@ -319,6 +321,10 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
 
   std::vector<GdfColumn> gdfColumns;
   gdfColumns.reserve(collector->Length());
+
+  // TODO: traverse el `collector`, then for each payload -> gdf column
+  // payload->Data : UCBuffer.Data  [BLAZ_UC] -> ptr = column.data
+  // payload->Size -> column.size
 }
 
 }  // namespace gdf_columns

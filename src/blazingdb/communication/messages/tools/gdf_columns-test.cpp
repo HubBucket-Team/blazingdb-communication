@@ -174,6 +174,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   auto specialized = GdfColumnSpecialized::MakeInHost(buffer);
 
   auto resultPayload = specialized->Apply();
+
+  // TODO: Check same values in payload and resultPayload
 }
 
 // Tests for gdf column collection builder

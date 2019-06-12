@@ -15,12 +15,10 @@ class UC_NOEXPORT InHostGdfColumnSpecialized : public Specialized {
   UC_CONCRETE(InHostGdfColumnSpecialized);
 
 public:
-  explicit InHostGdfColumnSpecialized(const Buffer &buffer) : buffer_{buffer} {}
+  explicit InHostGdfColumnSpecialized(const Buffer &buffer);
 
-  virtual std::unique_ptr<Payload>
-  Apply() const final {
-    return nullptr;
-  }
+  std::unique_ptr<Payload>
+  Apply() const final;
 
 private:
   const Buffer &buffer_;
