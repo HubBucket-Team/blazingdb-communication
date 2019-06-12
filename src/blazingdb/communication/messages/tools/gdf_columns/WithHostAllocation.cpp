@@ -10,7 +10,9 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-DTypeInfoWithHostAllocationBuilder::DTypeInfoWithHostAllocationBuilder(blazingdb::uc::Agent& agent) : agent_(agent) {}
+DTypeInfoWithHostAllocationBuilder::DTypeInfoWithHostAllocationBuilder(
+    blazingdb::uc::Agent &agent)
+    : agent_(agent) {}
 
 DTypeInfoBuilder &
 DTypeInfoWithHostAllocationBuilder::TimeUnit(
@@ -53,7 +55,9 @@ DTypeInfoWithHostAllocationBuilder::Build() const noexcept {
   //                                                 std::move(payload));
 }
 
-GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder(blazingdb::uc::Agent& agent) : agent_(agent) {}
+GdfColumnWithHostAllocationBuilder::GdfColumnWithHostAllocationBuilder(
+    blazingdb::uc::Agent &agent)
+    : agent_(agent) {}
 
 GdfColumnBuilder &
 GdfColumnWithHostAllocationBuilder::Data(
@@ -83,7 +87,8 @@ GdfColumnWithHostAllocationBuilder::DType(
 }
 
 GdfColumnBuilder &
-GdfColumnWithHostAllocationBuilder::NullCount(const std::size_t nullCount) noexcept {
+GdfColumnWithHostAllocationBuilder::NullCount(
+    const std::size_t nullCount) noexcept {
   nullCount_ = nullCount;
   return *this;
 }
@@ -148,8 +153,7 @@ GdfColumnWithHostAllocationBuilder::Build() const noexcept {
 
   offset += columnNameRecord->Size();
 
-  return std::make_unique<InHostGdfColumnPayload>(std::move(context),
-                                                  std::move(payload));
+  return std::make_unique<InHostGdfColumnPayload>(std::move(payload));
 }
 
 }  // namespace gdf_columns

@@ -6,20 +6,18 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-InHostGdfColumnPayload::InHostGdfColumnPayload(
-    std::unique_ptr<blazingdb::uc::Context>&& context,
-    const std::string&&                       payload)
-    : buffer_{nullptr, 0},
-      context_{std::move(context)},
-      payload_{std::move(payload)} {};
+InHostGdfColumnPayload::InHostGdfColumnPayload(const std::string&& content)
+    : content_{std::move(content)}, buffer_{content_} {}
 
 const UCBuffer&
 InHostGdfColumnPayload::Data() const noexcept {
+  static UCBuffer* ucBuffer_;
   return *ucBuffer_;
 }
 
 UCBuffer&
 InHostGdfColumnPayload::Valid() const noexcept {
+  static UCBuffer* ucBuffer_;
   return *ucBuffer_;
 }
 
@@ -40,6 +38,7 @@ InHostGdfColumnPayload::NullCount() const noexcept {
 
 DTypeInfoPayload&
 InHostGdfColumnPayload::DTypeInfo() const noexcept {
+  static DTypeInfoPayload* dtypeInfoPayload_;
   return *dtypeInfoPayload_;
 }
 

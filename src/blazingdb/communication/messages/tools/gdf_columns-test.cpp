@@ -3,7 +3,6 @@
 #include <array>
 #include <cstring>
 
-#include <cuda.h>
 #include <cuda_runtime_api.h>
 
 #include <blazingdb/uc/Context.hpp>
@@ -92,27 +91,92 @@ CreateBasicGdfColumnFixture() {
 
 // Tests for gdf column builder
 
+class MockBUCAgent : public blazingdb::uc::Agent {
+public:
+  using Buffer = blazingdb::uc::Buffer;
+
+  std::unique_ptr<Buffer>
+  Register(const void *&data, std::size_t size) const noexcept final {
+    return RegisterMember(data, size);
+  }
+
+  MOCK_CONST_METHOD2(RegisterMember,
+                     std::unique_ptr<Buffer>(const void *&, std::size_t));
+};
+
+class MockBUCBuffer : public blazingdb::uc::Buffer {
+public:
+  using Transport  = blazingdb::uc::Transport;
+  using Serialized = blazingdb::uc::Record::Serialized;
+
+  MOCK_CONST_METHOD1(Link, std::unique_ptr<Transport>(Buffer *));
+  MOCK_CONST_METHOD0(SerializedRecordMember,
+                     std::unique_ptr<const Serialized>());
+  MOCK_METHOD1(Link, std::unique_ptr<Transport>(const std::uint8_t *));
+
+  std::unique_ptr<const Serialized>
+  SerializedRecord() const noexcept final {
+    return SerializedRecordMember();
+  }
+};
+
+class MockBUCSerialized : public blazingdb::uc::Record::Serialized {
+public:
+  const std::uint8_t *
+  Data() const noexcept final {
+    return DataMember();
+  }
+
+  std::size_t
+  Size() const noexcept final {
+    return SizeMember();
+  }
+
+  MOCK_CONST_METHOD0(DataMember, const std::uint8_t *());
+  MOCK_CONST_METHOD0(SizeMember, std::size_t());
+};
+
 TEST(GdfColumnBuilderTest, CheckPayload) {
   auto fixture = CreateBasicGdfColumnFixture();
 
-  std::unique_ptr<blazingdb::uc::Context> context =
-      blazingdb::uc::Context::IPC();
-  // TODO: use mock instead this
-  std::unique_ptr<blazingdb::uc::Agent> agent = context->Agent();
+  MockBUCAgent agent;
+  EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
+      .WillRepeatedly(::testing::Invoke([](auto, auto) {
+        std::unique_ptr<MockBUCBuffer> buffer =
+            std::make_unique<MockBUCBuffer>();
+        EXPECT_CALL(*buffer, SerializedRecordMember)
+            .WillRepeatedly(::testing::Invoke([]() {
+              std::unique_ptr<const MockBUCSerialized> serialized =
+                  std::make_unique<const MockBUCSerialized>();
+              EXPECT_CALL(*serialized, DataMember)
+                  .WillRepeatedly(::testing::Return(
+                      reinterpret_cast<const std::uint8_t *>("12345")));
+              EXPECT_CALL(*serialized, SizeMember)
+                  .WillRepeatedly(::testing::Return(5));
+              return serialized;
+            }));
+        return buffer;
+      }));
 
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnBuilder;
-  auto builder = GdfColumnBuilder::MakeWithHostAllocation(*agent);
+  auto builder = GdfColumnBuilder::MakeInHost(agent);
 
   auto payload = builder->Data(fixture.data())
                      .Valid(fixture.valid())
                      .Size(fixture.size())
-                     .DType(fixture.dtype())
                      .Build();
 
   auto &buffer = payload->Deliver();
 
-  // TODO: do something with buffer
+  EXPECT_EQ(
+      0,
+      std::memcmp(
+          "12345", (reinterpret_cast<const char *>(buffer.Data()) + 21), 5));
+
+  std::cout << ">>>>     "
+            << (*reinterpret_cast<const std::size_t *>(buffer.Data()))
+            << std::endl;
 }
 
 // Tests for gdf column collection builder
@@ -255,7 +319,7 @@ public:
   std::unique_ptr<const Serialized>
   MakeSerializedRecord() {
     MockSerialized *serialized = new MockSerialized;
-
+    ::testing::Mock::AllowLeak(serialized);
     EXPECT_CALL(*serialized, DataMember)
         .WillRepeatedly(
             ::testing::Return(reinterpret_cast<const std::uint8_t *>("12345")));
@@ -276,6 +340,16 @@ public:
 
   MOCK_CONST_METHOD2(RegisterMember,
                      std::unique_ptr<Buffer>(const void *&, std::size_t));
+
+  std::unique_ptr<Buffer>
+  MakeBuffer(const void *, std::size_t) const {
+    std::unique_ptr<MockUCBuffer> buffer;
+    ON_CALL(*buffer, SerializedRecordMember)
+        .WillByDefault(::testing::Invoke(buffer.get(),
+                                         &MockUCBuffer::MakeSerializedRecord));
+    ::testing::Mock::AllowLeak(buffer.get());
+    return buffer;
+  }
 };
 
 static inline void
@@ -288,11 +362,10 @@ AddTo(std::vector<GdfColumn> &gdfColumns,
 }
 
 TEST(GdfColumnsTest, DeliverAndCollect) {
-  cuInit(0);
-
-  std::unique_ptr<blazingdb::uc::Context> context =
-      blazingdb::uc::Context::IPC();
-  std::unique_ptr<blazingdb::uc::Agent> agent = context->Agent();
+  MockAgent agent;
+  ON_CALL(agent, RegisterMember)
+      .WillByDefault(::testing::Invoke(&agent, &MockAgent::MakeBuffer));
+  ::testing::Mock::AllowLeak(&agent);
 
   std::vector<GdfColumn> gdfColumns;
   AddTo(gdfColumns, 100, 200, 10);
@@ -300,5 +373,5 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   AddTo(gdfColumns, 102, 202, 50);
 
   blazingdb::communication::messages::tools::gdf_columns::DeliverFrom(
-      gdfColumns, *agent);
+      gdfColumns, agent);
 }

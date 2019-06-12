@@ -159,7 +159,7 @@ public:
   DType(const std::int_fast32_t dtype) noexcept = 0;
 
   virtual GdfColumnBuilder &
-  NullCount(const std::size_t size) noexcept = 0;
+  NullCount(const std::size_t nullCount) noexcept = 0;
 
   virtual GdfColumnBuilder &
   DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept = 0;
@@ -171,6 +171,9 @@ public:
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
   MakeWithHostAllocation(blazingdb::uc::Agent &);
+
+  static std::unique_ptr<GdfColumnBuilder>
+  MakeInHost(blazingdb::uc::Agent &agent);
 
   UC_INTERFACE(GdfColumnBuilder);
 };
@@ -255,7 +258,7 @@ public:
 template <class GdfColumn>
 std::unique_ptr<Collector>
 DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
-            blazingdb::uc::Agent &          agent) {
+            blazingdb::uc::Agent &        agent) {
   std::unique_ptr<GdfColumnCollector> collector =
       GdfColumnCollector::MakeInHost();
 

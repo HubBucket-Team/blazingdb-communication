@@ -13,11 +13,29 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
+class UC_NOEXPORT StringRefBuffer : public Buffer {
+  UC_CONCRETE(StringRefBuffer);
+
+public:
+  explicit StringRefBuffer(const std::string& content) : content_{content} {}
+
+  const void*
+  Data() const noexcept final {
+    return content_.data();
+  }
+
+  std::size_t
+  Size() const noexcept final {
+    return content_.length();
+  }
+
+private:
+  const std::string& content_;
+};
+
 class UC_NOEXPORT InHostGdfColumnPayload : public GdfColumnPayload {
 public:
-  explicit InHostGdfColumnPayload(
-      std::unique_ptr<blazingdb::uc::Context>&& context,
-      const std::string&&                       payload);
+  explicit InHostGdfColumnPayload(const std::string&& content);
 
   const UCBuffer&
   Data() const noexcept final;
@@ -44,14 +62,8 @@ public:
   Deliver() const noexcept final;
 
 private:
-  UCBuffer*         ucBuffer_;
-  DTypeInfoPayload* dtypeInfoPayload_;
-
-  BufferBase buffer_;
-
-  std::unique_ptr<blazingdb::uc::Context> context_;
-
-  const std::string payload_;
+  const std::string     content_;
+  const StringRefBuffer buffer_;
 
   UC_CONCRETE(InHostGdfColumnPayload);
 };
