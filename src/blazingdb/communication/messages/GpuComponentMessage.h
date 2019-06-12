@@ -127,6 +127,7 @@ namespace messages {
 
             auto agent  = context->Agent();
 
+   // auto *column_ptr = gdfColumn.get_gdf_column();
             auto collector = blazingdb::communication::messages::tools::
                 gdf_columns::CollectorFrom(columns, *agent);
 

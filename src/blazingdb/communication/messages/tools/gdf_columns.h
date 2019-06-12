@@ -252,26 +252,27 @@ public:
 /// ----------------------------------------------------------------------
 /// Utils
 
-template <class Column>
+template <class GdfColumn>
 std::unique_ptr<Collector>
-CollectorFrom(const std::vector<Column> &columns, blazingdb::uc::Agent &agent) {
+DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
+            blazingdb::uc::Agent &          agent) {
   std::unique_ptr<GdfColumnCollector> collector =
       GdfColumnCollector::MakeInHost();
 
-  for (const auto &column : columns) {
-    auto *column_ptr = column.get_gdf_column();
+  for (const auto &gdfColumn : gdfColumns) {
+    // auto *column_ptr = gdfColumn.get_gdf_column();
 
     std::unique_ptr<GdfColumnBuilder> builder =
         GdfColumnBuilder::MakeWithHostAllocation(agent);
 
     const std::unique_ptr<const CudaBuffer> dataBuffer =
-        CudaBuffer::Make(column_ptr->data, 0);
+        CudaBuffer::Make(gdfColumn.data, 0);
     const std::unique_ptr<const CudaBuffer> validBuffer =
-        CudaBuffer::Make(column_ptr->valid, 0);
+        CudaBuffer::Make(gdfColumn.valid, 0);
 
     std::unique_ptr<Payload> columnPayload = builder->Data(*dataBuffer)
                                                  .Valid(*validBuffer)
-                                                 .Size(column_ptr->size)
+                                                 .Size(gdfColumn.size)
                                                  .Build();
 
     collector->Add(*columnPayload);
@@ -280,9 +281,42 @@ CollectorFrom(const std::vector<Column> &columns, blazingdb::uc::Agent &agent) {
   return collector;
 }
 
-
 std::string
 StringFrom(const Buffer &buffer);
+
+namespace {
+class StringViewBuffer : public Buffer {
+public:
+  explicit StringViewBuffer(const std::string &content) : content_{content} {}
+
+  const void *
+  Data() const noexcept final {
+    return content_.data();
+  }
+
+  std::size_t
+  Size() const noexcept final {
+    return content_.length();
+  }
+
+private:
+  const std::string &content_;
+};
+}  // namespace
+
+template <class GdfColumn>
+std::vector<GdfColumn>
+CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
+  const Buffer &buffer = StringViewBuffer{content};
+
+  std::unique_ptr<GdfColumnDispatcher> dispatcher =
+      GdfColumnDispatcher::MakeInHost(buffer);
+
+  std::unique_ptr<Collector> collector = dispatcher->Dispatch();
+
+  std::vector<GdfColumn> gdfColumns;
+  gdfColumns.reserve(collector->Length());
+}
 
 }  // namespace gdf_columns
 }  // namespace tools

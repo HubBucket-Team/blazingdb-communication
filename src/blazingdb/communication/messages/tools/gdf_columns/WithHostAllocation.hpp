@@ -26,8 +26,8 @@ public:
   Build() const noexcept final;
 
 private:
-  std::int_fast32_t     timeUnit_;
-  CudaBuffer *          categoryCudaBuffer_;
+  std::int_fast32_t timeUnit_;
+  CudaBuffer *      categoryCudaBuffer_;
 
   blazingdb::uc::Agent &agent_;
 
@@ -63,13 +63,13 @@ public:
   Build() const noexcept final;
 
 private:
-  CudaBuffer *          dataCudaBuffer_;
-  CudaBuffer *          validCudaBuffer_;
-  std::size_t           size_;
-  std::int_fast32_t     dtype_;
-  std::size_t           nullCount_;
-  DTypeInfoPayload *    dtypeInfoPayload_;
-  HostBuffer *          columnNameHostBuffer_;
+  CudaBuffer *      dataCudaBuffer_;
+  CudaBuffer *      validCudaBuffer_;
+  std::size_t       size_;
+  std::int_fast32_t dtype_;
+  std::size_t       nullCount_;
+  DTypeInfoPayload *dtypeInfoPayload_;
+  HostBuffer *      columnNameHostBuffer_;
 
   blazingdb::uc::Agent &agent_;
 
