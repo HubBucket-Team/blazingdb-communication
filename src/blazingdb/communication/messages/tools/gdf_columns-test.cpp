@@ -369,6 +369,36 @@ AddTo(std::vector<gdf_column> &gdfColumns,
       reinterpret_cast<void *>(data), reinterpret_cast<void *>(valid), size});
 }
 
+class GdfColumnInfoDummy {
+public:
+ static inline std::size_t DataSize(const gdf_column &) noexcept {
+   return 1;
+ }
+ static inline std::size_t ValidSize(const gdf_column &) noexcept {
+   return 2;
+ }
+};
+
+class BufferForTest : public blazingdb::communication::messages::tools::gdf_columns::Buffer {
+
+  private:
+  const std::string& string;
+
+  public:
+
+  BufferForTest(const std::string& str) : string(str) {}
+
+  const void *
+  Data() const noexcept final {
+    return string.data();
+  }
+
+  std::size_t
+  Size() const noexcept final {
+    return string.length();
+  }
+};
+
 TEST(GdfColumnsTest, DeliverAndCollect) {
  
   MockBUCAgent agent;
@@ -395,7 +425,19 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   AddTo(gdfColumns, 101, 201, 25);
   AddTo(gdfColumns, 102, 202, 50);
 
-  blazingdb::communication::messages::tools::gdf_columns::DeliverFrom(
+  std::string result = blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<GdfColumnInfoDummy>(
       gdfColumns, agent);
-}
 
+  BufferForTest resultBuffer(result);
+
+  using blazingdb::communication::messages::tools::gdf_columns::GdfColumnDispatcher;
+  auto dispatcher = GdfColumnDispatcher::MakeInHost(resultBuffer);
+
+  using blazingdb::communication::messages::tools::gdf_columns::Collector;
+  std::unique_ptr<Collector> collector = dispatcher->Dispatch();
+
+  using blazingdb::communication::messages::tools::gdf_columns::GdfColumnPayload;
+  const GdfColumnPayload & payload = static_cast<const GdfColumnPayload &>(collector->Get(0));
+
+  EXPECT_EQ(10, payload.Size());
+}

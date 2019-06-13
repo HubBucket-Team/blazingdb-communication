@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #include <blazingdb/uc/util/macros.hpp>
 
@@ -290,12 +291,15 @@ public:
 /// ----------------------------------------------------------------------
 /// Utils
 
-template <class gdf_column>
+template <class GdfColumnInfo, class gdf_column>
 std::string
 DeliverFrom(const std::vector<gdf_column> &gdfColumns,
             blazingdb::uc::Agent &        agent) {
   std::unique_ptr<GdfColumnCollector> collector =
       GdfColumnCollector::MakeInHost();
+
+  std::vector<std::unique_ptr<Payload>> payloads;
+  payloads.reserve(gdfColumns.size());
 
   for (const auto &gdfColumn : gdfColumns) {
     // auto *column_ptr = gdfColumn.get_gdf_column();
@@ -305,21 +309,24 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
 
     // TODO: Add other members y compute correct buffer size
     const std::unique_ptr<const CudaBuffer> dataBuffer =
-        CudaBuffer::Make(gdfColumn.data, 0);
+        CudaBuffer::Make(gdfColumn.data, GdfColumnInfo::DataSize(gdfColumn));
     const std::unique_ptr<const CudaBuffer> validBuffer =
-        CudaBuffer::Make(gdfColumn.valid, 0);
+        CudaBuffer::Make(gdfColumn.valid, GdfColumnInfo::ValidSize(gdfColumn));
     const std::size_t size = gdfColumn.size;
 
-    std::unique_ptr<Payload> columnPayload = builder->Data(*dataBuffer)
+    payloads.emplace_back(builder->Data(*dataBuffer)
                                                  .Valid(*validBuffer)
                                                  .Size(size)
-                                                 .Build();
-
+                                                 .Build());
     // TODO: support different buffer sizes (of payloads) in GdfColumnCollector
-    collector->Add(*columnPayload);
+
+    collector->Add(*payloads.back());
   }
 
   std::unique_ptr<Buffer> resultBuffer = collector->Collect();
+
+  //TODO usando el dispatcher chequear el primer elemento
+
   return std::string{
       static_cast<const std::string::value_type *const>(resultBuffer->Data()),
       resultBuffer->Size()};
