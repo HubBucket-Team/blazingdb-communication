@@ -277,7 +277,7 @@ TEST(GdfColumnCollectorTest, CollectPayloads) {
 
 // Tests for gdf column tools
 
-class GdfColumn {
+class gdf_column {
 public:
   void *      data;
   void *      valid;
@@ -352,21 +352,36 @@ public:
 };
 
 static inline void
-AddTo(std::vector<GdfColumn> &gdfColumns,
+AddTo(std::vector<gdf_column> &gdfColumns,
       std::uintptr_t          data,
       std::uintptr_t          valid,
       std::size_t             size) {
-  gdfColumns.push_back(GdfColumn{
+  gdfColumns.push_back(gdf_column{
       reinterpret_cast<void *>(data), reinterpret_cast<void *>(valid), size});
 }
 
 TEST(GdfColumnsTest, DeliverAndCollect) {
-  MockAgent agent;
-  ON_CALL(agent, RegisterMember)
-      .WillByDefault(::testing::Invoke(&agent, &MockAgent::MakeBuffer));
-  ::testing::Mock::AllowLeak(&agent);
+ 
+  MockBUCAgent agent;
+  EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
+      .WillRepeatedly(::testing::Invoke([](auto, auto) {
+        std::unique_ptr<MockBUCBuffer> buffer =
+            std::make_unique<MockBUCBuffer>();
+        EXPECT_CALL(*buffer, SerializedRecordMember)
+            .WillRepeatedly(::testing::Invoke([]() {
+              std::unique_ptr<const MockBUCSerialized> serialized =
+                  std::make_unique<const MockBUCSerialized>();
+              EXPECT_CALL(*serialized, DataMember)
+                  .WillRepeatedly(::testing::Return(
+                      reinterpret_cast<const std::uint8_t *>("12345")));
+              EXPECT_CALL(*serialized, SizeMember)
+                  .WillRepeatedly(::testing::Return(5));
+              return serialized;
+            }));
+        return buffer;
+      }));
 
-  std::vector<GdfColumn> gdfColumns;
+  std::vector<gdf_column> gdfColumns;
   AddTo(gdfColumns, 100, 200, 10);
   AddTo(gdfColumns, 101, 201, 25);
   AddTo(gdfColumns, 102, 202, 50);
@@ -374,3 +389,4 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   blazingdb::communication::messages::tools::gdf_columns::DeliverFrom(
       gdfColumns, agent);
 }
+

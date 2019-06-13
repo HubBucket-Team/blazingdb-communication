@@ -203,6 +203,7 @@ public:
     return Get(index);
   }
 
+  // TODO support iterators
   UC_INTERFACE(Collector);
 };
 
@@ -255,9 +256,9 @@ public:
 /// ----------------------------------------------------------------------
 /// Utils
 
-template <class GdfColumn>
-std::unique_ptr<Collector>
-DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
+template <class gdf_column>
+std::string
+DeliverFrom(const std::vector<gdf_column> &gdfColumns,
             blazingdb::uc::Agent &        agent) {
   std::unique_ptr<GdfColumnCollector> collector =
       GdfColumnCollector::MakeInHost();
@@ -266,24 +267,28 @@ DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
     // auto *column_ptr = gdfColumn.get_gdf_column();
 
     std::unique_ptr<GdfColumnBuilder> builder =
-        GdfColumnBuilder::MakeWithHostAllocation(agent);
+        GdfColumnBuilder::MakeInHost(agent);
 
     // TODO: Add other members y compute correct buffer size
     const std::unique_ptr<const CudaBuffer> dataBuffer =
         CudaBuffer::Make(gdfColumn.data, 0);
     const std::unique_ptr<const CudaBuffer> validBuffer =
         CudaBuffer::Make(gdfColumn.valid, 0);
+    const std::size_t size = gdfColumn.size;
 
     std::unique_ptr<Payload> columnPayload = builder->Data(*dataBuffer)
                                                  .Valid(*validBuffer)
-                                                 .Size(gdfColumn.size)
+                                                 .Size(size)
                                                  .Build();
 
     // TODO: support different buffer sizes (of payloads) in GdfColumnCollector
     collector->Add(*columnPayload);
   }
 
-  return collector; // TODO: return as std::string
+  std::unique_ptr<Buffer> resultBuffer = collector->Collect();
+  return std::string{
+      static_cast<const std::string::value_type *const>(resultBuffer->Data()),
+      resultBuffer->Size()};
 }
 
 std::string
@@ -309,8 +314,8 @@ private:
 };
 }  // namespace
 
-template <class GdfColumn>
-std::vector<GdfColumn>
+template <class gdf_column>
+std::vector<gdf_column>
 CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   const Buffer &buffer = StringViewBuffer{content};
 
@@ -319,12 +324,20 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
 
   std::unique_ptr<Collector> collector = dispatcher->Dispatch();
 
-  std::vector<GdfColumn> gdfColumns;
+  std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  // TODO: traverse el `collector`, then for each payload -> gdf column
-  // payload->Data : UCBuffer.Data  [BLAZ_UC] -> ptr = column.data
-  // payload->Size -> column.size
+  // TODO: iterators
+
+  for (size_t index = 0; index < collector->Length(); index++) {
+    GdfColumnPayload &payload = (*collector)[index];
+    gdf_column        col{.data  = payload.Data().Data(),
+                   .valid = payload.Valid().Data(),
+                   .size  = payload.Size()};
+    gdfColumns.push_back(col);
+  }
+
+  return gdfColumns;
 }
 
 }  // namespace gdf_columns
