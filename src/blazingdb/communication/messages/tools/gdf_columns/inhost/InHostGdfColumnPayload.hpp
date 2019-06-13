@@ -3,9 +3,10 @@
 
 #include "../../gdf_columns.h"
 
-#include "../buffers/StringReferenceBuffer.hpp"
-
 #include <blazingdb/uc/internal/macros.hpp>
+
+#include "../mixins/ActualBufferMixIn.hpp"
+#include "GdfColumnPayloadInHostBase.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -13,39 +14,12 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class UC_NOEXPORT InHostGdfColumnPayload : public GdfColumnPayload {
+class UC_NOEXPORT InHostGdfColumnPayload : public ActualBufferMixIn,
+                                           public GdfColumnPayloadInHostBase {
+  UC_CONCRETE(InHostGdfColumnPayload);
+
 public:
   explicit InHostGdfColumnPayload(const std::string&& content);
-
-  const UCBuffer&
-  Data() const noexcept final;
-
-  UCBuffer&
-  Valid() const noexcept final;
-
-  std::size_t
-  Size() const noexcept final;
-
-  std::int_fast32_t
-  DType() noexcept final;
-
-  std::size_t
-  NullCount() const noexcept final;
-
-  DTypeInfoPayload&
-  DTypeInfo() const noexcept final;
-
-  std::string
-  ColumnName() const noexcept final;
-
-  const Buffer&
-  Deliver() const noexcept final;
-
-private:
-  const std::string           content_;
-  const StringReferenceBuffer buffer_;
-
-  UC_CONCRETE(InHostGdfColumnPayload);
 };
 
 }  // namespace gdf_columns

@@ -153,7 +153,8 @@ GdfColumnWithHostAllocationBuilder::Build() const noexcept {
 
   offset += columnNameRecord->Size();
 
-  return std::make_unique<InHostGdfColumnPayload>(std::move(payload));
+  auto result = std::make_unique<InHostGdfColumnPayload>(std::move(payload));
+  return nullptr;  // TODO: cast result
 }
 
 }  // namespace gdf_columns

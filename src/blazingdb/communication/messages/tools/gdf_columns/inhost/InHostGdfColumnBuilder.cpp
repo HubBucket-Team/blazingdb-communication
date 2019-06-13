@@ -33,7 +33,8 @@ InHostGdfColumnBuilder::Build() const noexcept {
   ostream.flush();
   std::string content = ostream.str();
 
-  return std::make_unique<InHostGdfColumnPayload>(std::move(content));
+  return std::forward<std::unique_ptr<Payload>>(
+      std::make_unique<InHostGdfColumnPayload>(std::move(content)));
 };
 
 GdfColumnBuilder &
