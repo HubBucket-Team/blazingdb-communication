@@ -170,9 +170,6 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
-  MakeWithHostAllocation(blazingdb::uc::Agent &);
-
-  static std::unique_ptr<GdfColumnBuilder>
   MakeInHost(blazingdb::uc::Agent &agent);
 
   UC_INTERFACE(GdfColumnBuilder);
@@ -266,7 +263,7 @@ DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
     // auto *column_ptr = gdfColumn.get_gdf_column();
 
     std::unique_ptr<GdfColumnBuilder> builder =
-        GdfColumnBuilder::MakeWithHostAllocation(agent);
+        GdfColumnBuilder::MakeInHost(agent);
 
     // TODO: Add other members y compute correct buffer size
     const std::unique_ptr<const CudaBuffer> dataBuffer =
@@ -283,7 +280,7 @@ DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
     collector->Add(*columnPayload);
   }
 
-  return collector; // TODO: return as std::string
+  return collector;  // TODO: return as std::string
 }
 
 std::string

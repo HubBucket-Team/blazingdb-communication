@@ -180,6 +180,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   const GdfColumnPayload &gdfColumnPayload =
       *static_cast<GdfColumnPayload *>(resultPayload.get());
 
+  EXPECT_EQ(buffer.Size(), gdfColumnPayload.Deliver().Size());
+
   EXPECT_EQ(fixture.size(), gdfColumnPayload.Size());
 
   // TODO: Check same values in payload and resultPayload

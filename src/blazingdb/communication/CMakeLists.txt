@@ -22,7 +22,6 @@ blazingdb_artifact (
     messages/DataPivot.cpp
     messages/NodeDataMessage.cc
     messages/tools/gdf_columns.cpp
-    messages/tools/gdf_columns/WithHostAllocation.cpp
     messages/tools/gdf_columns/BufferBase.cpp
     messages/tools/gdf_columns/buffers/DetachedBuffer.cpp
     messages/tools/gdf_columns/buffers/DetachedBufferBuilder.cpp
