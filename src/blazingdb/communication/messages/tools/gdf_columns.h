@@ -200,7 +200,44 @@ public:
     return Get(index);
   }
 
-  // TODO support iterators
+  class iterator {
+    const Collector &collector_;
+    size_t           index_;
+
+  public:
+    iterator(const Collector &c) : collector_(c), index_(0) {}
+    iterator(const Collector &c, size_t size) : collector_(c), index_(size) {}
+
+    void
+    operator++() {
+      index_++;
+    }
+
+    void
+    operator--() {
+      index_--;
+    }
+
+    bool
+    operator!=(const iterator &other) {
+      return index_ != other.index_;
+    }
+
+    const Payload &operator*() { return collector_.Get(index_); }
+  };
+
+  iterator
+  begin() {
+    iterator it(*this);
+    return it;
+  }
+
+  iterator
+  end() {
+    iterator it(*this, this->Length());
+    return it;
+  }
+
   UC_INTERFACE(Collector);
 };
 
@@ -324,10 +361,9 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  // TODO: iterators
-
-  for (size_t index = 0; index < collector->Length(); index++) {
-    GdfColumnPayload &payload = (*collector)[index];
+  for (Collector::iterator it = collector->begin(); it != collector->end();
+       ++it) {
+    GdfColumnPayload &payload = *it;
     gdf_column        col{.data  = payload.Data().Data(),
                    .valid = payload.Valid().Data(),
                    .size  = payload.Size()};
