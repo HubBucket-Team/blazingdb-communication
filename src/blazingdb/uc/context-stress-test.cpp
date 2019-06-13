@@ -61,7 +61,7 @@ Sender(int (&pipedes)[2],
   cuInit(0);
   close(pipedes[0]);
 
-  const void *const data = CreateData(incrementalLength, ownSeed, 0);
+  const void * data = CreateData(incrementalLength, ownSeed, 0);
 
   auto context = Context::IPC();
   auto agent   = context->Agent();
@@ -83,7 +83,7 @@ Receiver(int (&pipedes)[2], const std::size_t incrementalLength) {
   cuInit(0);
   close(pipedes[1]);
 
-  const void *const data = CreateData(incrementalLength, peerSeed, 0);
+  const void * data = CreateData(incrementalLength, peerSeed, 0);
 
   auto context = Context::IPC();
   auto agent   = context->Agent();

@@ -47,10 +47,11 @@ namespace test {
                                const std::string& column_name);
 
         void create_gdf_column_for_ipc(gdf_dtype dtype,
-                                       void* input_data,
-                                       gdf_valid_type* input_valid,
-                                       std::size_t num_values,
-                                       const std::string& column_name);
+                                                   void* input_data,
+                                                   gdf_valid_type* input_valid,
+                                                   std::size_t num_values,
+                                                   std::size_t null_count,
+                                                   const std::string& column_name);
 
     private:
         void make(char* input_data,
