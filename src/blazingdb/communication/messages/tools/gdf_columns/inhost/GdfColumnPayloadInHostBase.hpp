@@ -43,6 +43,8 @@ public:
 
 private:
   const Buffer& buffer_;
+
+  std::size_t size_;
 };
 
 }  // namespace gdf_columns

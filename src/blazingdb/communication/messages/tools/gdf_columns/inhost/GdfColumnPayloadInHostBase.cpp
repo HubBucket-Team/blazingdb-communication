@@ -9,7 +9,25 @@ namespace tools {
 namespace gdf_columns {
 
 GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
-    : buffer_{buffer} {}
+    : buffer_{buffer} {
+  // TODO: actual read Data, actual read valid
+
+  const std::uint8_t* start = static_cast<const std::uint8_t*>(buffer.Data());
+
+  const std::ptrdiff_t sizePtrDiff = sizeof(const std::size_t);
+
+  const std::ptrdiff_t dataPtrDiff =
+      *static_cast<const std::size_t*>(buffer.Data());
+
+  const std::uint8_t* validRaw = start + sizePtrDiff + dataPtrDiff;
+
+  const std::ptrdiff_t validPtrDiff =
+      *static_cast<const std::size_t*>(static_cast<const void*>(validRaw));
+
+  const std::uint8_t* sizeRaw = validRaw + sizePtrDiff + validPtrDiff;
+
+  size_ = *static_cast<const std::size_t*>(static_cast<const void*>(sizeRaw));
+}
 
 const UCBuffer&
 GdfColumnPayloadInHostBase::Data() const noexcept {
@@ -25,7 +43,7 @@ GdfColumnPayloadInHostBase::Valid() const noexcept {
 
 std::size_t
 GdfColumnPayloadInHostBase::Size() const noexcept {
-  return -1;
+  return size_;
 }
 
 std::int_fast32_t

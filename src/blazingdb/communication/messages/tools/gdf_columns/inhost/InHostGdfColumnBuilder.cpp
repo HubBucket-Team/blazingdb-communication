@@ -20,7 +20,8 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   using BUBuffer = blazingdb::uc::Buffer;
 
-  //  TODO: each Write should be return a ticket about resouces ownership
+  // Writing may generate blazingdb-uc descriptors
+  // TODO: each Write should be return a ticket about resouces ownership
 
   std::unique_ptr<BUBuffer> dataBuffer =
       inhost_helpers::Write(ostream, agent_, *dataCudaBuffer_);
