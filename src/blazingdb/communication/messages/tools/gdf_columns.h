@@ -170,9 +170,6 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<GdfColumnBuilder>
-  MakeWithHostAllocation(blazingdb::uc::Agent &);
-
-  static std::unique_ptr<GdfColumnBuilder>
   MakeInHost(blazingdb::uc::Agent &agent);
 
   UC_INTERFACE(GdfColumnBuilder);

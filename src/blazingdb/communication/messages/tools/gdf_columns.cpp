@@ -1,7 +1,6 @@
 #include "gdf_columns.h"
 
 #include "gdf_columns/BufferBase.hpp"
-#include "gdf_columns/WithHostAllocation.hpp"
 #include "gdf_columns/collectors/InHostCollector.hpp"
 
 #include "gdf_columns/inhost/InHostGdfColumnBuilder.hpp"
@@ -18,11 +17,6 @@ namespace gdf_columns {
 std::unique_ptr<CudaBuffer>
 CudaBuffer::Make(const void *const data, const std::size_t size) {
   return pm::make_unique<CudaBuffer, BufferBase, Buffer>(data, size);
-}
-
-std::unique_ptr<GdfColumnBuilder>
-GdfColumnBuilder::MakeWithHostAllocation(blazingdb::uc::Agent &agent) {
-  return std::make_unique<GdfColumnWithHostAllocationBuilder>(agent);
 }
 
 std::unique_ptr<GdfColumnBuilder>

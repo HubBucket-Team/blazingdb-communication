@@ -173,7 +173,16 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
       GdfColumnSpecialized;
   auto specialized = GdfColumnSpecialized::MakeInHost(buffer);
 
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnPayload;
   auto resultPayload = specialized->Apply();
+
+  const GdfColumnPayload &gdfColumnPayload =
+      *static_cast<GdfColumnPayload *>(resultPayload.get());
+
+  EXPECT_EQ(buffer.Size(), gdfColumnPayload.Deliver().Size());
+
+  EXPECT_EQ(fixture.size(), gdfColumnPayload.Size());
 
   // TODO: Check same values in payload and resultPayload
 }

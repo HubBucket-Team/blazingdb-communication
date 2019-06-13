@@ -1,5 +1,7 @@
 #include "InHostGdfColumnSpecialized.hpp"
 
+#include "InHostGdfColumnPayload.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -11,7 +13,7 @@ InHostGdfColumnSpecialized::InHostGdfColumnSpecialized(const Buffer &buffer)
 
 std::unique_ptr<Payload>
 InHostGdfColumnSpecialized::Apply() const {
-  return nullptr;
+  return std::make_unique<GdfColumnPayloadInHostBase>(buffer_);
 }
 
 }  // namespace gdf_columns

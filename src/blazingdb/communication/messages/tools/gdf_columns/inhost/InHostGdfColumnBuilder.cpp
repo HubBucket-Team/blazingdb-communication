@@ -20,7 +20,8 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   using BUBuffer = blazingdb::uc::Buffer;
 
-  //  TODO: each Write should be return a ticket about resouces ownership
+  // Writing may generate blazingdb-uc descriptors
+  // TODO: each Write should be return a ticket about resouces ownership
 
   std::unique_ptr<BUBuffer> dataBuffer =
       inhost_helpers::Write(ostream, agent_, *dataCudaBuffer_);
@@ -33,7 +34,8 @@ InHostGdfColumnBuilder::Build() const noexcept {
   ostream.flush();
   std::string content = ostream.str();
 
-  return std::make_unique<InHostGdfColumnPayload>(std::move(content));
+  return std::forward<std::unique_ptr<Payload>>(
+      std::make_unique<InHostGdfColumnPayload>(std::move(content)));
 };
 
 GdfColumnBuilder &
