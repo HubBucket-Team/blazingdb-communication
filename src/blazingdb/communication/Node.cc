@@ -80,8 +80,9 @@ public:
         *static_cast<const internal::ConcreteAddress*>(address());
 
     const std::string nodeAsString =
-        concreteAddress.ip() + "," + std::to_string(concreteAddress.communication_port());
-
+        concreteAddress.ip() + "," + 
+        std::to_string(concreteAddress.communication_port()) + "," + 
+        std::to_string(concreteAddress.protocol_port());
 
     std::cout << nodeAsString << "\n";
 
@@ -91,8 +92,7 @@ public:
 private:
   static std::shared_ptr<Address> ConcreteAddressFrom(const Buffer& buffer) {
     // TODO: change to istream or avoid string
-    const char* it =
-        std::find(buffer.data(), buffer.data() + buffer.size(), ',');
+    const char* it = std::find(buffer.data(), buffer.data() + buffer.size(), ',');
 
     if (it == buffer.data() + buffer.size()) {
       throw std::runtime_error("Bad buffer");
@@ -100,6 +100,9 @@ private:
 
     const std::string ip{buffer.data(), it};
     const std::uint16_t communication_port = std::atoi(++it);
+
+    it = std::find(it, buffer.data() + buffer.size(), ',');
+
     const std::uint16_t protocol_port = std::atoi(++it);
 
     return std::make_shared<internal::ConcreteAddress>(ip, communication_port, protocol_port);
