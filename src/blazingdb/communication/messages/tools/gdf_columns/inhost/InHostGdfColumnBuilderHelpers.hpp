@@ -3,7 +3,7 @@
 
 #include <ostream>
 
-#include "../../gdf_columns.h"
+#include "../interfaces.hpp"
 
 namespace blazingdb {
 namespace communication {

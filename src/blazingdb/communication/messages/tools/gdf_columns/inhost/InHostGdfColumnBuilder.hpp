@@ -1,7 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_INHOST_INHOSTGDFCOLUMNBUILDER_HPP_
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_INHOST_INHOSTGDFCOLUMNBUILDER_HPP_
 
-#include "../../gdf_columns.h"
+#include "../interfaces.hpp"
 
 #include <blazingdb/uc/internal/macros.hpp>
 

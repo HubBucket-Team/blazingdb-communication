@@ -37,12 +37,14 @@ public:
 
   std::unique_ptr<Buffer>
   Collect() const noexcept final {
-    return nullptr;  // Not supported
+    UC_ABORT("Not supported");
+    return nullptr;
   }
 
   Collector &
   Add(const Payload &) noexcept final {
-    return *this;  // Not supported
+    UC_ABORT("Not supported");
+    return *this;
   }
 
   std::size_t

@@ -22,6 +22,7 @@ blazingdb_artifact (
     messages/DataPivot.cpp
     messages/NodeDataMessage.cc
     messages/tools/gdf_columns.cpp
+    messages/tools/gdf_columns/interfaces.cpp
     messages/tools/gdf_columns/BufferBase.cpp
     messages/tools/gdf_columns/buffers/DetachedBuffer.cpp
     messages/tools/gdf_columns/buffers/DetachedBufferBuilder.cpp
@@ -67,6 +68,7 @@ blazingdb_artifact (
     messages/PartitionPivotsMessage.h
     messages/UCPool.h
     messages/tools/gdf_columns.h
+    messages/tools/gdf_columns/interfaces.hpp
     Configuration.h
     ContextToken.h
     Cluster.h
