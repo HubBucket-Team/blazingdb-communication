@@ -20,7 +20,7 @@ public:
   const UCBuffer&
   Data() const noexcept final;
 
-  UCBuffer&
+  const UCBuffer&
   Valid() const noexcept final;
 
   std::size_t
@@ -44,7 +44,9 @@ public:
 private:
   const Buffer& buffer_;
 
-  std::size_t size_;
+  std::unique_ptr<Buffer> dataBuffer_;
+  std::unique_ptr<Buffer> validBuffer_;
+  const std::size_t*      size_;
 };
 
 }  // namespace gdf_columns

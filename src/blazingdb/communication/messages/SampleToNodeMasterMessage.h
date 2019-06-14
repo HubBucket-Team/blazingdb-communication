@@ -138,7 +138,7 @@ namespace messages {
           //}
 
           columns = blazingdb::communication::messages::tools::gdf_columns::
-              DeliverFrom<RalColumn>(binary, *agent);
+              DeliverFrom<RalColumn>(columns, *agent);
 
           // Create the message
           return std::make_shared<MessageType>(std::move(messageToken),

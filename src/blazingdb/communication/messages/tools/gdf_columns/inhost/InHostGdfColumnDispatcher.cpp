@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../buffers/ValueBuffer.hpp"
+#include "../buffers/ViewBuffer.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -11,28 +12,6 @@ namespace tools {
 namespace gdf_columns {
 
 namespace {
-
-class UC_NOEXPORT ViewBuffer : public Buffer {
-public:
-  explicit ViewBuffer(const void *const data, const std::size_t size)
-      : data_{data}, size_{size} {}
-
-  const void *
-  Data() const noexcept final {
-    return data_;
-  }
-
-  std::size_t
-  Size() const noexcept final {
-    return size_;
-  }
-
-private:
-  const void *const data_;
-  const std::size_t size_;
-
-  UC_CONCRETE(ViewBuffer);
-};
 
 class UC_NOEXPORT ReturnedPayload : public Payload {
 public:

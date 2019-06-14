@@ -1,6 +1,7 @@
 #include "GdfColumnPayloadInHostBase.hpp"
 
 #include "../buffers/StringBuffer.hpp"
+#include "../buffers/ViewBuffer.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -8,42 +9,57 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
+static UC_INLINE void
+Read(const std::uint8_t** const out_carry, std::unique_ptr<Buffer>* buffer) {
+  static constexpr std::ptrdiff_t sizePtrDiff = sizeof(const std::size_t);
+
+  const std::size_t dataSize = *static_cast<const std::size_t*>(
+      static_cast<const void* const>(*out_carry));
+  *out_carry += sizePtrDiff;
+
+  const void* const data = *out_carry;
+  *out_carry += static_cast<std::ptrdiff_t>(dataSize);
+
+  *buffer = std::make_unique<ViewBuffer>(data, dataSize);
+}
+
+template <class T>
+static UC_INLINE void
+Read(const std::uint8_t** const out_carry, const T** const type) {
+  static constexpr std::ptrdiff_t typePtrDiff = sizeof(const T);
+
+  *type =
+      static_cast<const T* const>(static_cast<const void* const>(*out_carry));
+  *out_carry += typePtrDiff;
+}
+
 GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
     : buffer_{buffer} {
   // TODO: actual read Data, actual read valid
 
-  const std::uint8_t* start = static_cast<const std::uint8_t*>(buffer.Data());
+  const std::uint8_t* const start =
+      static_cast<const std::uint8_t*>(buffer.Data());
 
-  const std::ptrdiff_t sizePtrDiff = sizeof(const std::size_t);
+  const std::uint8_t* carry = start;
 
-  const std::ptrdiff_t dataPtrDiff =
-      *static_cast<const std::size_t*>(buffer.Data());
-
-  const std::uint8_t* validRaw = start + sizePtrDiff + dataPtrDiff;
-
-  const std::ptrdiff_t validPtrDiff =
-      *static_cast<const std::size_t*>(static_cast<const void*>(validRaw));
-
-  const std::uint8_t* sizeRaw = validRaw + sizePtrDiff + validPtrDiff;
-
-  size_ = *static_cast<const std::size_t*>(static_cast<const void*>(sizeRaw));
+  Read(&carry, &dataBuffer_);
+  Read(&carry, &validBuffer_);
+  Read(&carry, &size_);
 }
 
 const UCBuffer&
 GdfColumnPayloadInHostBase::Data() const noexcept {
-  static UCBuffer* ucBuffer_;
-  return *ucBuffer_;
+  return UCBuffer::From(*dataBuffer_);
 }
 
-UCBuffer&
+const UCBuffer&
 GdfColumnPayloadInHostBase::Valid() const noexcept {
-  static UCBuffer* ucBuffer_;
-  return *ucBuffer_;
+  return UCBuffer::From(*validBuffer_);
 }
 
 std::size_t
 GdfColumnPayloadInHostBase::Size() const noexcept {
-  return size_;
+  return *size_;
 }
 
 std::int_fast32_t

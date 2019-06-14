@@ -18,6 +18,8 @@ namespace gdf_columns {
 /// Buffers
 
 class Buffer {
+  UC_INTERFACE(Buffer);
+
 public:
   virtual const void *
   Data() const noexcept = 0;
@@ -25,15 +27,23 @@ public:
   virtual std::size_t
   Size() const noexcept = 0;
 
-  UC_INTERFACE(Buffer);
+  /// ----------------------------------------------------------------------
+  /// Casters
+  template <class T, class U>
+  static UC_INLINE std::enable_if_t<!std::is_array<std::decay_t<T>>::value &&
+                                        !std::is_array<std::decay_t<U>>::value,
+                                    T>
+                   StaticCast(const U &u) noexcept {
+    return static_cast<const T>(u, static_cast<const T *const>(u.get()));
+  }
 };
 
 class NullableBuffer : public Buffer {
+  UC_INTERFACE(NullableBuffer);
+
 public:
   virtual bool
   IsNull() const noexcept = 0;
-
-  UC_INTERFACE(NullableBuffer);
 };
 
 class HostBuffer : public NullableBuffer {
@@ -41,15 +51,21 @@ class HostBuffer : public NullableBuffer {
 };
 
 class CudaBuffer : public NullableBuffer {
+  UC_INTERFACE(CudaBuffer);
+
 public:
   static std::unique_ptr<CudaBuffer>
   Make(const void *const data, const std::size_t size);
-
-  UC_INTERFACE(CudaBuffer);
 };
 
 class UCBuffer : public HostBuffer {
   UC_INTERFACE(UCBuffer);
+
+public:
+  static UC_INLINE const UCBuffer &
+                         From(const Buffer &buffer) noexcept {
+    return static_cast<const UCBuffer &>(buffer);
+  }
 };
 
 /// ----------------------------------------------------------------------
@@ -58,9 +74,9 @@ class UCBuffer : public HostBuffer {
 /// gdf_column {
 ///   data       : buffer
 ///   valid      : buffer
-///   size       : integer+
+///   size       : positive integer
 ///   dtype      : enum
-///   null_count : integer+
+///   null_count : positive integer
 ///   dtype_info : {
 ///     time_unit : enum
 ///     category  : buffer
@@ -85,7 +101,7 @@ public:
   virtual const UCBuffer &
   Data() const noexcept = 0;
 
-  virtual UCBuffer &
+  virtual const UCBuffer &
   Valid() const noexcept = 0;
 
   virtual std::size_t

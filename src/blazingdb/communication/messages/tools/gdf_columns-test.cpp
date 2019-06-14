@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstring>
+#include <numeric>
 
 #include <cuda_runtime_api.h>
 
@@ -141,18 +142,24 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   MockBUCAgent agent;
   EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
-      .WillRepeatedly(::testing::Invoke([](auto, auto) {
+      .WillRepeatedly(::testing::InvokeWithoutArgs([]() {
         std::unique_ptr<MockBUCBuffer> buffer =
             std::make_unique<MockBUCBuffer>();
         EXPECT_CALL(*buffer, SerializedRecordMember)
             .WillRepeatedly(::testing::Invoke([]() {
               std::unique_ptr<const MockBUCSerialized> serialized =
                   std::make_unique<const MockBUCSerialized>();
+              static auto generator = [n = 0]() mutable -> const std::string & {
+                std::string *s = new std::string(5 + n++, 48);
+                std::iota(s->begin(), s->end(), 49);
+                return *s;
+              };
+              const auto &string = generator();
               EXPECT_CALL(*serialized, DataMember)
                   .WillRepeatedly(::testing::Return(
-                      reinterpret_cast<const std::uint8_t *>("12345")));
+                      reinterpret_cast<const std::uint8_t *>(string.data())));
               EXPECT_CALL(*serialized, SizeMember)
-                  .WillRepeatedly(::testing::Return(5));
+                  .WillRepeatedly(::testing::Return(string.length()));
               return serialized;
             }));
         return buffer;
@@ -181,6 +188,12 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
       *static_cast<GdfColumnPayload *>(resultPayload.get());
 
   EXPECT_EQ(buffer.Size(), gdfColumnPayload.Deliver().Size());
+
+  EXPECT_EQ(5, gdfColumnPayload.Data().Size());
+  EXPECT_FALSE(std::memcmp("12345", gdfColumnPayload.Data().Data(), 5));
+
+  EXPECT_EQ(6, gdfColumnPayload.Valid().Size());
+  EXPECT_FALSE(std::memcmp("123456", gdfColumnPayload.Valid().Data(), 6));
 
   EXPECT_EQ(fixture.size(), gdfColumnPayload.Size());
 
