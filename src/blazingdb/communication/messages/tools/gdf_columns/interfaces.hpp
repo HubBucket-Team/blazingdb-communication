@@ -154,6 +154,79 @@ public:
 };
 
 /// ----------------------------------------------------------------------
+/// Values
+
+class Value {
+  UC_INTERFACE(Value);
+};
+
+class CategoryValue : public Value {
+  UC_INTERFACE(CategoryValue);
+
+public:
+  virtual const void *
+  base_address() const noexcept = 0;
+
+  virtual const void *
+  mem() const noexcept = 0;
+
+  virtual const void *
+  strs() const noexcept = 0;
+
+  virtual std::size_t
+  size() const noexcept = 0;
+
+  virtual std::size_t
+  count() const noexcept = 0;
+
+  virtual std::size_t
+  keys() const noexcept = 0;
+
+  virtual const void *
+  map() const noexcept = 0;
+};
+
+class DTypeInfoValue : public Value {
+  UC_INTERFACE(DTypeInfoValue);
+
+public:
+  virtual std::int_fast32_t
+  time_unit() const noexcept = 0;
+
+  virtual const CategoryValue &
+  category() const noexcept = 0;
+};
+
+class GdfColumnValue : public Value {
+  UC_INTERFACE(GdfColumnValue);
+
+public:
+  virtual const void *
+  data() const noexcept = 0;
+
+  virtual const void *
+  valid() const noexcept = 0;
+
+  virtual std::size_t
+  size() const noexcept = 0;
+
+  virtual std::int_fast32_t
+  dtype() const noexcept = 0;
+
+  virtual std::size_t
+  null_count() const noexcept = 0;
+
+  virtual const DTypeInfoValue &
+  dtype_info() const noexcept = 0;
+
+  virtual const char *
+  column_name() const noexcept = 0;
+
+  static std::unique_ptr<GdfColumnValue>
+  Make(const GdfColumnPayload &gdfColumnPayload, blazingdb::uc::Agent &agent);
+};
+
+/// ----------------------------------------------------------------------
 /// Builders
 
 class Builder {
