@@ -22,11 +22,13 @@ public:
                             const void *const       valid,
                             const std::size_t       validSize,
                             const std::size_t       size,
-                            const std::int_fast32_t dtype)
+                            const std::int_fast32_t dtype,
+                            const std::size_t       nullCount)
       : data_{CudaBuffer::Make(data, dataSize)},
         valid_{CudaBuffer::Make(valid, validSize)},
         size_{size},
-        dtype_{dtype} {}
+        dtype_{dtype},
+        nullCount_{nullCount} {}
 
   const CudaBuffer &
   data() const noexcept {
@@ -48,11 +50,17 @@ public:
     return dtype_;
   }
 
+  std::size_t
+  nullCount() const noexcept {
+    return nullCount_;
+  }
+
 private:
   std::unique_ptr<CudaBuffer> data_;
   std::unique_ptr<CudaBuffer> valid_;
   std::size_t                 size_;
   std::int_fast32_t           dtype_;
+  std::size_t                 nullCount_;
 };
 }  // namespace
 
@@ -87,7 +95,9 @@ CreateBasicGdfColumnFixture() {
 
   const std::int_fast32_t dtype = 3;
 
-  return GdfColumnFixture{data, dataSize, valid, validSize, size, dtype};
+  const std::size_t nullCount = 5;
+
+  return GdfColumnFixture{data, dataSize, valid, validSize, size, dtype, nullCount};
 }
 
 // Tests for gdf column builder
@@ -173,6 +183,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                      .Valid(fixture.valid())
                      .Size(fixture.size())
                      .DType(fixture.dtype())
+                     .NullCount(fixture.nullCount())
                      .Build();
 
   auto &buffer = payload->Deliver();
@@ -199,6 +210,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   EXPECT_EQ(fixture.size(), gdfColumnPayload.Size());
 
   EXPECT_EQ(fixture.dtype(), gdfColumnPayload.DType());
+
+  EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
 
   // TODO: Check same values in payload and resultPayload
 }

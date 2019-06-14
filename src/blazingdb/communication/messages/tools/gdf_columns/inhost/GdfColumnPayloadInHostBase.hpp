@@ -44,10 +44,11 @@ public:
 private:
   const Buffer& buffer_;
 
-  std::unique_ptr<Buffer> dataBuffer_;
-  std::unique_ptr<Buffer> validBuffer_;
-  const std::size_t*      size_;
+  std::unique_ptr<Buffer>  dataBuffer_;
+  std::unique_ptr<Buffer>  validBuffer_;
+  const std::size_t*       size_;
   const std::int_fast32_t* dtype_;
+  const std::size_t*       nullCount_;
 };
 
 }  // namespace gdf_columns

@@ -46,6 +46,7 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   Read(&carry, &validBuffer_);
   Read(&carry, &size_);
   Read(&carry, &dtype_);
+  Read(&carry, &nullCount_);
 }
 
 const UCBuffer&
@@ -70,7 +71,7 @@ GdfColumnPayloadInHostBase::DType() const noexcept {
 
 std::size_t
 GdfColumnPayloadInHostBase::NullCount() const noexcept {
-  return -1;
+  return *nullCount_;
 }
 
 DTypeInfoPayload&
