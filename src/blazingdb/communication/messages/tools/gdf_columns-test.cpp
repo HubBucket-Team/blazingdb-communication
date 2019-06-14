@@ -375,31 +375,32 @@ public:
 
 static inline void
 AddTo(std::vector<gdf_column> &gdfColumns,
-      std::uintptr_t          data,
-      std::uintptr_t          valid,
-      std::size_t             size) {
+      std::uintptr_t           data,
+      std::uintptr_t           valid,
+      std::size_t              size) {
   gdfColumns.push_back(gdf_column{
       reinterpret_cast<void *>(data), reinterpret_cast<void *>(valid), size});
 }
 
 class GdfColumnInfoDummy {
 public:
- static inline std::size_t DataSize(const gdf_column &) noexcept {
-   return 1;
- }
- static inline std::size_t ValidSize(const gdf_column &) noexcept {
-   return 2;
- }
+  static inline std::size_t
+  DataSize(const gdf_column &) noexcept {
+    return 1;
+  }
+  static inline std::size_t
+  ValidSize(const gdf_column &) noexcept {
+    return 2;
+  }
 };
 
-class BufferForTest : public blazingdb::communication::messages::tools::gdf_columns::Buffer {
+class BufferForTest
+    : public blazingdb::communication::messages::tools::gdf_columns::Buffer {
+private:
+  const std::string &string;
 
-  private:
-  const std::string& string;
-
-  public:
-
-  BufferForTest(const std::string& str) : string(str) {}
+public:
+  BufferForTest(const std::string &str) : string(str) {}
 
   const void *
   Data() const noexcept final {
@@ -413,7 +414,6 @@ class BufferForTest : public blazingdb::communication::messages::tools::gdf_colu
 };
 
 TEST(GdfColumnsTest, DeliverAndCollect) {
- 
   MockBUCAgent agent;
   EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
       .WillRepeatedly(::testing::Invoke([](auto, auto) {
@@ -438,19 +438,23 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   AddTo(gdfColumns, 101, 201, 25);
   AddTo(gdfColumns, 102, 202, 50);
 
-  std::string result = blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<GdfColumnInfoDummy>(
-      gdfColumns, agent);
+  std::string result =
+      blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
+          GdfColumnInfoDummy>(gdfColumns, agent);
 
   BufferForTest resultBuffer(result);
 
-  using blazingdb::communication::messages::tools::gdf_columns::GdfColumnDispatcher;
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnDispatcher;
   auto dispatcher = GdfColumnDispatcher::MakeInHost(resultBuffer);
 
   using blazingdb::communication::messages::tools::gdf_columns::Collector;
   std::unique_ptr<Collector> collector = dispatcher->Dispatch();
 
-  using blazingdb::communication::messages::tools::gdf_columns::GdfColumnPayload;
-  const GdfColumnPayload & payload = static_cast<const GdfColumnPayload &>(collector->Get(0));
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnPayload;
+  const GdfColumnPayload &payload =
+      static_cast<const GdfColumnPayload &>(collector->Get(0));
 
   EXPECT_EQ(10, payload.Size());
 }
