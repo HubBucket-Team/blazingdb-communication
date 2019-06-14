@@ -1,9 +1,9 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_H_
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_H_
 
+#include <iostream>
 #include <memory>
 #include <vector>
-#include <iostream>
 
 #include <blazingdb/uc/util/macros.hpp>
 
@@ -310,7 +310,7 @@ public:
 template <class GdfColumnInfo, class gdf_column>
 std::string
 DeliverFrom(const std::vector<gdf_column> &gdfColumns,
-            blazingdb::uc::Agent &        agent) {
+            blazingdb::uc::Agent &         agent) {
   std::unique_ptr<GdfColumnCollector> collector =
       GdfColumnCollector::MakeInHost();
 
@@ -330,10 +330,8 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
         CudaBuffer::Make(gdfColumn.valid, GdfColumnInfo::ValidSize(gdfColumn));
     const std::size_t size = gdfColumn.size;
 
-    payloads.emplace_back(builder->Data(*dataBuffer)
-                                                 .Valid(*validBuffer)
-                                                 .Size(size)
-                                                 .Build());
+    payloads.emplace_back(
+        builder->Data(*dataBuffer).Valid(*validBuffer).Size(size).Build());
     // TODO: support different buffer sizes (of payloads) in GdfColumnCollector
 
     collector->Add(*payloads.back());
@@ -341,7 +339,7 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
 
   std::unique_ptr<Buffer> resultBuffer = collector->Collect();
 
-  //TODO usando el dispatcher chequear el primer elemento
+  // TODO usando el dispatcher chequear el primer elemento
 
   return std::string{
       static_cast<const std::string::value_type *const>(resultBuffer->Data()),
