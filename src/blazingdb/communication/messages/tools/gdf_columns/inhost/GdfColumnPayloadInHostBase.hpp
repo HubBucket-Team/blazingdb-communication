@@ -47,6 +47,7 @@ private:
   std::unique_ptr<Buffer> dataBuffer_;
   std::unique_ptr<Buffer> validBuffer_;
   const std::size_t*      size_;
+  const std::int_fast32_t* dtype_;
 };
 
 }  // namespace gdf_columns

@@ -45,6 +45,7 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   Read(&carry, &dataBuffer_);
   Read(&carry, &validBuffer_);
   Read(&carry, &size_);
+  Read(&carry, &dtype_);
 }
 
 const UCBuffer&
@@ -64,7 +65,7 @@ GdfColumnPayloadInHostBase::Size() const noexcept {
 
 std::int_fast32_t
 GdfColumnPayloadInHostBase::DType() const noexcept {
-  return -1;
+  return *dtype_;
 }
 
 std::size_t

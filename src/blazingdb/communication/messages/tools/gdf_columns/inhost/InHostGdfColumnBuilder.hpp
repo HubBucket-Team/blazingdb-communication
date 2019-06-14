@@ -45,6 +45,7 @@ private:
   const CudaBuffer *dataCudaBuffer_;
   const CudaBuffer *validCudaBuffer_;
   std::size_t       size_;
+  std::int_fast32_t       dtype_;
 
   blazingdb::uc::Agent &agent_;
 };
