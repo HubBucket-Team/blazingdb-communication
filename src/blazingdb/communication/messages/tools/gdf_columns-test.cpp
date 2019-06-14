@@ -384,10 +384,17 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   using blazingdb::communication::messages::tools::gdf_columns::Collector;
   std::unique_ptr<Collector> collector = dispatcher->Dispatch();
 
-  //using blazingdb::communication::messages::tools::gdf_columns::
-      //GdfColumnPayload;
-  //const GdfColumnPayload &payload =
-      //static_cast<const GdfColumnPayload &>(collector->Get(0));
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnPayload;
 
-  //EXPECT_EQ(10, payload.Size());
+  EXPECT_EQ(3, collector->Length());
+
+  EXPECT_EQ(10,
+            static_cast<const GdfColumnPayload &>(collector->Get(0)).Size());
+  EXPECT_EQ(25,
+            static_cast<const GdfColumnPayload &>(collector->Get(1)).Size());
+  EXPECT_EQ(50,
+            static_cast<const GdfColumnPayload &>(collector->Get(2)).Size());
+
+  // TODO: support diferent sizes in collector
 }

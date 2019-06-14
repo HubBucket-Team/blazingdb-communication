@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "GdfColumnPayloadInHostBase.hpp"
+
 #include "../buffers/ValueBuffer.hpp"
 #include "../buffers/ViewBuffer.hpp"
 
@@ -12,22 +14,6 @@ namespace tools {
 namespace gdf_columns {
 
 namespace {
-
-class UC_NOEXPORT ReturnedPayload : public Payload {
-public:
-  explicit ReturnedPayload(const void *const data, const std::size_t size)
-      : buffer_{data, size} {}
-
-  const Buffer &
-  Deliver() const noexcept final {
-    return buffer_;
-  }
-
-private:
-  const ViewBuffer buffer_;
-
-  UC_CONCRETE(ReturnedPayload);
-};
 
 class UC_NOEXPORT ReturnedCollector : public Collector {
 public:
@@ -42,8 +28,10 @@ public:
     payloads_.reserve(length_);
 
     for (std::size_t i = 0; i < length_; i++) {
+      const ViewBuffer buffer{base_ + i * offset_,
+                              static_cast<const std::size_t>(offset_)};
       payloads_.emplace_back(
-          std::make_unique<ReturnedPayload>(base_ + i * offset_, offset_));
+          std::make_unique<GdfColumnPayloadInHostBase>(buffer));
     }
   }
 
@@ -74,7 +62,7 @@ private:
   const std::uint8_t *base_;
   std::ptrdiff_t      offset_;
 
-  std::vector<std::unique_ptr<ReturnedPayload>> payloads_;
+  std::vector<std::unique_ptr<GdfColumnPayloadInHostBase>> payloads_;
 
   UC_CONCRETE(ReturnedCollector);
 };

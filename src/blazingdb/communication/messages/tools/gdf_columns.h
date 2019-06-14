@@ -330,16 +330,16 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
         CudaBuffer::Make(gdfColumn.valid, GdfColumnInfo::ValidSize(gdfColumn));
     const std::size_t size = gdfColumn.size;
 
+    // TODO: support different buffer sizes (of payloads) in
+    // GdfColumnCollector
+
     payloads.emplace_back(
         builder->Data(*dataBuffer).Valid(*validBuffer).Size(size).Build());
-    // TODO: support different buffer sizes (of payloads) in GdfColumnCollector
 
     collector->Add(*payloads.back());
   }
 
   std::unique_ptr<Buffer> resultBuffer = collector->Collect();
-
-  // TODO usando el dispatcher chequear el primer elemento
 
   return std::string{
       static_cast<const std::string::value_type *const>(resultBuffer->Data()),
