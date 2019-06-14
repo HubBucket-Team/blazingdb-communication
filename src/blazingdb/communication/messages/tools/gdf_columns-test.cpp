@@ -172,6 +172,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   auto payload = builder->Data(fixture.data())
                      .Valid(fixture.valid())
                      .Size(fixture.size())
+                     .DType(fixture.dtype())
                      .Build();
 
   auto &buffer = payload->Deliver();
@@ -196,6 +197,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   EXPECT_FALSE(std::memcmp("123456", gdfColumnPayload.Valid().Data(), 6));
 
   EXPECT_EQ(fixture.size(), gdfColumnPayload.Size());
+
+  EXPECT_EQ(fixture.dtype(), gdfColumnPayload.DType());
 
   // TODO: Check same values in payload and resultPayload
 }

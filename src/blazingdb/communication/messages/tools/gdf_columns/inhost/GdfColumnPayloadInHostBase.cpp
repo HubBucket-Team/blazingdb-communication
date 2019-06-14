@@ -63,7 +63,7 @@ GdfColumnPayloadInHostBase::Size() const noexcept {
 }
 
 std::int_fast32_t
-GdfColumnPayloadInHostBase::DType() noexcept {
+GdfColumnPayloadInHostBase::DType() const noexcept {
   return -1;
 }
 

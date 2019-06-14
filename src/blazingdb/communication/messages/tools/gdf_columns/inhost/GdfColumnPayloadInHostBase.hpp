@@ -27,7 +27,7 @@ public:
   Size() const noexcept final;
 
   std::int_fast32_t
-  DType() noexcept final;
+  DType() const noexcept final;
 
   std::size_t
   NullCount() const noexcept final;
