@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #include <blazingdb/uc/util/macros.hpp>
 
@@ -216,6 +217,44 @@ public:
     return Get(index);
   }
 
+  class iterator {
+    const Collector &collector_;
+    size_t           index_;
+
+  public:
+    iterator(const Collector &c) : collector_(c), index_(0) {}
+    iterator(const Collector &c, size_t size) : collector_(c), index_(size) {}
+
+    void
+    operator++() {
+      index_++;
+    }
+
+    void
+    operator--() {
+      index_--;
+    }
+
+    bool
+    operator!=(const iterator &other) {
+      return index_ != other.index_;
+    }
+
+    const Payload &operator*() { return collector_.Get(index_); }
+  };
+
+  iterator
+  begin() {
+    iterator it(*this);
+    return it;
+  }
+
+  iterator
+  end() {
+    iterator it(*this, this->Length());
+    return it;
+  }
+
   UC_INTERFACE(Collector);
 };
 
@@ -268,12 +307,15 @@ public:
 /// ----------------------------------------------------------------------
 /// Utils
 
-template <class GdfColumn>
-std::unique_ptr<Collector>
-DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
+template <class GdfColumnInfo, class gdf_column>
+std::string
+DeliverFrom(const std::vector<gdf_column> &gdfColumns,
             blazingdb::uc::Agent &        agent) {
   std::unique_ptr<GdfColumnCollector> collector =
       GdfColumnCollector::MakeInHost();
+
+  std::vector<std::unique_ptr<Payload>> payloads;
+  payloads.reserve(gdfColumns.size());
 
   for (const auto &gdfColumn : gdfColumns) {
     // auto *column_ptr = gdfColumn.get_gdf_column();
@@ -283,20 +325,27 @@ DeliverFrom(const std::vector<GdfColumn> &gdfColumns,
 
     // TODO: Add other members y compute correct buffer size
     const std::unique_ptr<const CudaBuffer> dataBuffer =
-        CudaBuffer::Make(gdfColumn.data, 0);
+        CudaBuffer::Make(gdfColumn.data, GdfColumnInfo::DataSize(gdfColumn));
     const std::unique_ptr<const CudaBuffer> validBuffer =
-        CudaBuffer::Make(gdfColumn.valid, 0);
+        CudaBuffer::Make(gdfColumn.valid, GdfColumnInfo::ValidSize(gdfColumn));
+    const std::size_t size = gdfColumn.size;
 
-    std::unique_ptr<Payload> columnPayload = builder->Data(*dataBuffer)
+    payloads.emplace_back(builder->Data(*dataBuffer)
                                                  .Valid(*validBuffer)
-                                                 .Size(gdfColumn.size)
-                                                 .Build();
-
+                                                 .Size(size)
+                                                 .Build());
     // TODO: support different buffer sizes (of payloads) in GdfColumnCollector
-    collector->Add(*columnPayload);
+
+    collector->Add(*payloads.back());
   }
 
-  return collector;  // TODO: return as std::string
+  std::unique_ptr<Buffer> resultBuffer = collector->Collect();
+
+  //TODO usando el dispatcher chequear el primer elemento
+
+  return std::string{
+      static_cast<const std::string::value_type *const>(resultBuffer->Data()),
+      resultBuffer->Size()};
 }
 
 std::string
@@ -322,8 +371,8 @@ private:
 };
 }  // namespace
 
-template <class GdfColumn>
-std::vector<GdfColumn>
+template <class gdf_column>
+std::vector<gdf_column>
 CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   const Buffer &buffer = StringViewBuffer{content};
 
@@ -332,12 +381,19 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
 
   std::unique_ptr<Collector> collector = dispatcher->Dispatch();
 
-  std::vector<GdfColumn> gdfColumns;
+  std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  // TODO: traverse el `collector`, then for each payload -> gdf column
-  // payload->Data : UCBuffer.Data  [BLAZ_UC] -> ptr = column.data
-  // payload->Size -> column.size
+  for (Collector::iterator it = collector->begin(); it != collector->end();
+       ++it) {
+    GdfColumnPayload &payload = *it;
+    gdf_column        col{.data  = payload.Data().Data(),
+                   .valid = payload.Valid().Data(),
+                   .size  = payload.Size()};
+    gdfColumns.push_back(col);
+  }
+
+  return gdfColumns;
 }
 
 }  // namespace gdf_columns
