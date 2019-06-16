@@ -31,6 +31,10 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   inhost_helpers::Write(ostream, size_);
 
+  inhost_helpers::Write(ostream, dtype_);
+
+  inhost_helpers::Write(ostream, nullCount_);
+
   ostream.flush();
   std::string content = ostream.str();
 
@@ -58,11 +62,13 @@ InHostGdfColumnBuilder::Size(const std::size_t size) noexcept {
 
 GdfColumnBuilder &
 InHostGdfColumnBuilder::DType(const std::int_fast32_t dtype) noexcept {
+  dtype_ = dtype;
   return *this;
 };
 
 GdfColumnBuilder &
 InHostGdfColumnBuilder::NullCount(const std::size_t nullCount) noexcept {
+  nullCount_ = nullCount;
   return *this;
 };
 

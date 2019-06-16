@@ -43,8 +43,11 @@ Write(std::ostream &        ostream,
   return buffer;
 }
 
-template void
-Write<std::size_t>(std::ostream &ostream, const std::size_t type);
+#define WRITE_FACTORY(T)                                                       \
+  template void Write<T>(std::ostream & ostream, const T type)
+
+WRITE_FACTORY(std::size_t);
+WRITE_FACTORY(std::int_fast32_t);
 
 }  // namespace inhost_helpers
 }  // namespace gdf_columns

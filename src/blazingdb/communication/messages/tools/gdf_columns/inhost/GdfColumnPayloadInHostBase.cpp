@@ -91,9 +91,11 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   std::istream::pos_type begin = std::istream::pos_type(
       reinterpret_cast<std::istream::streamoff>(buffer_.Data()));
 
-  Read(istream, begin, &dataBuffer_);
-  Read(istream, begin, &validBuffer_);
-  Read(istream, begin, &size_);
+  Read(&carry, &dataBuffer_);
+  Read(&carry, &validBuffer_);
+  Read(&carry, &size_);
+  Read(&carry, &dtype_);
+  Read(&carry, &nullCount_);
 }
 
 const UCBuffer&
@@ -112,13 +114,13 @@ GdfColumnPayloadInHostBase::Size() const noexcept {
 }
 
 std::int_fast32_t
-GdfColumnPayloadInHostBase::DType() noexcept {
-  return -1;
+GdfColumnPayloadInHostBase::DType() const noexcept {
+  return *dtype_;
 }
 
 std::size_t
 GdfColumnPayloadInHostBase::NullCount() const noexcept {
-  return -1;
+  return *nullCount_;
 }
 
 DTypeInfoPayload&

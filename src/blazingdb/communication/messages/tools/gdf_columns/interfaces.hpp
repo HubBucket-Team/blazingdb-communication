@@ -90,7 +90,40 @@ public:
   UC_INTERFACE(Payload);
 };
 
+class CategoryPayload : public Payload {
+public:
+  virtual const UCBuffer &
+  Strs() const noexcept = 0;
+
+  virtual const UCBuffer &
+  Mem() const noexcept = 0;
+
+  virtual const UCBuffer &
+  Map() const noexcept = 0;
+
+  virtual const std::size_t
+  Count() const noexcept = 0;
+
+  virtual const std::size_t
+  Keys() const noexcept = 0;
+
+  virtual const std::size_t
+  Size() const noexcept = 0;
+
+  virtual const std::size_t
+  BaseAddress() const noexcept = 0;
+
+  UC_INTERFACE(CategoryPayload);
+};
+
 class DTypeInfoPayload : public Payload {
+public:
+  virtual const std::int_fast32_t
+  TimeUnit() noexcept = 0;
+
+  virtual const CategoryPayload &
+  Category() noexcept = 0;
+
   UC_INTERFACE(DTypeInfoPayload);
 };
 
@@ -106,7 +139,7 @@ public:
   Size() const noexcept = 0;
 
   virtual std::int_fast32_t
-  DType() noexcept = 0;
+  DType() const noexcept = 0;
 
   virtual std::size_t
   NullCount() const noexcept = 0;
@@ -211,6 +244,32 @@ public:
   UC_INTERFACE(Builder);
 };
 
+class CategoryBuilder : public Builder {
+public:
+  virtual CategoryBuilder &
+  Strs(const CudaBuffer &cudaBuffer) noexcept = 0;
+
+  virtual const UCBuffer &
+  Mem(const CudaBuffer &cudaBuffer) noexcept = 0;
+
+  virtual const UCBuffer &
+  Map(const CudaBuffer &cudaBuffer) noexcept = 0;
+
+  virtual const std::size_t
+  Count(const std::size_t count) noexcept = 0;
+
+  virtual const std::size_t
+  Keys(const std::size_t keys) noexcept = 0;
+
+  virtual const std::size_t
+  Size(const std::size_t size) noexcept = 0;
+
+  virtual const std::size_t
+  BaseAddress(const std::size_t baseAddress) noexcept = 0;
+
+  UC_INTERFACE(CategoryBuilder);
+};
+
 class DTypeInfoBuilder : public Builder {
 public:
   /// ----------------------------------------------------------------------
@@ -219,7 +278,7 @@ public:
   TimeUnit(const std::int_fast32_t timeUnit) noexcept = 0;
 
   virtual DTypeInfoBuilder &
-  Category(const CudaBuffer &cudaBuffer) noexcept = 0;
+  Category(const CategoryPayload &categoryPayload) noexcept = 0;
 
   /// ----------------------------------------------------------------------
   /// Builders
