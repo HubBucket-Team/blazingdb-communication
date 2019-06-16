@@ -10,41 +10,90 @@ namespace tools {
 namespace gdf_columns {
 
 static UC_INLINE void
-Read(const std::uint8_t** const out_carry, std::unique_ptr<Buffer>* buffer) {
+Read(std::istream&                istream,
+     const std::istream::pos_type begin,
+     std::unique_ptr<Buffer>*     buffer) {
   static constexpr std::ptrdiff_t sizePtrDiff = sizeof(const std::size_t);
 
-  const std::size_t dataSize = *static_cast<const std::size_t*>(
-      static_cast<const void* const>(*out_carry));
-  *out_carry += sizePtrDiff;
+  std::size_t size;
+  istream.read(static_cast<char*>(static_cast<void*>(&size)), sizePtrDiff);
 
-  const void* const data = *out_carry;
-  *out_carry += static_cast<std::ptrdiff_t>(dataSize);
+  const std::istream::streamoff streamoff = begin + istream.tellg();
+  const void* const data = reinterpret_cast<const void* const>(streamoff);
 
-  *buffer = std::make_unique<ViewBuffer>(data, dataSize);
+  istream.seekg(size, std::ios_base::cur);
+
+  *buffer = std::make_unique<ViewBuffer>(data, size);
 }
 
 template <class T>
 static UC_INLINE void
-Read(const std::uint8_t** const out_carry, const T** const type) {
+Read(std::istream&                istream,
+     const std::istream::pos_type begin,
+     const T** const              type) {
   static constexpr std::ptrdiff_t typePtrDiff = sizeof(const T);
 
-  *type =
-      static_cast<const T* const>(static_cast<const void* const>(*out_carry));
-  *out_carry += typePtrDiff;
+  const std::istream::streamoff streamoff = begin + istream.tellg();
+  *type = reinterpret_cast<const T* const>(streamoff);
+
+  istream.seekg(typePtrDiff, std::ios_base::cur);
 }
+
+class UC_NOEXPORT StreamBuffer : public std::streambuf {
+  UC_CONCRETE(StreamBuffer);
+
+public:
+  explicit StreamBuffer(const Buffer& buffer) : buffer_{buffer}, cur{nullptr} {
+    char_type* begin = data();
+    char_type* end   = begin + buffer.Size();
+    setg(begin, begin, end);
+  }
+
+protected:
+  pos_type
+  seekoff(const off_type                off,
+          const std::ios_base::seekdir  way,
+          const std::ios_base::openmode which) final {
+    off_type noff;
+    switch (way) {
+      case std::ios_base::beg: noff = 0; break;
+      case std::ios_base::cur:
+        noff = which & std::ios_base::in ? gptr() - eback() : pptr() - pbase();
+        break;
+      case std::ios_base::end: noff = 0; break;
+      default: return pos_type(-1);
+    }
+    noff += off;
+    if (noff < 0) { return pos_type(-1); }
+    if (which & std::ios_base::in) { setg(eback(), eback() + noff, egptr()); }
+    return pos_type(noff);
+  }
+
+private:
+  UC_INLINE char_type*
+            data() const noexcept {
+    return const_cast<char_type*>(
+        static_cast<const char_type*>(buffer_.Data()));
+  }
+
+  const Buffer&      buffer_;
+  mutable char_type* cur;
+};
 
 GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
     : buffer_{buffer} {
   // TODO: actual read Data, actual read valid
 
-  const std::uint8_t* const start =
-      static_cast<const std::uint8_t*>(buffer.Data());
+  StreamBuffer streamBuffer(buffer);
+  std::istream istream{&streamBuffer};
+  istream.sync();
 
-  const std::uint8_t* carry = start;
+  std::istream::pos_type begin = std::istream::pos_type(
+      reinterpret_cast<std::istream::streamoff>(buffer_.Data()));
 
-  Read(&carry, &dataBuffer_);
-  Read(&carry, &validBuffer_);
-  Read(&carry, &size_);
+  Read(istream, begin, &dataBuffer_);
+  Read(istream, begin, &validBuffer_);
+  Read(istream, begin, &size_);
 }
 
 const UCBuffer&
