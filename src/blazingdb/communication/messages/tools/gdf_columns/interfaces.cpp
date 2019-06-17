@@ -7,6 +7,8 @@
 #include "inhost/InHostGdfColumnDispatcher.hpp"
 #include "inhost/InHostGdfColumnSpecialized.hpp"
 
+#include "values/UCGdfColumnValue.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -21,6 +23,12 @@ CudaBuffer::Make(const void *const data, const std::size_t size) {
 std::unique_ptr<HostBuffer>
 HostBuffer::Make(const void *const data, const std::size_t size) {
   return pm::make_unique<HostBuffer, BufferBase, Buffer>(data, size);
+}
+
+std::unique_ptr<GdfColumnValue>
+GdfColumnValue::Make(const GdfColumnPayload &gdfColumnPayload,
+                     blazingdb::uc::Agent &  agent) {
+  return std::make_unique<UCGdfColumnValue>(gdfColumnPayload, agent);
 }
 
 std::unique_ptr<GdfColumnBuilder>
