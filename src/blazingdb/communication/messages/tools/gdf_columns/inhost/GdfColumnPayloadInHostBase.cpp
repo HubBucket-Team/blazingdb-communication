@@ -96,6 +96,7 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   Read(istream, begin, &size_);
   Read(istream, begin, &dtype_);
   Read(istream, begin, &nullCount_);
+  Read(istream, begin, &columnNameBuffer_);
 }
 
 const UCBuffer&
@@ -130,10 +131,9 @@ GdfColumnPayloadInHostBase::DTypeInfo() const noexcept {
   return *dtypeInfoPayload_;
 }
 
-std::string
+const UCBuffer&
 GdfColumnPayloadInHostBase::ColumnName() const noexcept {
-  UC_ABORT("Not support");
-  return "";
+  return UCBuffer::From(*columnNameBuffer_);
 }
 
 const Buffer&

@@ -18,6 +18,11 @@ CudaBuffer::Make(const void *const data, const std::size_t size) {
   return pm::make_unique<CudaBuffer, BufferBase, Buffer>(data, size);
 }
 
+std::unique_ptr<HostBuffer>
+HostBuffer::Make(const void *const data, const std::size_t size) {
+  return pm::make_unique<HostBuffer, BufferBase, Buffer>(data, size);
+}
+
 std::unique_ptr<GdfColumnBuilder>
 GdfColumnBuilder::MakeInHost(blazingdb::uc::Agent &agent) {
   return std::make_unique<InHostGdfColumnBuilder>(agent);

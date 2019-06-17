@@ -21,6 +21,11 @@ Write(std::ostream &        ostream,
       blazingdb::uc::Agent &agent,
       const CudaBuffer &    cudaBuffer);
 
+std::unique_ptr<blazingdb::uc::Buffer>
+Write(std::ostream &        ostream,
+      blazingdb::uc::Agent &agent,
+      const HostBuffer &    hostBuffer);
+
 }  // namespace inhost_helpers
 }  // namespace gdf_columns
 }  // namespace tools

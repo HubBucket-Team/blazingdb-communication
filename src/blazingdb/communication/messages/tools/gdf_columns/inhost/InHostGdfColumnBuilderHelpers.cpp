@@ -43,6 +43,23 @@ Write(std::ostream &        ostream,
   return buffer;
 }
 
+std::unique_ptr<blazingdb::uc::Buffer>
+Write(std::ostream &        ostream,
+      blazingdb::uc::Agent &agent,
+      const HostBuffer &    hostBuffer) {
+  using blazingdb::uc::Buffer;
+  using SerializedRecord = blazingdb::uc::Record::Serialized;
+
+  const void *            pointer = hostBuffer.Data();
+  std::unique_ptr<Buffer> buffer  = agent.Register(pointer, hostBuffer.Size());
+  std::unique_ptr<const SerializedRecord> serializedRecord =
+      buffer->SerializedRecord();
+
+  Write(ostream, *serializedRecord);
+
+  return buffer;
+}
+
 #define WRITE_FACTORY(T)                                                       \
   template void Write<T>(std::ostream & ostream, const T type)
 
