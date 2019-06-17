@@ -2,20 +2,58 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 
 #include <cmath>
+#include <iostream>
+#include <unordered_map>
 
+#include <blazingdb/communication/Configuration.h>
 #include <blazingdb/communication/messages/BaseComponentMessage.h>
 #include <blazingdb/communication/messages/tools/gdf_columns.h>
-#include <blazingdb/communication/Configuration.h>
 
 #include <blazingdb/uc/Context.hpp>
-#include <iostream>
+
+#include <cuda_runtime_api.h>
 
 #include "blazingdb/communication/messages/UCPool.h"
-#include <cuda_runtime_api.h>
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
+    namespace {
+    // TODO: move to RAL
+    template <class CudfColumn>
+    class CudfColumnInfo {
+    public:
+      static std::size_t
+      DataSize(const CudfColumn& c) {
+        return c.size * SizeOf.at(static_cast<int>(c.dtype));
+      }
+
+      static std::size_t
+      ValidSize(const CudfColumn& c) {
+        return std::ceil(c.null_count / 8);
+      }
+
+      static const std::unordered_map<int, const std::size_t> SizeOf;
+    };
+
+    template <class CudfColumn>
+    const std::unordered_map<int, const std::size_t>
+        CudfColumnInfo<CudfColumn>::SizeOf{
+            {0, -1},
+            {1, 8},
+            {2, 16},
+            {3, 32},
+            {4, 64},
+            {5, 32},
+            {6, 64},
+            {7, 32},
+            {8, 64},
+            {9, 64},
+            {10, -1},
+            {11, -1},
+            {12, -1},
+        };
+    }  // namespace
 
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class GpuComponentMessage : public BaseComponentMessage {
@@ -77,8 +115,6 @@ namespace messages {
             writer.EndObject();
         }
 
-
-
         static std::string  RegisterAndGetBufferDescriptor(const void *agent_ptr, const void* data, size_t data_size) {
             const blazingdb::uc::Agent* agent = static_cast<const blazingdb::uc::Agent*>(agent_ptr);
             auto data_buffer = agent->Register(data, data_size);
@@ -110,37 +146,37 @@ namespace messages {
             dataFuture.wait();
         }
 
-
         static std::string serializeToBinary(std::vector<RalColumn>& columns) {
-            std::string result;
-
             std::unique_ptr<blazingdb::uc::Context> context;
 
-            const blazingdb::communication::Configuration &configuration =
-              blazingdb::communication::Configuration::Instance();
+            const blazingdb::communication::Configuration& configuration =
+                blazingdb::communication::Configuration::Instance();
 
-            if (configuration.WithGDR()) {
-              context = blazingdb::uc::Context::GDR();
-            } else {
-              context = blazingdb::uc::Context::IPC();
-            }
+            context = configuration.WithGDR() ? blazingdb::uc::Context::GDR()
+                                              : blazingdb::uc::Context::IPC();
 
-            auto agent  = context->Agent();
+            auto agent = context->Agent();
 
-   // auto *column_ptr = gdfColumn.get_gdf_column();
-            auto collector = blazingdb::communication::messages::tools::
-                gdf_columns::CollectorFrom(columns, *agent);
+            // TODO(improve): use reference vector (check on gdf_column_cpp)
+            std::vector<CudfColumn> cudfColumns;
+            cudfColumns.reserve(columns.size());
+            std::transform(columns.cbegin(),
+                           columns.cend(),
+                           cudfColumns.begin(),
+                           [](RalColumn& ralColumn) {
+                             return ralColumn.get_gdf_column();
+                           });
+
+            std::string result = blazingdb::communication::messages::tools::
+                gdf_columns::DeliverFrom<CudfColumnInfo>(cudfColumns, *agent);
 
             std::hash<std::string> hasher;
             auto                   hashed = hasher(result);
-
             std::cout << "****message sent: " << hashed << std::endl;
-
-            result = blazingdb::communication::messages::tools::gdf_columns::
-                StringFrom(*collector->Collect());
 
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());
+
             return result;
         }
 
@@ -198,6 +234,7 @@ namespace messages {
 
             return ral_column;
         }
+
         // TODO: elimitar todo rastro de simple-distribution.
         static RalColumn
         deserializeRalColumn(std::size_t&                    binary_pointer,
@@ -262,9 +299,8 @@ namespace messages {
           return ral_column;
         }
     };
-
-    }  // namespace messages
-    }  // namespace communication
-    }  // namespace blazingdb
+}  // namespace messages
+}  // namespace communication
+}  // namespace blazingdb
 
 #endif //BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H

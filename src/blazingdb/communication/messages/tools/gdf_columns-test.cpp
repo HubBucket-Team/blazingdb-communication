@@ -11,6 +11,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../GpuComponentMessage.h"
+
 namespace {
 class GdfColumnFixture {
   using CudaBuffer =
