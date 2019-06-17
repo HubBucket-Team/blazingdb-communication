@@ -97,6 +97,12 @@ Write(std::ostream &                           ostream,
   Write(ostream, serialized.Data(), serialized.Size());
 }
 
+void UC_NOEXPORT
+     Write(std::ostream &ostream, const HostBuffer &buffer) {
+  Write(ostream, buffer.Size());
+  Write(ostream, buffer.Data(), buffer.Size());
+}
+
 std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
                                        Write(std::ostream &        ostream,
                                              blazingdb::uc::Agent &agent,
@@ -106,23 +112,6 @@ std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
 
   const void *            pointer = cudaBuffer.Data();
   std::unique_ptr<Buffer> buffer = agent.Register(pointer, cudaBuffer.Size());
-  std::unique_ptr<const SerializedRecord> serializedRecord =
-      buffer->SerializedRecord();
-
-  Write(ostream, *serializedRecord);
-
-  return buffer;
-}
-
-std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
-                                       Write(std::ostream &        ostream,
-                                             blazingdb::uc::Agent &agent,
-                                             const HostBuffer &    hostBuffer) {
-  using blazingdb::uc::Buffer;
-  using SerializedRecord = blazingdb::uc::Record::Serialized;
-
-  const void *            pointer = hostBuffer.Data();
-  std::unique_ptr<Buffer> buffer = agent.Register(pointer, hostBuffer.Size());
   std::unique_ptr<const SerializedRecord> serializedRecord =
       buffer->SerializedRecord();
 

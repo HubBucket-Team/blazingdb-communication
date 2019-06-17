@@ -41,7 +41,9 @@ public:
         size_{size},
         dtype_{dtype},
         nullCount_{nullCount},
-        columnName_{HostBuffer::Make(columnName.data(), columnName.size())} {}
+        columnNameStr_{columnName},
+        columnName_{
+            HostBuffer::Make(columnNameStr_.data(), columnNameStr_.size())} {}
 
   const CudaBuffer &
   data() const noexcept {
@@ -79,6 +81,7 @@ private:
   std::size_t                 size_;
   std::int_fast32_t           dtype_;
   std::size_t                 nullCount_;
+  std::string                 columnNameStr_;
   std::unique_ptr<HostBuffer> columnName_;
 };
 }  // namespace

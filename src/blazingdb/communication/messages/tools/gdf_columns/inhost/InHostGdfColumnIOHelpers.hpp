@@ -49,15 +49,13 @@ template <class T>
 void UC_NOEXPORT
      Write(std::ostream& ostream, const T type);
 
-std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
-                                       Write(std::ostream&         ostream,
-                                             blazingdb::uc::Agent& agent,
-                                             const CudaBuffer&     cudaBuffer);
+void UC_NOEXPORT
+     Write(std::ostream& ostream, const HostBuffer& buffer);
 
 std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
                                        Write(std::ostream&         ostream,
                                              blazingdb::uc::Agent& agent,
-                                             const HostBuffer&     hostBuffer);
+                                             const CudaBuffer&     cudaBuffer);
 
 }  // namespace inhost_iohelpers
 }  // namespace gdf_columns
