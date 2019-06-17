@@ -52,7 +52,7 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
 }
 
 std::string
-StringFrom(const Buffer &buffer);
+StringFrom(const Buffer &buffer) UC_DEPRECATED;
 
 namespace {
 class StringViewBuffer : public Buffer {

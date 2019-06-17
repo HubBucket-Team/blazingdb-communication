@@ -57,12 +57,15 @@ using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
 #define UC_BIT(i) (1UL << (i))
 
 #define UC_CONST const __attribute__((__const__))
-#ifndef UC_INLINE
-#define UC_INLINE inline __attribute__((__always_inline__))
-#endif
 #define UC_NOEXPORT __attribute__((visibility("internal")))
 #define UC_NORETURN __attribute__((__noreturn__))
 #define UC_PURE __attribute__((__pure__))
+#ifndef UC_INLINE
+#define UC_INLINE inline __attribute__((__always_inline__))
+#endif
+#ifndef UC_DEPRECATED
+#define UC_DEPRECATED __attribute__((deprecated));
+#endif
 
 #define uc_likely(x) __builtin_expect(x, 1)
 #define uc_unlikely(x) __builtin_expect(x, 0)
