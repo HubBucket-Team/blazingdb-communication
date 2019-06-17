@@ -45,10 +45,10 @@ StreamBuffer::data() const noexcept {
 /// ----------------------------------------------------------------------
 /// Read functions
 
-void
-Read(std::istream &               istream,
-     const std::istream::pos_type begin,
-     std::unique_ptr<Buffer> *    buffer) {
+void UC_NOEXPORT
+     Read(std::istream &               istream,
+          const std::istream::pos_type begin,
+          std::unique_ptr<Buffer> *    buffer) {
   static constexpr std::ptrdiff_t sizePtrDiff = sizeof(const std::size_t);
 
   std::size_t size;
@@ -63,10 +63,10 @@ Read(std::istream &               istream,
 }
 
 template <class T>
-void
-Read(std::istream &               istream,
-     const std::istream::pos_type begin,
-     const T **const              type) {
+void UC_NOEXPORT
+     Read(std::istream &               istream,
+          const std::istream::pos_type begin,
+          const T **const              type) {
   static constexpr std::ptrdiff_t typePtrDiff = sizeof(const T);
 
   const std::istream::streamoff streamoff = begin + istream.tellg();
@@ -79,8 +79,8 @@ Read(std::istream &               istream,
 /// Write functions
 
 template <class T>
-void
-Write(std::ostream &ostream, const T type) {
+void UC_NOEXPORT
+     Write(std::ostream &ostream, const T type) {
   ostream.write(reinterpret_cast<const char *>(&type), sizeof(T));
 }
 
@@ -97,15 +97,15 @@ Write(std::ostream &                           ostream,
   Write(ostream, serialized.Data(), serialized.Size());
 }
 
-std::unique_ptr<blazingdb::uc::Buffer>
-Write(std::ostream &        ostream,
-      blazingdb::uc::Agent &agent,
-      const CudaBuffer &    cudaBuffer) {
+std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
+                                       Write(std::ostream &        ostream,
+                                             blazingdb::uc::Agent &agent,
+                                             const CudaBuffer &    cudaBuffer) {
   using blazingdb::uc::Buffer;
   using SerializedRecord = blazingdb::uc::Record::Serialized;
 
   const void *            pointer = cudaBuffer.Data();
-  std::unique_ptr<Buffer> buffer  = agent.Register(pointer, cudaBuffer.Size());
+  std::unique_ptr<Buffer> buffer = agent.Register(pointer, cudaBuffer.Size());
   std::unique_ptr<const SerializedRecord> serializedRecord =
       buffer->SerializedRecord();
 

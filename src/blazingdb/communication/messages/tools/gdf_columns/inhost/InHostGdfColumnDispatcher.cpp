@@ -25,13 +25,14 @@ public:
     base_ = static_cast<const std::uint8_t *const>(buffer.Data()) +
             sizeof(const std::size_t);
 
+    buffers_.reserve(length_);
     payloads_.reserve(length_);
 
     for (std::size_t i = 0; i < length_; i++) {
-      const ViewBuffer buffer{base_ + i * offset_,
-                              static_cast<const std::size_t>(offset_)};
+      buffers_.emplace_back(std::make_unique<ViewBuffer>(
+          base_ + i * offset_, static_cast<const std::size_t>(offset_)));
       payloads_.emplace_back(
-          std::make_unique<GdfColumnPayloadInHostBase>(buffer));
+          std::make_unique<GdfColumnPayloadInHostBase>(*buffers_.back()));
     }
   }
 
@@ -64,10 +65,11 @@ private:
   const std::uint8_t *base_;
   std::ptrdiff_t      offset_;
 
+  std::vector<std::unique_ptr<ViewBuffer>>                 buffers_;
   std::vector<std::unique_ptr<GdfColumnPayloadInHostBase>> payloads_;
 
   UC_CONCRETE(ReturnedCollector);
-};
+};  // namespace
 
 }  // namespace
 

@@ -94,6 +94,7 @@ blazingdb_artifact (
     manager-test.cc
     messages/message-test.cpp
     messages/tools/gdf_columns-test.cpp
+    messages/tools/gdf_columns/inhost/CollectorDispatcherIntegrationTest.cpp
     node-test.cc
     network/integration-server-client-test.cc
     processes-test.cc

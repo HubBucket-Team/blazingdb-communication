@@ -97,7 +97,8 @@ CreateBasicGdfColumnFixture() {
 
   const std::size_t nullCount = 5;
 
-  return GdfColumnFixture{data, dataSize, valid, validSize, size, dtype, nullCount};
+  return GdfColumnFixture{
+      data, dataSize, valid, validSize, size, dtype, nullCount};
 }
 
 // Tests for gdf column builder
@@ -214,103 +215,6 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
 
   // TODO: Check same values in payload and resultPayload
-}
-
-// Tests for gdf column collection builder
-
-class MockPayload
-    : public blazingdb::communication::messages::tools::gdf_columns::Payload {
-public:
-  using Buffer = blazingdb::communication::messages::tools::gdf_columns::Buffer;
-
-  const Buffer &
-  Deliver() const noexcept final {
-    return DeliverMember();
-  }
-
-  MOCK_CONST_METHOD0(DeliverMember, const Buffer &());
-};
-
-class MockBuffer
-    : public blazingdb::communication::messages::tools::gdf_columns::Buffer {
-public:
-  const void *
-  Data() const noexcept final {
-    return DataMember();
-  }
-
-  std::size_t
-  Size() const noexcept final {
-    return SizeMember();
-  }
-
-  MOCK_CONST_METHOD0(DataMember, const void *());
-  MOCK_CONST_METHOD0(SizeMember, std::size_t());
-};
-
-static inline void
-ExpectCall(MockBuffer &mock, const std::string &&content) {
-  EXPECT_CALL(mock, DataMember)
-      .WillRepeatedly(::testing::Return(content.c_str()));
-  EXPECT_CALL(mock, SizeMember)
-      .WillRepeatedly(::testing::Return(content.length()));
-}
-
-static inline void
-ExpectCall(MockPayload &mock, const MockBuffer &buffer) {
-  EXPECT_CALL(mock, DeliverMember).WillOnce(::testing::ReturnRef(buffer));
-}
-
-static inline void
-ExpectCall(MockPayload &       mockPayload,
-           MockBuffer &        mockBuffer,
-           const std::string &&content) {
-  ExpectCall(mockBuffer, std::move(content));
-  ExpectCall(mockPayload, mockBuffer);
-}
-
-static inline void
-CheckReturned(
-    const blazingdb::communication::messages::tools::gdf_columns::Buffer
-        &buffer) {
-  using blazingdb::communication::messages::tools::gdf_columns::
-      GdfColumnDispatcher;
-  auto dispatcher = GdfColumnDispatcher::MakeInHost(buffer);
-
-  auto collector = dispatcher->Dispatch();
-
-  EXPECT_EQ(3, collector->Length());
-
-  EXPECT_EQ(5, collector->Get(0).Deliver().Size());
-  EXPECT_EQ(5, collector->Get(1).Deliver().Size());
-  EXPECT_EQ(5, collector->Get(2).Deliver().Size());
-
-  EXPECT_FALSE(std::memcmp("11111", collector->Get(0).Deliver().Data(), 5));
-  EXPECT_FALSE(std::memcmp("22222", collector->Get(1).Deliver().Data(), 5));
-  EXPECT_FALSE(std::memcmp("33333", collector->Get(2).Deliver().Data(), 5));
-}
-
-TEST(GdfColumnCollectorTest, CollectPayloads) {
-  using blazingdb::communication::messages::tools::gdf_columns::
-      GdfColumnCollector;
-  auto collector = GdfColumnCollector::MakeInHost();
-
-  MockPayload payload1, payload2, payload3;
-  MockBuffer  buffer1, buffer2, buffer3;
-
-  ExpectCall(payload1, buffer1, "11111");
-  ExpectCall(payload2, buffer2, "22222");
-  ExpectCall(payload3, buffer3, "33333");
-
-  collector->Add(payload1);
-  collector->Add(payload2);
-  collector->Add(payload3);
-
-  EXPECT_EQ(3, collector->Length());
-
-  auto buffer = collector->Collect();
-
-  CheckReturned(*buffer);
 }
 
 // Tests for gdf column tools

@@ -34,25 +34,25 @@ private:
   const Buffer& buffer_;
 };
 
-void
-Read(std::istream&                istream,
-     const std::istream::pos_type begin,
-     std::unique_ptr<Buffer>*     buffer);
+void UC_NOEXPORT
+     Read(std::istream&                istream,
+          const std::istream::pos_type begin,
+          std::unique_ptr<Buffer>*     buffer);
 
 template <class T>
-void
-Read(std::istream&                istream,
-     const std::istream::pos_type begin,
-     const T** const              type);
+void UC_NOEXPORT
+     Read(std::istream&                istream,
+          const std::istream::pos_type begin,
+          const T** const              type);
 
 template <class T>
-void
-Write(std::ostream& ostream, const T type);
+void UC_NOEXPORT
+     Write(std::ostream& ostream, const T type);
 
-std::unique_ptr<blazingdb::uc::Buffer>
-Write(std::ostream&         ostream,
-      blazingdb::uc::Agent& agent,
-      const CudaBuffer&     cudaBuffer);
+std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
+                                       Write(std::ostream&         ostream,
+                                             blazingdb::uc::Agent& agent,
+                                             const CudaBuffer&     cudaBuffer);
 
 }  // namespace inhost_iohelpers
 }  // namespace gdf_columns
