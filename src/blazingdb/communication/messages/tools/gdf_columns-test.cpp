@@ -263,6 +263,7 @@ AddTo(std::vector<gdf_column> &gdfColumns,
       reinterpret_cast<void *>(data), reinterpret_cast<void *>(valid), size});
 }
 
+template <class gdf_column>
 class GdfColumnInfoDummy {
 public:
   static inline std::size_t

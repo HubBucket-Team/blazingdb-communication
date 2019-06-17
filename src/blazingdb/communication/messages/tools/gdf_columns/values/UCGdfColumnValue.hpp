@@ -4,6 +4,7 @@
 #include "../interfaces.hpp"
 
 #include <cmath>
+#include <cassert>
 
 #include <blazingdb/uc/internal/macros.hpp>
 
