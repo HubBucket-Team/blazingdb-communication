@@ -18,6 +18,9 @@ class GdfColumnFixture {
   using CudaBuffer =
       blazingdb::communication::messages::tools::gdf_columns::CudaBuffer;
 
+  using HostBuffer =
+      blazingdb::communication::messages::tools::gdf_columns::HostBuffer;
+
 public:
   explicit GdfColumnFixture(const void *const       data,
                             const std::size_t       dataSize,
@@ -25,12 +28,14 @@ public:
                             const std::size_t       validSize,
                             const std::size_t       size,
                             const std::int_fast32_t dtype,
-                            const std::size_t       nullCount)
+                            const std::size_t       nullCount,
+                            const std::string       columnName)
       : data_{CudaBuffer::Make(data, dataSize)},
         valid_{CudaBuffer::Make(valid, validSize)},
         size_{size},
         dtype_{dtype},
-        nullCount_{nullCount} {}
+        nullCount_{nullCount},
+        columnName_{HostBuffer::Make(columnName.data(), columnName.size())} {}
 
   const CudaBuffer &
   data() const noexcept {
@@ -57,12 +62,18 @@ public:
     return nullCount_;
   }
 
+  const HostBuffer &
+  columnName() const noexcept {
+    return *columnName_;
+  }
+
 private:
   std::unique_ptr<CudaBuffer> data_;
   std::unique_ptr<CudaBuffer> valid_;
   std::size_t                 size_;
   std::int_fast32_t           dtype_;
   std::size_t                 nullCount_;
+  std::unique_ptr<HostBuffer> columnName_;
 };
 }  // namespace
 
@@ -99,8 +110,10 @@ CreateBasicGdfColumnFixture() {
 
   const std::size_t nullCount = 5;
 
+  const std::string columnName = "ColName";
+
   return GdfColumnFixture{
-      data, dataSize, valid, validSize, size, dtype, nullCount};
+      data, dataSize, valid, validSize, size, dtype, nullCount, columnName};
 }
 
 // Tests for gdf column builder
@@ -187,6 +200,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                      .Size(fixture.size())
                      .DType(fixture.dtype())
                      .NullCount(fixture.nullCount())
+                     .ColumnName(fixture.columnName())
                      .Build();
 
   auto &buffer = payload->Deliver();
@@ -215,6 +229,9 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   EXPECT_EQ(fixture.dtype(), gdfColumnPayload.DType());
 
   EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
+
+  EXPECT_EQ(7, gdfColumnPayload.ColumnName().Size());
+  EXPECT_FALSE(std::memcmp("ColName", gdfColumnPayload.ColumnName().Data(), 7));
 
   // TODO: Check same values in payload and resultPayload
 }

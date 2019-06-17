@@ -35,7 +35,7 @@ public:
   DTypeInfoPayload&
   DTypeInfo() const noexcept final;
 
-  std::string
+  const UCBuffer&
   ColumnName() const noexcept final;
 
   const Buffer&
@@ -49,6 +49,7 @@ private:
   const std::size_t*       size_;
   const std::int_fast32_t* dtype_;
   const std::size_t*       nullCount_;
+  std::unique_ptr<Buffer>        columnNameBuffer_;
 };
 
 }  // namespace gdf_columns

@@ -24,6 +24,7 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   inhost_iohelpers::Read(istream, begin, &size_);
   inhost_iohelpers::Read(istream, begin, &dtype_);
   inhost_iohelpers::Read(istream, begin, &nullCount_);
+  inhost_iohelpers::Read(istream, begin, &columnNameBuffer_);
 }
 
 const UCBuffer&
@@ -58,10 +59,9 @@ GdfColumnPayloadInHostBase::DTypeInfo() const noexcept {
   return *dtypeInfoPayload_;
 }
 
-std::string
+const UCBuffer&
 GdfColumnPayloadInHostBase::ColumnName() const noexcept {
-  UC_ABORT("Not support");
-  return "";
+  return UCBuffer::From(*columnNameBuffer_);
 }
 
 const Buffer&

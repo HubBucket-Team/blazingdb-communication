@@ -46,6 +46,10 @@ public:
 
 class HostBuffer : public NullableBuffer {
   UC_INTERFACE(HostBuffer);
+
+public:
+  static std::unique_ptr<HostBuffer>
+  Make(const void *const data, const std::size_t size);
 };
 
 class CudaBuffer : public NullableBuffer {
@@ -147,7 +151,7 @@ public:
   virtual DTypeInfoPayload &
   DTypeInfo() const noexcept = 0;
 
-  virtual std::string
+  virtual const UCBuffer &
   ColumnName() const noexcept = 0;
 
   UC_INTERFACE(GdfColumnPayload);
