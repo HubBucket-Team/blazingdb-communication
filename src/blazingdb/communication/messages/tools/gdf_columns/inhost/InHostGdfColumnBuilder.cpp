@@ -1,5 +1,5 @@
 #include "InHostGdfColumnBuilder.hpp"
-#include "InHostGdfColumnBuilderHelpers.hpp"
+#include "InHostGdfColumnIOHelpers.hpp"
 
 #include <cstring>
 
@@ -24,19 +24,19 @@ InHostGdfColumnBuilder::Build() const noexcept {
   // TODO: each Write should be return a ticket about resouces ownership
 
   std::unique_ptr<BUBuffer> dataBuffer =
-      inhost_helpers::Write(ostream, agent_, *dataCudaBuffer_);
+      inhost_iohelpers::Write(ostream, agent_, *dataCudaBuffer_);
 
   std::unique_ptr<BUBuffer> validBuffer =
-      inhost_helpers::Write(ostream, agent_, *validCudaBuffer_);
+      inhost_iohelpers::Write(ostream, agent_, *validCudaBuffer_);
 
-  inhost_helpers::Write(ostream, size_);
+  inhost_iohelpers::Write(ostream, size_);
 
-  inhost_helpers::Write(ostream, dtype_);
+  inhost_iohelpers::Write(ostream, dtype_);
 
-  inhost_helpers::Write(ostream, nullCount_);
+  inhost_iohelpers::Write(ostream, nullCount_);
 
   std::unique_ptr<BUBuffer> columnNameBuffer =
-      inhost_helpers::Write(ostream, agent_, *columnNameHostBuffer_);
+      inhost_iohelpers::Write(ostream, agent_, *columnNameHostBuffer_);
 
   ostream.flush();
   std::string content = ostream.str();

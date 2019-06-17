@@ -1,11 +1,8 @@
 #ifndef BLAZINGDB_UC_UTIL_MACROS_HPP_
 #define BLAZINGDB_UC_UTIL_MACROS_HPP_
 
-#ifdef __GNUC__
+#define UC_DEPRECATED __attribute__((deprecated));
 #define UC_INLINE inline __attribute__((always_inline))
-#else
-#define UC_INLINE inline
-#endif
 
 #define UC_INTERFACE(Kind)                                                     \
 public:                                                                        \
