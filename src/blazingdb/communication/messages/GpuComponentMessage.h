@@ -1,6 +1,7 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <unordered_map>
@@ -160,11 +161,12 @@ namespace messages {
           // TODO(improve): use reference vector (check on gdf_column_cpp)
           std::vector<CudfColumn> cudfColumns;
           cudfColumns.reserve(columns.size());
-          std::transform(
-              columns.cbegin(),
-              columns.cend(),
-              std::back_inserter(cudfColumns),
-              [](RalColumn& ralColumn) { return ralColumn.get_gdf_column(); });
+          std::transform(columns.cbegin(),
+                         columns.cend(),
+                         std::back_inserter(cudfColumns),
+                         [](const RalColumn& ralColumn) {
+                           return *ralColumn.get_gdf_column();
+                         });
 
           std::string result = blazingdb::communication::messages::tools::
               gdf_columns::DeliverFrom<CudfColumnInfo>(cudfColumns, *agent);
@@ -316,7 +318,8 @@ namespace messages {
                                cudfColumn.data,
                                static_cast<unsigned char*>(cudfColumn.valid),
                                cudfColumn.size,
-                               cudfColumn.null_count);
+                               cudfColumn.null_count,
+                               cudfColumn.col_name);
                            return ralColumn;
                          });
 

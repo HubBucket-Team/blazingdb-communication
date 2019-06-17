@@ -12,7 +12,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-template <class GdfColumnInfo, class gdf_column>
+template <template <class gdf_column> class GdfColumnInfo, class gdf_column>
 std::string
 DeliverFrom(const std::vector<gdf_column> &gdfColumns,
             blazingdb::uc::Agent &         agent) {
@@ -29,10 +29,10 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
         GdfColumnBuilder::MakeInHost(agent);
 
     // TODO: Add other members y compute correct buffer size
-    const std::unique_ptr<const CudaBuffer> dataBuffer =
-        CudaBuffer::Make(gdfColumn.data, GdfColumnInfo::DataSize(gdfColumn));
-    const std::unique_ptr<const CudaBuffer> validBuffer =
-        CudaBuffer::Make(gdfColumn.valid, GdfColumnInfo::ValidSize(gdfColumn));
+    const std::unique_ptr<const CudaBuffer> dataBuffer = CudaBuffer::Make(
+        gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn));
+    const std::unique_ptr<const CudaBuffer> validBuffer = CudaBuffer::Make(
+        gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn));
     const std::size_t size = gdfColumn.size;
 
     // TODO: support different buffer sizes (of payloads) in
@@ -87,15 +87,15 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  for (Collector::iterator it = collector->begin(); it != collector->end();
-       ++it) {
-    GdfColumnPayload &payload = *it;
+  // for (Collector::iterator it = collector->begin(); it != collector->end();
+  //++it) {
+  // GdfColumnPayload &payload = *it;
 
-    gdf_column col{.data  = payload.Data().Data(),
-                   .valid = payload.Valid().Data(),
-                   .size  = payload.Size()};
-    gdfColumns.push_back(col);
-  }
+  // gdf_column col{.data  = payload.Data().Data(),
+  //.valid = payload.Valid().Data(),
+  //.size  = payload.Size()};
+  // gdfColumns.push_back(col);
+  //}
 
   return gdfColumns;
 }

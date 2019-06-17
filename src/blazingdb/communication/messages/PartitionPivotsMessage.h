@@ -105,7 +105,7 @@ public:
 
       // Get array columns (payload)
       std::vector<RalColumn> columns =
-          BaseClass::deserializeRalColumns(binary, agent);
+          BaseClass::deserializeRalColumns(binary, *agent);
 
       // Create the message
       return std::make_shared<MessageType>(std::move(messageToken),
