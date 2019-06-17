@@ -47,7 +47,7 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
   std::unique_ptr<Buffer> resultBuffer = collector->Collect();
 
   return std::string{
-      static_cast<const std::string::value_type *const>(resultBuffer->Data()),
+      static_cast<const std::string::value_type *>(resultBuffer->Data()),
       resultBuffer->Size()};
 }
 

@@ -32,7 +32,7 @@ public:
                                         !std::is_array<std::decay_t<U>>::value,
                                     T>
                    StaticCast(const U &u) noexcept {
-    return static_cast<const T>(u, static_cast<const T *const>(u.get()));
+    return static_cast<const T>(u, static_cast<const T *>(u.get()));
   }
 };
 
@@ -105,16 +105,16 @@ public:
   virtual const UCBuffer &
   Map() const noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   Count() const noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   Keys() const noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   Size() const noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   BaseAddress() const noexcept = 0;
 
   UC_INTERFACE(CategoryPayload);
@@ -122,7 +122,7 @@ public:
 
 class DTypeInfoPayload : public Payload {
 public:
-  virtual const std::int_fast32_t
+  virtual std::int_fast32_t
   TimeUnit() noexcept = 0;
 
   virtual const CategoryPayload &
@@ -259,16 +259,16 @@ public:
   virtual const UCBuffer &
   Map(const CudaBuffer &cudaBuffer) noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   Count(const std::size_t count) noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   Keys(const std::size_t keys) noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   Size(const std::size_t size) noexcept = 0;
 
-  virtual const std::size_t
+  virtual std::size_t
   BaseAddress(const std::size_t baseAddress) noexcept = 0;
 
   UC_INTERFACE(CategoryBuilder);
