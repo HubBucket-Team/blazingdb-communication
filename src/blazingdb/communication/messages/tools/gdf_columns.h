@@ -90,7 +90,8 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   for (Collector::iterator it = collector->begin(); it != collector->end();
        ++it) {
     GdfColumnPayload &payload = *it;
-    gdf_column        col{.data  = payload.Data().Data(),
+
+    gdf_column col{.data  = payload.Data().Data(),
                    .valid = payload.Valid().Data(),
                    .size  = payload.Size()};
     gdfColumns.push_back(col);

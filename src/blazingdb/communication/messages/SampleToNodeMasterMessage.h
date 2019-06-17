@@ -112,33 +112,20 @@ namespace messages {
           const Configuration& configuration =
               blazingdb::communication::Configuration::Instance();
 
-          std::unique_ptr<blazingdb::uc::Context> context;
-
-          if (configuration.WithGDR()) {
-            context = blazingdb::uc::Context::GDR();
-          } else {
-            context = blazingdb::uc::Context::IPC();
-          }
+          std::unique_ptr<blazingdb::uc::Context> context =
+              configuration.WithGDR() ? blazingdb::uc::Context::GDR()
+                                      : blazingdb::uc::Context::IPC();
 
           auto agent = context->Agent();
 
           // Get samples
-          std::vector<RalColumn> columns;
-          std::size_t            binary_offset = 0;
-          const auto& gpu_data_array = document["samples"].GetArray();
-
           std::hash<std::string> hasher;
-          auto hashed = hasher(binary);
-          std::cout << "****Make message from bin: " << binary  << std::endl;
+          auto                   hashed = hasher(binary);
+          std::cout << "****Make message from bin: " << binary << std::endl;
           std::cout << "****Make message from: " << hashed << std::endl;
-          //for (const auto& gpu_data : gpu_data_array) {
-            //std::cout << "\t offset: " << binary_offset << std::endl;
-            //columns.emplace_back(BaseClass::deserializeRalColumn(
-                //binary_offset, binary, gpu_data.GetObject(), agent.get()));
-          //}
 
-          columns = blazingdb::communication::messages::tools::gdf_columns::
-              DeliverFrom<RalColumn>(columns, *agent);
+          std::vector<RalColumn> columns =
+              BaseClass::deserializeRalColumns(binary, agent);
 
           // Create the message
           return std::make_shared<MessageType>(std::move(messageToken),

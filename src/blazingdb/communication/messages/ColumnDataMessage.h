@@ -70,36 +70,47 @@ public:
     const std::string serializeToBinary() const override {
         return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns));
     }
- 
+
 public:
     static const std::string getMessageID() {
         return MessageID;
     }
 
-    static std::shared_ptr<Message> Make(const std::string& json, const std::string& binary) {
-        // Parse json
-        rapidjson::Document document;
-        document.Parse(json.c_str());
+    static std::shared_ptr<Message>
+    Make(const std::string& json, const std::string& binary) {
+      // Parse json
+      rapidjson::Document document;
+      document.Parse(json.c_str());
 
-        // Get main object
-        const auto& object = document.GetObject();
+      // Get main object
+      const auto& object = document.GetObject();
 
-        // Get message values;
-        std::unique_ptr<Node> node;
-        std::unique_ptr<MessageToken> messageToken;
-        std::shared_ptr<ContextToken> contextToken;
-        deserializeMessage(object["message"].GetObject(), messageToken, contextToken, node);
+      // Get message values;
+      std::unique_ptr<Node>         node;
+      std::unique_ptr<MessageToken> messageToken;
+      std::shared_ptr<ContextToken> contextToken;
+      deserializeMessage(
+          object["message"].GetObject(), messageToken, contextToken, node);
 
-        // Get array columns (payload)
-        std::size_t binary_pointer = 0;
-        std::vector<RalColumn> columns;
-        const auto& gpu_data_array = object["columns"].GetArray();
-        for (const auto& gpu_data : gpu_data_array) {
-            columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
-        }
+      // blazingdb-uc
+      const Configuration& configuration =
+          blazingdb::communication::Configuration::Instance();
 
-        // Create the message
-        return std::make_shared<MessageType>(std::move(messageToken), std::move(contextToken), *node, std::move(columns));
+      std::unique_ptr<blazingdb::uc::Context> context =
+          configuration.WithGDR() ? blazingdb::uc::Context::GDR()
+                                  : blazingdb::uc::Context::IPC();
+
+      auto agent = context->Agent();
+
+      // Get array columns (payload)
+      std::vector<RalColumn> columns =
+          BaseClass::deserializeRalColumns(binary, agent);
+
+      // Create the message
+      return std::make_shared<MessageType>(std::move(messageToken),
+                                           std::move(contextToken),
+                                           *node,
+                                           std::move(columns));
     }
 
 private:

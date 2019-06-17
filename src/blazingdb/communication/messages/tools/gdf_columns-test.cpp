@@ -11,7 +11,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../ColumnDataMessage.h"
+#include "../DataPivot.h"
+#include "../DataScatterMessage.h"
 #include "../GpuComponentMessage.h"
+#include "../NodeDataMessage.h"
+#include "../PartitionPivotsMessage.h"
+#include "../SampleToNodeMasterMessage.h"
 
 namespace {
 class GdfColumnFixture {

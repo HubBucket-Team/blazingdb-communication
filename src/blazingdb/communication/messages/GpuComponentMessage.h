@@ -146,38 +146,37 @@ namespace messages {
             dataFuture.wait();
         }
 
-        static std::string serializeToBinary(std::vector<RalColumn>& columns) {
-            std::unique_ptr<blazingdb::uc::Context> context;
+        static std::string
+        serializeToBinary(std::vector<RalColumn>& columns) {
+          const blazingdb::communication::Configuration& configuration =
+              blazingdb::communication::Configuration::Instance();
 
-            const blazingdb::communication::Configuration& configuration =
-                blazingdb::communication::Configuration::Instance();
+          std::unique_ptr<blazingdb::uc::Context> context =
+              configuration.WithGDR() ? blazingdb::uc::Context::GDR()
+                                      : blazingdb::uc::Context::IPC();
 
-            context = configuration.WithGDR() ? blazingdb::uc::Context::GDR()
-                                              : blazingdb::uc::Context::IPC();
+          auto agent = context->Agent();
 
-            auto agent = context->Agent();
+          // TODO(improve): use reference vector (check on gdf_column_cpp)
+          std::vector<CudfColumn> cudfColumns;
+          cudfColumns.reserve(columns.size());
+          std::transform(
+              columns.cbegin(),
+              columns.cend(),
+              std::back_inserter(cudfColumns),
+              [](RalColumn& ralColumn) { return ralColumn.get_gdf_column(); });
 
-            // TODO(improve): use reference vector (check on gdf_column_cpp)
-            std::vector<CudfColumn> cudfColumns;
-            cudfColumns.reserve(columns.size());
-            std::transform(columns.cbegin(),
-                           columns.cend(),
-                           cudfColumns.begin(),
-                           [](RalColumn& ralColumn) {
-                             return ralColumn.get_gdf_column();
-                           });
+          std::string result = blazingdb::communication::messages::tools::
+              gdf_columns::DeliverFrom<CudfColumnInfo>(cudfColumns, *agent);
 
-            std::string result = blazingdb::communication::messages::tools::
-                gdf_columns::DeliverFrom<CudfColumnInfo>(cudfColumns, *agent);
+          std::hash<std::string> hasher;
+          auto                   hashed = hasher(result);
+          std::cout << "****message sent: " << hashed << std::endl;
 
-            std::hash<std::string> hasher;
-            auto                   hashed = hasher(result);
-            std::cout << "****message sent: " << hashed << std::endl;
+          UCPool::getInstance().push(agent.release());
+          UCPool::getInstance().push(context.release());
 
-            UCPool::getInstance().push(agent.release());
-            UCPool::getInstance().push(context.release());
-
-            return result;
+          return result;
         }
 
         static CudfColumn deserializeCudfColumn(rapidjson::Value::ConstObject&& object) {
@@ -244,7 +243,6 @@ namespace messages {
           const auto& column_name_data = object["column_name"];
           std::string column_name(column_name_data.GetString(),
                                   column_name_data.GetStringLength());
-          bool is_ipc = object["is_ipc"].GetBool();
 
           std::uint64_t column_token = object["column_token"].GetUint64();
 
@@ -297,6 +295,32 @@ namespace messages {
           binary_pointer += 208;
 
           return ral_column;
+        }
+
+        static std::vector<RalColumn>
+        deserializeRalColumns(const std::string&    binary,
+                              blazingdb::uc::Agent& agent) {
+          std::vector<CudfColumn> cudfColumns =
+              blazingdb::communication::messages::tools::gdf_columns::
+                  CollectFrom<CudfColumn>(binary, agent);
+
+          std::vector<RalColumn> ralColumns;
+          ralColumns.reserve(cudfColumns.size());
+          std::transform(cudfColumns.cbegin(),
+                         cudfColumns.cend(),
+                         std::back_inserter(ralColumns),
+                         [](const CudfColumn& cudfColumn) {
+                           RalColumn ralColumn;
+                           ralColumn.create_gdf_column_for_ipc(
+                               cudfColumn.dtype,
+                               cudfColumn.data,
+                               static_cast<unsigned char*>(cudfColumn.valid),
+                               cudfColumn.size,
+                               cudfColumn.null_count);
+                           return ralColumn;
+                         });
+
+          return ralColumns;
         }
     };
 }  // namespace messages
