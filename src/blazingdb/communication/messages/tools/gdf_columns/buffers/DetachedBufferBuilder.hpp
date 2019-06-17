@@ -18,6 +18,7 @@ public:
   Add(const Buffer &buffer);
 
 private:
+  // TODO(improve): Use reserved iostreams helpers to better perfomance
   std::ostringstream ss_;
 };
 

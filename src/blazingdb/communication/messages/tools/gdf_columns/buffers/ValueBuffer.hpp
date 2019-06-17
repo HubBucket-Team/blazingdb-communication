@@ -23,8 +23,7 @@ public:
   Size() const noexcept final;
 
 private:
-  explicit ValueBuffer(const void *const data, const std::size_t size)
-      : data_{data}, size_{size} {}
+  explicit ValueBuffer(const void *const data, const std::size_t size);
 
   const void *const data_;
   const std::size_t size_;

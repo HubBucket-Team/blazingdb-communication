@@ -47,7 +47,7 @@ ExpectCall(MockBuffer &mock, const std::string &content) {
 
 static UC_INLINE void
 ExpectCall(MockPayload &mock, const MockBuffer &buffer) {
-  EXPECT_CALL(mock, DeliverMember).WillOnce(::testing::ReturnRef(buffer));
+  EXPECT_CALL(mock, DeliverMember).WillRepeatedly(::testing::ReturnRef(buffer));
 }
 
 static UC_INLINE void
@@ -68,8 +68,8 @@ CheckCollect() {
   MockBuffer  buffer1, buffer2, buffer3;
 
   ExpectCall(payload1, buffer1, "11111");
-  ExpectCall(payload2, buffer2, "22222");
-  ExpectCall(payload3, buffer3, "33333");
+  ExpectCall(payload2, buffer2, "222222");
+  ExpectCall(payload3, buffer3, "3333333");
 
   collector->Add(payload1);
   collector->Add(payload2);
@@ -79,17 +79,19 @@ CheckCollect() {
 
   auto buffer = collector->Collect();
 
-  EXPECT_LE(15, buffer->Size());
+  EXPECT_LE(18, buffer->Size());
 
   std::string content{
       static_cast<const std::string::value_type *>(buffer->Data()),
       buffer->Size()};
-  std::string sub{"111112222233333"};
 
-  auto result =
-      std::find_end(content.cbegin(), content.cend(), sub.cbegin(), sub.cend());
+  std::vector<std::string> subs{{"11111", "222222", "3333333"}};
+  for (const auto &sub : subs) {
+    auto result = std::find_end(
+        content.cbegin(), content.cend(), sub.cbegin(), sub.cend());
 
-  EXPECT_NE(result, content.cend());
+    EXPECT_NE(result, content.cend());
+  }
 
   return buffer;
 }
@@ -107,12 +109,12 @@ CheckDispatch(
   EXPECT_EQ(3, collector->Length());
 
   EXPECT_EQ(5, collector->Get(0).Deliver().Size());
-  EXPECT_EQ(5, collector->Get(1).Deliver().Size());
-  EXPECT_EQ(5, collector->Get(2).Deliver().Size());
+  EXPECT_EQ(6, collector->Get(1).Deliver().Size());
+  EXPECT_EQ(7, collector->Get(2).Deliver().Size());
 
   EXPECT_FALSE(std::memcmp("11111", collector->Get(0).Deliver().Data(), 5));
-  EXPECT_FALSE(std::memcmp("22222", collector->Get(1).Deliver().Data(), 5));
-  EXPECT_FALSE(std::memcmp("33333", collector->Get(2).Deliver().Data(), 5));
+  EXPECT_FALSE(std::memcmp("222222", collector->Get(1).Deliver().Data(), 6));
+  EXPECT_FALSE(std::memcmp("3333333", collector->Get(2).Deliver().Data(), 7));
 }
 
 TEST(CollectorDispatcherIntegrationTest, CollectAndDispatch) {
