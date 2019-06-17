@@ -35,8 +35,7 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   inhost_iohelpers::Write(ostream, nullCount_);
 
-  std::unique_ptr<BUBuffer> columnNameBuffer =
-      inhost_iohelpers::Write(ostream, agent_, *columnNameHostBuffer_);
+  inhost_iohelpers::Write(ostream, *columnNameHostBuffer_);
 
   ostream.flush();
   std::string content = ostream.str();
