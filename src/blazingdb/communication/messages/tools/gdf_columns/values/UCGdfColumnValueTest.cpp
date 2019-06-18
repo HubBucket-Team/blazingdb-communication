@@ -34,7 +34,9 @@ TEST(UCGdfColumnValueTest, MakeValue) {
       .WillRepeatedly(
           testing::ReturnPointeeCast<UCBuffer>(std::make_shared<ViewBuffer>(
               reinterpret_cast<const void *const>(222), 2)));
-  EXPECT_CALL(gdfColumnPayload, Size).WillRepeatedly(testing::Return(12345));
+  EXPECT_CALL(gdfColumnPayload, Size).WillRepeatedly(testing::Return(444));
+  EXPECT_CALL(gdfColumnPayload, DType).WillRepeatedly(testing::Return(555));
+  EXPECT_CALL(gdfColumnPayload, NullCount).WillRepeatedly(testing::Return(666));
 
   MockUCAgent ucAgent;
   EXPECT_CALL(ucAgent, Register(testing::_, testing::_))
@@ -45,9 +47,9 @@ TEST(UCGdfColumnValueTest, MakeValue) {
             .WillRepeatedly(testing::InvokeWithoutArgs([]() {
               std::unique_ptr<MockUCTransport> ucTransport =
                   std::make_unique<MockUCTransport>();
-              EXPECT_CALL(*ucTransport, Get)
-                  .Times(testing::Exactly(2))
-                  .WillRepeatedly([]() { return std::async([]() {}); });
+              EXPECT_CALL(*ucTransport, Get).WillOnce([]() {
+                return std::async([]() {});
+              });
               return ucTransport;
             }));
         return ucBuffer;
@@ -55,5 +57,8 @@ TEST(UCGdfColumnValueTest, MakeValue) {
 
   auto gdfColumnValue = GdfColumnValue::Make(gdfColumnPayload, ucAgent);
 
-  EXPECT_EQ(12345, gdfColumnValue->size());
+  // TODO(improve): cuda behavior
+  EXPECT_EQ(444, gdfColumnValue->size());
+  EXPECT_EQ(555, gdfColumnValue->dtype());
+  EXPECT_EQ(666, gdfColumnValue->null_count());
 }

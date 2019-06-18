@@ -42,11 +42,11 @@ public:
 private:
   const GdfColumnPayload& gdfColumnPayload_;
 
-  const void* const data_;
-  const void* const valid_;
-
   std::unique_ptr<blazingdb::uc::Buffer> dataUcBuffer_;
   std::unique_ptr<blazingdb::uc::Buffer> validUcBuffer_;
+
+  const void* const data_;
+  const void* const valid_;
 };
 
 }  // namespace gdf_columns

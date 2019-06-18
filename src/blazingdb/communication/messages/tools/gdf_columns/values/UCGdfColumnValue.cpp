@@ -30,15 +30,15 @@ static UC_INLINE const void*
 LinkThrough(blazingdb::uc::Agent&                   agent,
             const Buffer&                           buffer,
             const std::size_t                       size,
-            std::unique_ptr<blazingdb::uc::Buffer>* outputUcBuffer) {
+            std::unique_ptr<blazingdb::uc::Buffer>& outputUcBuffer) {
   if (nullptr == buffer.Data()) { return nullptr; }
 
   const void* data = Malloc(size);
 
-  *outputUcBuffer = agent.Register(data, size);
+  outputUcBuffer = agent.Register(data, size);
 
   std::unique_ptr<blazingdb::uc::Transport> transport =
-      (*outputUcBuffer)->Link(static_cast<const std::uint8_t*>(buffer.Data()));
+      outputUcBuffer->Link(static_cast<const std::uint8_t*>(buffer.Data()));
 
   transport->Get().wait();
 
@@ -53,12 +53,12 @@ UCGdfColumnValue::UCGdfColumnValue(const GdfColumnPayload& gdfColumnPayload,
       data_{LinkThrough(agent,
                         gdfColumnPayload.Data(),
                         gdfColumnPayload.Size() * 8,  // TODO: calculate
-                        &dataUcBuffer_)},
+                        dataUcBuffer_)},
       valid_{LinkThrough(
           agent,
           gdfColumnPayload.Valid(),
           std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate
-          &validUcBuffer_)} {}
+          validUcBuffer_)} {}
 
 const void*
 UCGdfColumnValue::data() const noexcept {
