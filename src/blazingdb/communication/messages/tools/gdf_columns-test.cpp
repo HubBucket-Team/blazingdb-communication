@@ -232,16 +232,14 @@ CreateBasicCategoryFixture() {
 }
 
 static inline DTypeInfoFixture
-CreateBasicDTypeInfoFixture() {
+CreateBasicDTypeInfoFixture(CategoryFixture &category) {
   const std::size_t timeUnit = 1;
-
-  CategoryFixture category = CreateBasicCategoryFixture();
 
   return DTypeInfoFixture{timeUnit, category};
 }
 
 static inline GdfColumnFixture
-CreateBasicGdfColumnFixture() {
+CreateBasicGdfColumnFixture(DTypeInfoFixture &dtypeInfo) {
   const std::size_t dataSize = 2000;
   const void *const data     = CreateCudaSequence(dataSize);
 
@@ -255,8 +253,6 @@ CreateBasicGdfColumnFixture() {
   const std::size_t nullCount = 5;
 
   const std::string columnName = "ColName";
-
-  DTypeInfoFixture dtypeInfo = CreateBasicDTypeInfoFixture();
 
   return GdfColumnFixture{data,
                           dataSize,
@@ -317,9 +313,9 @@ public:
 };
 
 TEST(GdfColumnBuilderTest, CheckPayload) {
-  auto fixture          = CreateBasicGdfColumnFixture();
   auto categoryFixture  = CreateBasicCategoryFixture();
-  auto dtypeInfoFixture = CreateBasicDTypeInfoFixture();
+  auto dtypeInfoFixture = CreateBasicDTypeInfoFixture(categoryFixture);
+  auto fixture          = CreateBasicGdfColumnFixture(dtypeInfoFixture);
 
   MockBUCAgent agent;
   EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
@@ -358,7 +354,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                              .BaseAddress(categoryFixture.baseAddress())
                              .Build();
 
-  using blazingdb::communication::messages::tools::gdf_columns::DTypeInfoBuilder;
+  using blazingdb::communication::messages::tools::gdf_columns::
+      DTypeInfoBuilder;
   auto dtypeInfoBuilder = DTypeInfoBuilder::MakeInHost(agent);
 
   using blazingdb::communication::messages::tools::gdf_columns::CategoryPayload;
@@ -367,8 +364,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
           .Category(*categoryPayload)
           .Build();
 
-  using blazingdb::communication::messages::
-                                     tools::gdf_columns::GdfColumnBuilder;
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnBuilder;
   auto builder = GdfColumnBuilder::MakeInHost(agent);
 
   auto payload = builder->Data(fixture.data())
