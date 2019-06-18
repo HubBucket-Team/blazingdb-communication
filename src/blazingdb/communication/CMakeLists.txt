@@ -45,6 +45,8 @@ blazingdb_artifact (
     messages/tools/gdf_columns/inhost/InHostDTypeInfoPayload.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnSpecialized.cpp
     messages/tools/gdf_columns/values/UCGdfColumnValue.cpp
+    messages/tools/gdf_columns/values/interfaces.cpp
+    messages/tools/gdf_columns/values/CudaMemoryRuntime.cpp
 
   INCLUDES
     PUBLIC ${PROJECT_SOURCE_DIR}/src
