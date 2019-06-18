@@ -36,7 +36,7 @@ public:
   NullCount(const std::size_t nullCount) noexcept final;
 
   GdfColumnBuilder &
-  DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept final;
+  DTypeInfo(const Payload &dtypeInfoPayload) noexcept final;
 
   GdfColumnBuilder &
   ColumnName(const HostBuffer &hostBuffer) noexcept final;

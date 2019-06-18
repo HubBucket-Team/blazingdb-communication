@@ -24,11 +24,11 @@ public:
   TimeUnit(const std::int_fast32_t timeUnit) noexcept final;
 
   DTypeInfoBuilder &
-  Category(const CategoryPayload &categoryPayload) noexcept final;
+  Category(const Payload &categoryPayload) noexcept final;
 
 private:
-  std::int_fast32_t timeUnit_;
-  const CategoryPayload *  categoryPayload_;
+  std::int_fast32_t      timeUnit_;
+  const Payload *categoryPayload_;
 
   blazingdb::uc::Agent &agent_;
 };

@@ -364,8 +364,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   using blazingdb::communication::messages::tools::gdf_columns::CategoryPayload;
   auto dtypeInfoPayload =
       dtypeInfoBuilder->TimeUnit(dtypeInfoFixture.timeUnit())
-          //.Category(*static_cast<std::unique_ptr<CategoryPayload>>(
-          //    categoryPayload))
+          .Category(*categoryPayload)
           .Build();
 
   using blazingdb::communication::messages::
@@ -378,7 +377,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                      .DType(fixture.dtype())
                      .NullCount(fixture.nullCount())
                      .ColumnName(fixture.columnName())
-                     //.DTypeInfo(*dtypeInfoPayload)
+                     .DTypeInfo(*dtypeInfoPayload)
                      .Build();
 
   auto &buffer = payload->Deliver();

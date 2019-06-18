@@ -289,7 +289,7 @@ public:
   TimeUnit(const std::int_fast32_t timeUnit) noexcept = 0;
 
   virtual DTypeInfoBuilder &
-  Category(const CategoryPayload &categoryPayload) noexcept = 0;
+  Category(const Payload &categoryPayload) noexcept = 0;
 
   /// ----------------------------------------------------------------------
   /// Builders
@@ -319,7 +319,7 @@ public:
   NullCount(const std::size_t nullCount) noexcept = 0;
 
   virtual GdfColumnBuilder &
-  DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept = 0;
+  DTypeInfo(const Payload &dtypeInfoPayload) noexcept = 0;
 
   virtual GdfColumnBuilder &
   ColumnName(const HostBuffer &hostBuffer) noexcept = 0;
