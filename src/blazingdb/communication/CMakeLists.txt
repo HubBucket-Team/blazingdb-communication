@@ -26,6 +26,7 @@ blazingdb_artifact (
     messages/tools/gdf_columns/BufferBase.cpp
     messages/tools/gdf_columns/buffers/DetachedBuffer.cpp
     messages/tools/gdf_columns/buffers/DetachedBufferBuilder.cpp
+    messages/tools/gdf_columns/buffers/NullBuffer.cpp
     messages/tools/gdf_columns/buffers/StringBuffer.cpp
     messages/tools/gdf_columns/buffers/StringReferenceBuffer.cpp
     messages/tools/gdf_columns/buffers/ValueBuffer.cpp
@@ -37,6 +38,7 @@ blazingdb_artifact (
     messages/tools/gdf_columns/inhost/InHostGdfColumnIOHelpers.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnPayload.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnSpecialized.cpp
+    messages/tools/gdf_columns/values/UCGdfColumnValue.cpp
 
   INCLUDES
     PUBLIC ${PROJECT_SOURCE_DIR}/src
@@ -95,6 +97,7 @@ blazingdb_artifact (
     messages/message-test.cpp
     messages/tools/gdf_columns-test.cpp
     messages/tools/gdf_columns/inhost/CollectorDispatcherIntegrationTest.cpp
+    messages/tools/gdf_columns/values/UCGdfColumnValueTest.cpp
     node-test.cc
     network/integration-server-client-test.cc
     processes-test.cc

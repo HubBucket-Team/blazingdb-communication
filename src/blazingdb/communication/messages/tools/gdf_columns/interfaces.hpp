@@ -132,6 +132,8 @@ public:
 };
 
 class GdfColumnPayload : public Payload {
+  UC_INTERFACE(GdfColumnPayload);
+
 public:
   virtual const UCBuffer &
   Data() const noexcept = 0;
@@ -148,13 +150,11 @@ public:
   virtual std::size_t
   NullCount() const noexcept = 0;
 
-  virtual DTypeInfoPayload &
+  virtual const DTypeInfoPayload &
   DTypeInfo() const noexcept = 0;
 
   virtual const UCBuffer &
   ColumnName() const noexcept = 0;
-
-  UC_INTERFACE(GdfColumnPayload);
 };
 
 /// ----------------------------------------------------------------------
