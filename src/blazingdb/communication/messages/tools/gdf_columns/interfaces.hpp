@@ -123,10 +123,10 @@ public:
 class DTypeInfoPayload : public Payload {
 public:
   virtual std::int_fast32_t
-  TimeUnit() noexcept = 0;
+  TimeUnit() const noexcept = 0;
 
-  virtual const CategoryPayload &
-  Category() noexcept = 0;
+  virtual CategoryPayload &
+  Category() const noexcept = 0;
 
   UC_INTERFACE(DTypeInfoPayload);
 };
@@ -168,7 +168,7 @@ class CategoryValue : public Value {
   UC_INTERFACE(CategoryValue);
 
 public:
-  virtual const void *
+  virtual std::size_t
   base_address() const noexcept = 0;
 
   virtual const void *
@@ -250,26 +250,33 @@ public:
 
 class CategoryBuilder : public Builder {
 public:
+  /// ----------------------------------------------------------------------
+  /// Member serializers
   virtual CategoryBuilder &
   Strs(const CudaBuffer &cudaBuffer) noexcept = 0;
 
-  virtual const UCBuffer &
+  virtual CategoryBuilder &
   Mem(const CudaBuffer &cudaBuffer) noexcept = 0;
 
-  virtual const UCBuffer &
+  virtual CategoryBuilder &
   Map(const CudaBuffer &cudaBuffer) noexcept = 0;
 
-  virtual std::size_t
+  virtual CategoryBuilder &
   Count(const std::size_t count) noexcept = 0;
 
-  virtual std::size_t
+  virtual CategoryBuilder &
   Keys(const std::size_t keys) noexcept = 0;
 
-  virtual std::size_t
+  virtual CategoryBuilder &
   Size(const std::size_t size) noexcept = 0;
 
-  virtual std::size_t
+  virtual CategoryBuilder &
   BaseAddress(const std::size_t baseAddress) noexcept = 0;
+
+  /// ----------------------------------------------------------------------
+  /// Builders
+  static std::unique_ptr<CategoryBuilder>
+  MakeInHost(blazingdb::uc::Agent &agent);
 
   UC_INTERFACE(CategoryBuilder);
 };
@@ -287,7 +294,7 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<DTypeInfoBuilder>
-  Make();
+  MakeInHost(blazingdb::uc::Agent &agent);
 
   UC_INTERFACE(DTypeInfoBuilder);
 };

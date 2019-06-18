@@ -6,6 +6,8 @@
 #include "inhost/InHostGdfColumnCollector.hpp"
 #include "inhost/InHostGdfColumnDispatcher.hpp"
 #include "inhost/InHostGdfColumnSpecialized.hpp"
+#include "inhost/InHostCategoryBuilder.hpp"
+#include "inhost/InHostDTypeInfoBuilder.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -21,6 +23,16 @@ CudaBuffer::Make(const void *const data, const std::size_t size) {
 std::unique_ptr<HostBuffer>
 HostBuffer::Make(const void *const data, const std::size_t size) {
   return pm::make_unique<HostBuffer, BufferBase, Buffer>(data, size);
+}
+
+std::unique_ptr<DTypeInfoBuilder>
+DTypeInfoBuilder::MakeInHost(blazingdb::uc::Agent &agent) {
+  return std::make_unique<InHostDTypeInfoBuilder>(agent);
+}
+
+std::unique_ptr<CategoryBuilder>
+CategoryBuilder::MakeInHost(blazingdb::uc::Agent &agent) {
+  return std::make_unique<InHostCategoryBuilder>(agent);
 }
 
 std::unique_ptr<GdfColumnBuilder>

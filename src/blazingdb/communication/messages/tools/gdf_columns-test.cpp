@@ -20,6 +20,93 @@
 #include "../SampleToNodeMasterMessage.h"
 
 namespace {
+class CategoryFixture {
+  using CudaBuffer =
+      blazingdb::communication::messages::tools::gdf_columns::CudaBuffer;
+
+public:
+  explicit CategoryFixture(const void *const strs,
+                           const std::size_t strsSize,
+                           const void *const mem,
+                           const std::size_t memSize,
+                           const void *const map,
+                           const std::size_t mapSize,
+                           std::size_t       count,
+                           std::size_t       keys,
+                           std::size_t       size,
+                           std::size_t       base_address)
+      : strs_{CudaBuffer::Make(strs, strsSize)},
+        mem_{CudaBuffer::Make(mem, memSize)},
+        map_{CudaBuffer::Make(map, mapSize)},
+        count_{count},
+        keys_{keys},
+        size_{size},
+        base_address_{base_address} {}
+
+  const CudaBuffer &
+  strs() const noexcept {
+    return *strs_;
+  }
+
+  const CudaBuffer &
+  mem() const noexcept {
+    return *mem_;
+  }
+
+  const CudaBuffer &
+  map() const noexcept {
+    return *map_;
+  }
+
+  std::size_t
+  count() const noexcept {
+    return count_;
+  }
+
+  std::size_t
+  keys() const noexcept {
+    return keys_;
+  }
+
+  std::size_t
+  size() const noexcept {
+    return size_;
+  }
+
+  std::size_t
+  baseAddress() const noexcept {
+    return base_address_;
+  }
+
+  std::unique_ptr<CudaBuffer> strs_;
+  std::unique_ptr<CudaBuffer> mem_;
+  std::unique_ptr<CudaBuffer> map_;
+  std::size_t                 count_;
+  std::size_t                 keys_;
+  std::size_t                 size_;
+  std::size_t                 base_address_;
+};
+
+class DTypeInfoFixture {
+public:
+  explicit DTypeInfoFixture(const std::size_t time_unit,
+                            CategoryFixture & category)
+      : time_unit_{time_unit}, category_{category} {}
+
+  std::size_t
+  timeUnit() const noexcept {
+    return time_unit_;
+  }
+
+  const CategoryFixture &
+  category() const noexcept {
+    return category_;
+  }
+
+  std::size_t      time_unit_;
+  CategoryFixture &category_;
+};
+
 class GdfColumnFixture {
   using CudaBuffer =
       blazingdb::communication::messages::tools::gdf_columns::CudaBuffer;
@@ -35,7 +122,8 @@ public:
                             const std::size_t       size,
                             const std::int_fast32_t dtype,
                             const std::size_t       nullCount,
-                            const std::string       columnName)
+                            const std::string       columnName,
+                            DTypeInfoFixture &      dtypeInfo)
       : data_{CudaBuffer::Make(data, dataSize)},
         valid_{CudaBuffer::Make(valid, validSize)},
         size_{size},
@@ -43,7 +131,8 @@ public:
         nullCount_{nullCount},
         columnNameStr_{columnName},
         columnName_{
-            HostBuffer::Make(columnNameStr_.data(), columnNameStr_.size())} {}
+            HostBuffer::Make(columnNameStr_.data(), columnNameStr_.size())},
+        dtypeInfo_{dtypeInfo} {}
 
   const CudaBuffer &
   data() const noexcept {
@@ -75,6 +164,11 @@ public:
     return *columnName_;
   }
 
+  const DTypeInfoFixture &
+  dtypeInfo() const noexcept {
+    return dtypeInfo_;
+  }
+
 private:
   std::unique_ptr<CudaBuffer> data_;
   std::unique_ptr<CudaBuffer> valid_;
@@ -83,6 +177,7 @@ private:
   std::size_t                 nullCount_;
   std::string                 columnNameStr_;
   std::unique_ptr<HostBuffer> columnName_;
+  DTypeInfoFixture &          dtypeInfo_;
 };
 }  // namespace
 
@@ -105,6 +200,46 @@ CreateCudaSequence(const std::size_t size) {
   return data;
 }
 
+static inline CategoryFixture
+CreateBasicCategoryFixture() {
+  const std::size_t strsSize = 200;
+  const void *const strs     = CreateCudaSequence(strsSize);
+
+  const std::size_t memSize = 100;
+  const void *const mem     = CreateCudaSequence(memSize);
+
+  const std::size_t mapSize = 50;
+  const void *const map     = CreateCudaSequence(mapSize);
+
+  const std::size_t count = 500;
+
+  const std::size_t keys = 10;
+
+  const std::size_t size = 20;
+
+  const std::size_t baseAddress = 0;
+
+  return CategoryFixture{strs,
+                         strsSize,
+                         mem,
+                         memSize,
+                         map,
+                         mapSize,
+                         count,
+                         keys,
+                         size,
+                         baseAddress};
+}
+
+static inline DTypeInfoFixture
+CreateBasicDTypeInfoFixture() {
+  const std::size_t timeUnit = 1;
+
+  CategoryFixture category = CreateBasicCategoryFixture();
+
+  return DTypeInfoFixture{timeUnit, category};
+}
+
 static inline GdfColumnFixture
 CreateBasicGdfColumnFixture() {
   const std::size_t dataSize = 2000;
@@ -121,8 +256,17 @@ CreateBasicGdfColumnFixture() {
 
   const std::string columnName = "ColName";
 
-  return GdfColumnFixture{
-      data, dataSize, valid, validSize, size, dtype, nullCount, columnName};
+  DTypeInfoFixture dtypeInfo = CreateBasicDTypeInfoFixture();
+
+  return GdfColumnFixture{data,
+                          dataSize,
+                          valid,
+                          validSize,
+                          size,
+                          dtype,
+                          nullCount,
+                          columnName,
+                          dtypeInfo};
 }
 
 // Tests for gdf column builder
@@ -173,7 +317,9 @@ public:
 };
 
 TEST(GdfColumnBuilderTest, CheckPayload) {
-  auto fixture = CreateBasicGdfColumnFixture();
+  auto fixture          = CreateBasicGdfColumnFixture();
+  auto categoryFixture  = CreateBasicCategoryFixture();
+  auto dtypeInfoFixture = CreateBasicDTypeInfoFixture();
 
   MockBUCAgent agent;
   EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
@@ -200,8 +346,30 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
         return buffer;
       }));
 
-  using blazingdb::communication::messages::tools::gdf_columns::
-      GdfColumnBuilder;
+  using blazingdb::communication::messages::tools::gdf_columns::CategoryBuilder;
+  auto categoryBuilder = CategoryBuilder::MakeInHost(agent);
+
+  auto categoryPayload = categoryBuilder->Strs(categoryFixture.strs())
+                             .Mem(categoryFixture.mem())
+                             .Map(categoryFixture.map())
+                             .Count(categoryFixture.count())
+                             .Keys(categoryFixture.keys())
+                             .Size(categoryFixture.size())
+                             .BaseAddress(categoryFixture.baseAddress())
+                             .Build();
+
+  using blazingdb::communication::messages::tools::gdf_columns::DTypeInfoBuilder;
+  auto dtypeInfoBuilder = DTypeInfoBuilder::MakeInHost(agent);
+
+  using blazingdb::communication::messages::tools::gdf_columns::CategoryPayload;
+  auto dtypeInfoPayload =
+      dtypeInfoBuilder->TimeUnit(dtypeInfoFixture.timeUnit())
+          //.Category(*static_cast<std::unique_ptr<CategoryPayload>>(
+          //    categoryPayload))
+          .Build();
+
+  using blazingdb::communication::messages::
+                                     tools::gdf_columns::GdfColumnBuilder;
   auto builder = GdfColumnBuilder::MakeInHost(agent);
 
   auto payload = builder->Data(fixture.data())
@@ -210,6 +378,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                      .DType(fixture.dtype())
                      .NullCount(fixture.nullCount())
                      .ColumnName(fixture.columnName())
+                     //.DTypeInfo(*dtypeInfoPayload)
                      .Build();
 
   auto &buffer = payload->Deliver();
@@ -319,9 +488,9 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   AddTo(gdfColumns, 101, 201, 25);
   AddTo(gdfColumns, 102, 202, 50);
 
-  std::string result =
-      blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
-          GdfColumnInfoDummy>(gdfColumns, agent);
+  std::string result = "";
+      // blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
+      //     GdfColumnInfoDummy>(gdfColumns, agent);
 
   BufferForTest resultBuffer(result);
 
