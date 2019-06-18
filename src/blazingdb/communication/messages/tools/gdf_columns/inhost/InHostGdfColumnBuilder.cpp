@@ -77,8 +77,7 @@ InHostGdfColumnBuilder::NullCount(const std::size_t nullCount) noexcept {
 };
 
 GdfColumnBuilder &
-InHostGdfColumnBuilder::DTypeInfo(
-    const Payload &dtypeInfoPayload) noexcept {
+InHostGdfColumnBuilder::DTypeInfo(const Payload &dtypeInfoPayload) noexcept {
   dtypeInfoPayload_ = &dtypeInfoPayload;
   return *this;
 };

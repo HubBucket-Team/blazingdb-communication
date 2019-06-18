@@ -444,6 +444,22 @@ public:
   UC_INTERFACE(GdfColumnSpecialized);
 };
 
+class DTypeInfoSpecialized : public Specialized {
+public:
+  static std::unique_ptr<Specialized>
+  MakeInHost(const Buffer &buffer);
+
+  UC_INTERFACE(DTypeInfoSpecialized);
+};
+
+class CategorySpecialized : public Specialized {
+public:
+  static std::unique_ptr<Specialized>
+  MakeInHost(const Buffer &buffer);
+
+  UC_INTERFACE(CategorySpecialized);
+};
+
 }  // namespace gdf_columns
 }  // namespace tools
 }  // namespace messages

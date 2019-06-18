@@ -24,7 +24,14 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   inhost_iohelpers::Read(istream, begin, &size_);
   inhost_iohelpers::Read(istream, begin, &dtype_);
   inhost_iohelpers::Read(istream, begin, &nullCount_);
-  //inhost_iohelpers::Read(istream, begin, &dtypeInfoPayload_);
+  
+  std::unique_ptr<Buffer>  dtypeInfoBuffer;
+  inhost_iohelpers::Read(istream, begin, &dtypeInfoBuffer);
+
+  auto specialized = DTypeInfoSpecialized::MakeInHost(*dtypeInfoBuffer);
+  auto resultPayload = specialized->Apply();
+  dtypeInfoPayload_ = static_cast<DTypeInfoPayload *>(resultPayload.get());
+
   inhost_iohelpers::Read(istream, begin, &columnNameBuffer_);
 }
 

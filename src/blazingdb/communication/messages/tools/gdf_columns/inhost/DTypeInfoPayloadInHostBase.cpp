@@ -1,4 +1,5 @@
 #include "DTypeInfoPayloadInHostBase.hpp"
+#include "CategoryPayloadInHostBase.hpp"
 
 #include "../buffers/StringBuffer.hpp"
 
@@ -20,7 +21,13 @@ DTypeInfoPayloadInHostBase::DTypeInfoPayloadInHostBase(const Buffer& buffer)
       reinterpret_cast<std::istream::streamoff>(buffer_.Data()));
 
   inhost_iohelpers::Read(istream, begin, &timeUnit_);
-  //inhost_iohelpers::Read(istream, begin, &categoryPayload_);
+
+  std::unique_ptr<Buffer> categoryBuffer;
+  inhost_iohelpers::Read(istream, begin, &categoryBuffer);
+
+  auto specialized = CategorySpecialized::MakeInHost(*categoryBuffer);
+  auto resultPayload = specialized->Apply();
+  categoryPayload_ = static_cast<CategoryPayload *>(resultPayload.get());
 }
 
 std::int_fast32_t
