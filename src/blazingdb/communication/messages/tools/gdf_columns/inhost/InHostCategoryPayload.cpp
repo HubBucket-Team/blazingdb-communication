@@ -1,4 +1,4 @@
-#include "InHostGdfColumnPayload.hpp"
+#include "InHostCategoryPayload.hpp"
 
 #include "../buffers/StringBuffer.hpp"
 
@@ -8,9 +8,9 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-InHostGdfColumnPayload::InHostGdfColumnPayload(const std::string&& content)
+InHostCategoryPayload::InHostCategoryPayload(const std::string&& content)
     : ActualBufferMixIn{std::make_unique<StringBuffer>(std::move(content))},
-      GdfColumnPayloadInHostBase{buffer()} {}
+      CategoryPayloadInHostBase{buffer()} {}
 
 }  // namespace gdf_columns
 }  // namespace tools

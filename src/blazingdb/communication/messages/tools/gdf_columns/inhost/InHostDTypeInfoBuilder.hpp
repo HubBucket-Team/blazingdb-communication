@@ -28,7 +28,7 @@ public:
 
 private:
   std::int_fast32_t timeUnit_;
-  CategoryPayload &  categoryPayload_;
+  const CategoryPayload *  categoryPayload_;
 
   blazingdb::uc::Agent &agent_;
 };

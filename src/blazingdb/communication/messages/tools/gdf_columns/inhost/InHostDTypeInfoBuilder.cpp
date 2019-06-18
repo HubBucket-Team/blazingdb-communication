@@ -41,6 +41,7 @@ InHostDTypeInfoBuilder::TimeUnit(const std::int_fast32_t timeUnit) noexcept {
 DTypeInfoBuilder &
 InHostDTypeInfoBuilder::Category(
     const CategoryPayload &categoryPayload) noexcept {
+  categoryPayload_ = &categoryPayload;
   return *this;
 };
 
