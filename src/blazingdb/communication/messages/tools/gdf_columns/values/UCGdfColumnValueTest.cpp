@@ -10,6 +10,12 @@
 
 using namespace blazingdb::communication::messages::tools::gdf_columns;
 
+class UC_NOEXPORT MockMemoryRuntime : public MemoryRuntime {
+public:
+  MOCK_METHOD1(Allocate, void *(const std::size_t));
+  MOCK_METHOD0(Synchronize, void());
+};
+
 class MockGdfColumnPayload : public GdfColumnPayload {
 public:
   MOCK_CONST_METHOD0_NE(Deliver, const Buffer &());
@@ -23,20 +29,31 @@ public:
 };
 
 TEST(UCGdfColumnValueTest, MakeValue) {
+  std::unique_ptr<MockMemoryRuntime> memoryRuntime =
+      std::make_unique<MockMemoryRuntime>();
+  {
+    testing::InSequence inSequence;
+    EXPECT_CALL(*memoryRuntime, Allocate(testing::_))
+        .WillOnce(testing::Return(reinterpret_cast<void *const>(111)));
+    EXPECT_CALL(*memoryRuntime, Allocate(testing::_))
+        .WillOnce(testing::Return(reinterpret_cast<void *const>(222)));
+  }
+  EXPECT_CALL(*memoryRuntime, Synchronize).WillRepeatedly(testing::Return());
+
   MockGdfColumnPayload gdfColumnPayload;
   EXPECT_CALL(gdfColumnPayload, Deliver)
       .WillRepeatedly(testing::ReturnPointee(std::make_shared<NullBuffer>()));
   EXPECT_CALL(gdfColumnPayload, Data)
       .WillRepeatedly(
           testing::ReturnPointeeCast<UCBuffer>(std::make_shared<ViewBuffer>(
-              reinterpret_cast<const void *const>(111), 1)));
+              reinterpret_cast<const void *const>(-1), 1)));
   EXPECT_CALL(gdfColumnPayload, Valid)
       .WillRepeatedly(
           testing::ReturnPointeeCast<UCBuffer>(std::make_shared<ViewBuffer>(
-              reinterpret_cast<const void *const>(222), 2)));
-  EXPECT_CALL(gdfColumnPayload, Size).WillRepeatedly(testing::Return(444));
-  EXPECT_CALL(gdfColumnPayload, DType).WillRepeatedly(testing::Return(555));
-  EXPECT_CALL(gdfColumnPayload, NullCount).WillRepeatedly(testing::Return(666));
+              reinterpret_cast<const void *const>(-1), 2)));
+  EXPECT_CALL(gdfColumnPayload, Size).WillRepeatedly(testing::Return(333));
+  EXPECT_CALL(gdfColumnPayload, DType).WillRepeatedly(testing::Return(444));
+  EXPECT_CALL(gdfColumnPayload, NullCount).WillRepeatedly(testing::Return(555));
 
   MockUCAgent ucAgent;
   EXPECT_CALL(ucAgent, Register(testing::_, testing::_))
@@ -55,10 +72,12 @@ TEST(UCGdfColumnValueTest, MakeValue) {
         return ucBuffer;
       }));
 
-  auto gdfColumnValue = GdfColumnValue::Make(gdfColumnPayload, ucAgent);
+  auto gdfColumnValue = std::make_unique<UCGdfColumnValue>(
+      std::move(memoryRuntime), gdfColumnPayload, ucAgent);
 
-  // TODO(improve): cuda behavior
-  EXPECT_EQ(444, gdfColumnValue->size());
-  EXPECT_EQ(555, gdfColumnValue->dtype());
-  EXPECT_EQ(666, gdfColumnValue->null_count());
+  EXPECT_EQ(111, reinterpret_cast<std::intptr_t>(gdfColumnValue->data()));
+  EXPECT_EQ(222, reinterpret_cast<std::intptr_t>(gdfColumnValue->valid()));
+  EXPECT_EQ(333, gdfColumnValue->size());
+  EXPECT_EQ(444, gdfColumnValue->dtype());
+  EXPECT_EQ(555, gdfColumnValue->null_count());
 }

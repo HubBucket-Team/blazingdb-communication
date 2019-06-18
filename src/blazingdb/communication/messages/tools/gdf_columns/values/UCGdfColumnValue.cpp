@@ -14,26 +14,21 @@ namespace gdf_columns {
 namespace {
 
 static UC_INLINE const void*
-Malloc(const std::size_t size) {
-  void* buffer;
-
-  cudaError_t cudaStatus = cudaMalloc(&buffer, size);
-  assert(cudaSuccess == cudaStatus);
-
-  cudaStatus = cudaDeviceSynchronize();
-  assert(cudaSuccess == cudaStatus);
-
-  return buffer;
+Reserve(std::unique_ptr<MemoryRuntime>& memoryRuntime, const std::size_t size) {
+  const void* data = memoryRuntime->Allocate(size);
+  memoryRuntime->Synchronize();
+  return data;
 }
 
 static UC_INLINE const void*
-LinkThrough(blazingdb::uc::Agent&                   agent,
+LinkThrough(std::unique_ptr<MemoryRuntime>&         memoryRuntime,
+            blazingdb::uc::Agent&                   agent,
             const Buffer&                           buffer,
             const std::size_t                       size,
             std::unique_ptr<blazingdb::uc::Buffer>& outputUcBuffer) {
   if (nullptr == buffer.Data()) { return nullptr; }
 
-  const void* data = Malloc(size);
+  const void* data = Reserve(memoryRuntime, size);
 
   outputUcBuffer = agent.Register(data, size);
 
@@ -47,14 +42,17 @@ LinkThrough(blazingdb::uc::Agent&                   agent,
 
 }  // namespace
 
-UCGdfColumnValue::UCGdfColumnValue(const GdfColumnPayload& gdfColumnPayload,
+UCGdfColumnValue::UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
+                                   const GdfColumnPayload& gdfColumnPayload,
                                    blazingdb::uc::Agent&   agent)
     : gdfColumnPayload_{gdfColumnPayload},
-      data_{LinkThrough(agent,
+      data_{LinkThrough(memoryRuntime,
+                        agent,
                         gdfColumnPayload.Data(),
                         gdfColumnPayload.Size() * 8,  // TODO: calculate
                         dataUcBuffer_)},
       valid_{LinkThrough(
+          memoryRuntime,
           agent,
           gdfColumnPayload.Valid(),
           std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate

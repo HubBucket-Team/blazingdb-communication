@@ -8,6 +8,7 @@
 #include "inhost/InHostGdfColumnSpecialized.hpp"
 
 #include "values/UCGdfColumnValue.hpp"
+#include "values/interfaces.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -28,7 +29,8 @@ HostBuffer::Make(const void *const data, const std::size_t size) {
 std::unique_ptr<GdfColumnValue>
 GdfColumnValue::Make(const GdfColumnPayload &gdfColumnPayload,
                      blazingdb::uc::Agent &  agent) {
-  return std::make_unique<UCGdfColumnValue>(gdfColumnPayload, agent);
+  return std::make_unique<UCGdfColumnValue>(
+      MemoryRuntime::MakeCuda(), gdfColumnPayload, agent);
 }
 
 std::unique_ptr<GdfColumnBuilder>

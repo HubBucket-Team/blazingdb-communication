@@ -5,6 +5,8 @@
 
 #include <blazingdb/uc/internal/macros.hpp>
 
+#include "interfaces.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -15,8 +17,9 @@ class UC_NOEXPORT UCGdfColumnValue : public GdfColumnValue {
   UC_CONCRETE(UCGdfColumnValue);
 
 public:
-  explicit UCGdfColumnValue(const GdfColumnPayload& gdfColumnPayload,
-                            blazingdb::uc::Agent&   agent);
+  explicit UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
+                            const GdfColumnPayload&        gdfColumnPayload,
+                            blazingdb::uc::Agent&          agent);
 
   const void*
   data() const noexcept final;
