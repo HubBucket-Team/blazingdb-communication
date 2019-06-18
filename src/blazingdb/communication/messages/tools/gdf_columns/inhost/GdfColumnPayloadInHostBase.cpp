@@ -24,6 +24,7 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   inhost_iohelpers::Read(istream, begin, &size_);
   inhost_iohelpers::Read(istream, begin, &dtype_);
   inhost_iohelpers::Read(istream, begin, &nullCount_);
+  //inhost_iohelpers::Read(istream, begin, &dtypeInfoPayload_);
   inhost_iohelpers::Read(istream, begin, &columnNameBuffer_);
 }
 

@@ -25,7 +25,7 @@ InHostDTypeInfoBuilder::Build() const noexcept {
 
   inhost_iohelpers::Write(ostream, timeUnit_);
 
-  //inhost_iohelpers::Write(ostream, *categoryPayload_);
+  inhost_iohelpers::Write(ostream, *categoryPayload_);
 
   ostream.flush();
   std::string content = ostream.str();

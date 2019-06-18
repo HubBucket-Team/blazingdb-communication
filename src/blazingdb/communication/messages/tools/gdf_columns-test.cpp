@@ -407,6 +407,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
 
+  EXPECT_EQ(fixture.dtypeInfo().timeUnit(), gdfColumnPayload.DTypeInfo().TimeUnit());
+
   EXPECT_EQ(7, gdfColumnPayload.ColumnName().Size());
   EXPECT_FALSE(std::memcmp("ColName", gdfColumnPayload.ColumnName().Data(), 7));
 
