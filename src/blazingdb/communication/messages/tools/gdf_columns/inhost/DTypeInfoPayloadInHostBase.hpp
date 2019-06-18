@@ -20,7 +20,7 @@ public:
   std::int_fast32_t
   TimeUnit() const noexcept final;
 
-  CategoryPayload&
+  const CategoryPayload&
   Category() const noexcept final;
 
   const Buffer&
@@ -30,6 +30,7 @@ private:
   const Buffer& buffer_;
 
   const std::int_fast32_t* timeUnit_;
+  const CategoryPayload*   categoryPayload_;
 };
 
 }  // namespace gdf_columns

@@ -125,7 +125,7 @@ public:
   virtual std::int_fast32_t
   TimeUnit() const noexcept = 0;
 
-  virtual CategoryPayload &
+  virtual const CategoryPayload &
   Category() const noexcept = 0;
 
   UC_INTERFACE(DTypeInfoPayload);

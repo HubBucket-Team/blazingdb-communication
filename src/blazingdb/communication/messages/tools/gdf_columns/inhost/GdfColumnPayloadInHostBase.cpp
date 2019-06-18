@@ -54,8 +54,6 @@ GdfColumnPayloadInHostBase::NullCount() const noexcept {
 
 DTypeInfoPayload&
 GdfColumnPayloadInHostBase::DTypeInfo() const noexcept {
-  static DTypeInfoPayload* dtypeInfoPayload_;
-  UC_ABORT("Not support");
   return *dtypeInfoPayload_;
 }
 

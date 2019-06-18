@@ -47,6 +47,7 @@ private:
   std::size_t       size_;
   std::int_fast32_t dtype_;
   std::size_t       nullCount_;
+  const Payload *   dtypeInfoPayload_;
   const HostBuffer *columnNameHostBuffer_;
 
   blazingdb::uc::Agent &agent_;
