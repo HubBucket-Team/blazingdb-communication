@@ -9,6 +9,8 @@
 #include "inhost/InHostCategoryBuilder.hpp"
 #include "inhost/InHostDTypeInfoBuilder.hpp"
 
+#include "values/UCGdfColumnValue.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -33,6 +35,12 @@ DTypeInfoBuilder::MakeInHost(blazingdb::uc::Agent &agent) {
 std::unique_ptr<CategoryBuilder>
 CategoryBuilder::MakeInHost(blazingdb::uc::Agent &agent) {
   return std::make_unique<InHostCategoryBuilder>(agent);
+}
+
+std::unique_ptr<GdfColumnValue>
+GdfColumnValue::Make(const GdfColumnPayload &gdfColumnPayload,
+                     blazingdb::uc::Agent &  agent) {
+  return std::make_unique<UCGdfColumnValue>(gdfColumnPayload, agent);
 }
 
 std::unique_ptr<GdfColumnBuilder>
