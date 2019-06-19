@@ -404,7 +404,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
 
-  EXPECT_EQ(fixture.dtypeInfo().timeUnit(), gdfColumnPayload.DTypeInfo().TimeUnit());
+  EXPECT_EQ(fixture.dtypeInfo().timeUnit(),
+            gdfColumnPayload.DTypeInfo().TimeUnit());
 
   EXPECT_EQ(7, gdfColumnPayload.ColumnName().Size());
   EXPECT_FALSE(std::memcmp("ColName", gdfColumnPayload.ColumnName().Data(), 7));
@@ -416,18 +417,25 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
 class gdf_column {
 public:
-  void *      data;
-  void *      valid;
-  std::size_t size;
+  const void *            data;
+  const void *            valid;
+  std::size_t       size;
+  std::int_fast32_t dtype;
+  std::size_t       null_count;
 };
 
 static inline void
 AddTo(std::vector<gdf_column> &gdfColumns,
       std::uintptr_t           data,
       std::uintptr_t           valid,
-      std::size_t              size) {
-  gdfColumns.push_back(gdf_column{
-      reinterpret_cast<void *>(data), reinterpret_cast<void *>(valid), size});
+      std::size_t              size,
+      std::int_fast32_t        dtype,
+      std::size_t              null_count) {
+  gdfColumns.push_back(gdf_column{reinterpret_cast<void *>(data),
+                                  reinterpret_cast<void *>(valid),
+                                  size,
+                                  dtype,
+                                  null_count});
 }
 
 template <class gdf_column>
@@ -483,13 +491,13 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
       }));
 
   std::vector<gdf_column> gdfColumns;
-  AddTo(gdfColumns, 100, 200, 10);
-  AddTo(gdfColumns, 101, 201, 25);
-  AddTo(gdfColumns, 102, 202, 50);
+  AddTo(gdfColumns, 100, 200, 10, 1, 0);
+  AddTo(gdfColumns, 101, 201, 25, 2, 5);
+  AddTo(gdfColumns, 102, 202, 50, 3, 10);
 
-  std::string result = "";
-      // blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
-      //     GdfColumnInfoDummy>(gdfColumns, agent);
+  std::string result =
+      blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
+          GdfColumnInfoDummy>(gdfColumns, agent);
 
   BufferForTest resultBuffer(result);
 
@@ -512,5 +520,8 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   EXPECT_EQ(50,
             static_cast<const GdfColumnPayload &>(collector->Get(2)).Size());
 
-  // TODO: support diferent sizes in collector
+  blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
+      gdf_column>(result, agent);
+
+  // TODO(in progress): check collect from result
 }

@@ -33,13 +33,17 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
         gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn));
     const std::unique_ptr<const CudaBuffer> validBuffer = CudaBuffer::Make(
         gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn));
-    const std::size_t size = gdfColumn.size;
+    const std::size_t       size      = gdfColumn.size;
+    const std::int_fast32_t dtype     = gdfColumn.dtype;
+    const std::size_t       nullCount = gdfColumn.null_count;
 
-    // TODO: support different buffer sizes (of payloads) in
-    // GdfColumnCollector
-
-    payloads.emplace_back(
-        builder->Data(*dataBuffer).Valid(*validBuffer).Size(size).Build());
+    // TODO(potential bug): optional setters
+    payloads.emplace_back(builder->Data(*dataBuffer)
+                              .Valid(*validBuffer)
+                              .Size(size)
+                              .DType(dtype)
+                              .NullCount(nullCount)
+                              .Build());
 
     collector->Add(*payloads.back());
   }
@@ -87,15 +91,18 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  // for (Collector::iterator it = collector->begin(); it != collector->end();
-  //++it) {
-  // GdfColumnPayload &payload = *it;
+  for (const Payload &payload : *collector) {
+    std::unique_ptr<GdfColumnValue> gdfColumnValue = GdfColumnValue::Make(
+        static_cast<const GdfColumnPayload &>(payload), agent);
 
-  // gdf_column col{.data  = payload.Data().Data(),
-  //.valid = payload.Valid().Data(),
-  //.size  = payload.Size()};
-  // gdfColumns.push_back(col);
-  //}
+    const gdf_column col{
+        gdfColumnValue->data(),
+        gdfColumnValue->valid(),
+        gdfColumnValue->size(),
+    };
+
+    gdfColumns.push_back(col);
+  }
 
   return gdfColumns;
 }

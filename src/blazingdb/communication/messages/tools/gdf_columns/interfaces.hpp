@@ -336,6 +336,8 @@ public:
 /// Collectors
 
 class Collector {
+  UC_INTERFACE(Collector);
+
 public:
   // collection
 
@@ -357,45 +359,45 @@ public:
     return Get(index);
   }
 
-  class iterator {
-    const Collector &collector_;
-    size_t           index_;
-
+  class Iterator {
   public:
-    iterator(const Collector &c) : collector_(c), index_(0) {}
-    iterator(const Collector &c, size_t size) : collector_(c), index_(size) {}
+    UC_INLINE constexpr explicit Iterator(const Collector & collector,
+                                          const std::size_t index)
+        : collector_{collector}, index_{index} {}
 
-    void
+    UC_INLINE constexpr explicit Iterator(const Collector &collector)
+        : Iterator{collector, 0} {}
+
+    UC_INLINE constexpr Iterator &
     operator++() {
-      index_++;
+      ++index_;
+      return *this;
     }
 
-    void
-    operator--() {
-      index_--;
-    }
-
-    bool
-    operator!=(const iterator &other) {
+    UC_INLINE constexpr bool
+    operator!=(const Iterator &other) {
       return index_ != other.index_;
     }
 
-    const Payload &operator*() { return collector_.Get(index_); }
+    UC_INLINE const Payload &operator*() const {
+      // TODO(improve): to constexpr
+      return collector_[index_];
+    }
+
+  private:
+    const Collector &collector_;
+    std::size_t      index_;
   };
 
-  iterator
-  begin() {
-    iterator it(*this);
-    return it;
+  Iterator
+  begin() noexcept {
+    return Iterator{*this};
   }
 
-  iterator
-  end() {
-    iterator it(*this, this->Length());
-    return it;
+  Iterator
+  end() noexcept {
+    return Iterator{*this, Length()};
   }
-
-  UC_INTERFACE(Collector);
 };
 
 class GdfColumnCollector : public Collector {

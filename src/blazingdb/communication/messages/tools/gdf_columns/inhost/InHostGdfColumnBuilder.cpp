@@ -35,9 +35,10 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   inhost_iohelpers::Write(ostream, nullCount_);
 
-  inhost_iohelpers::Write(ostream, *dtypeInfoPayload_);
+  // TODO(bug): see #GdfColumnPayloadInHostBase
+  // inhost_iohelpers::Write(ostream, *dtypeInfoPayload_);
 
-  inhost_iohelpers::Write(ostream, *columnNameHostBuffer_);
+  // inhost_iohelpers::Write(ostream, *columnNameHostBuffer_);
 
   ostream.flush();
   std::string content = ostream.str();

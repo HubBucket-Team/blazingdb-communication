@@ -41,16 +41,14 @@ public:
     }
   }
 
-  std::unique_ptr<Buffer>
-  Collect() const noexcept final {
+  UC_NORETURN std::unique_ptr<Buffer>
+              Collect() const noexcept final {
     UC_ABORT("Not supported");
-    return nullptr;
   }
 
-  Collector &
-  Add(const Payload &) noexcept final {
+  UC_NORETURN Collector &
+              Add(const Payload &) noexcept final {
     UC_ABORT("Not supported");
-    return *this;
   }
 
   std::size_t
