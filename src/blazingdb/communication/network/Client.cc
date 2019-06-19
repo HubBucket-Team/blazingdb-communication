@@ -47,8 +47,6 @@ public:
         concreteAddress->ip() + ":" + std::to_string(concreteAddress->communication_port());
 
     
-    std::cout << "AAAAAAAAAAA->>>>> " << serverPortPath << std::endl;
-    
     HttpClient httpClient{serverPortPath};
 
     std::map<std::string, std::string> headers{{"json_data", data}};
@@ -76,9 +74,6 @@ public:
         const std::string head_json = message->serializeToJson();
         const std::string body_binary = message->serializeToBinary();
 
-        std::cout << "BBBBB ->>>>> " << head_json << std::endl;
-
-        
         std::map<std::string, std::string> headers{{"json_data", head_json}};
 
         return sendPost(httpClient, message->getMessageTokenValue(), headers, body_binary);

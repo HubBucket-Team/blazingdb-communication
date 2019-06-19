@@ -95,9 +95,6 @@ public:
                 // get message data
                 const std::string json_data = request->header.find("json_data")->second;
                 
-                
-                std::cout << "CCC ->>>>> " << json_data << std::endl;
-                
                 const std::string binary_data = request->content.string();
 
                 // create message
