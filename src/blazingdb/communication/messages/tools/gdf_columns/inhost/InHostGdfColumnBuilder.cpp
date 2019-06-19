@@ -1,6 +1,7 @@
 #include "InHostGdfColumnBuilder.hpp"
 #include "InHostGdfColumnIOHelpers.hpp"
 
+#include <cassert>
 #include <cstring>
 
 #include "InHostGdfColumnPayload.hpp"
@@ -12,10 +13,26 @@ namespace tools {
 namespace gdf_columns {
 
 InHostGdfColumnBuilder::InHostGdfColumnBuilder(blazingdb::uc::Agent &agent)
-    : agent_{agent} {}
+    : dataCudaBuffer_{nullptr},
+      validCudaBuffer_{nullptr},
+      size_{std::numeric_limits<std::size_t>::max()},
+      dtype_{std::numeric_limits<std::int_fast32_t>::max()},
+      nullCount_{std::numeric_limits<std::size_t>::max()},
+      dtypeInfoPayload_{nullptr},
+      columnNameHostBuffer_{nullptr},
+      agent_{agent} {}
 
 std::unique_ptr<Payload>
 InHostGdfColumnBuilder::Build() const noexcept {
+  assert(nullptr != dataCudaBuffer_);
+  assert(nullptr != validCudaBuffer_);
+  assert(std::numeric_limits<std::size_t>::max() != size_);
+  assert(std::numeric_limits<std::int_fast32_t>::max() != dtype_);
+  assert(std::numeric_limits<std::size_t>::max() != nullCount_);
+  // TODO(support):
+  // assert(nullptr != dtypeInfoPayload_);
+  // assert(nullptr != columnNameHostBuffer_);
+
   std::ostringstream ostream;
 
   using BUBuffer = blazingdb::uc::Buffer;

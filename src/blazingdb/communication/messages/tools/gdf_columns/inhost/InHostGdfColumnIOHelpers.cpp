@@ -45,6 +45,18 @@ StreamBuffer::data() const noexcept {
 /// ----------------------------------------------------------------------
 /// Read functions
 
+static UC_INLINE const void *
+CarryDataFrom(std::istream &               istream,
+              const std::istream::pos_type begin,
+              const std::size_t            size) {
+  if (0 == size) {
+    return nullptr;
+  } else {
+    const std::istream::streamoff streamoff = begin + istream.tellg();
+    return reinterpret_cast<const void *const>(streamoff);
+  }
+}
+
 void UC_NOEXPORT
      Read(std::istream &               istream,
           const std::istream::pos_type begin,
@@ -54,8 +66,7 @@ void UC_NOEXPORT
   std::size_t size;
   istream.read(static_cast<char *>(static_cast<void *>(&size)), sizePtrDiff);
 
-  const std::istream::streamoff streamoff = begin + istream.tellg();
-  const void *const data = reinterpret_cast<const void *const>(streamoff);
+  const void *const data = CarryDataFrom(istream, begin, size);
 
   istream.seekg(size, std::ios_base::cur);
 
@@ -114,17 +125,22 @@ std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
                                        Write(std::ostream &        ostream,
                                              blazingdb::uc::Agent &agent,
                                              const CudaBuffer &    cudaBuffer) {
-  using blazingdb::uc::Buffer;
-  using SerializedRecord = blazingdb::uc::Record::Serialized;
+  if (cudaBuffer.IsNull()) {
+    Write(ostream, static_cast<std::size_t>(0));
+    return nullptr;
+  } else {
+    using blazingdb::uc::Buffer;
+    using SerializedRecord = blazingdb::uc::Record::Serialized;
 
-  const void *            pointer = cudaBuffer.Data();
-  std::unique_ptr<Buffer> buffer = agent.Register(pointer, cudaBuffer.Size());
-  std::unique_ptr<const SerializedRecord> serializedRecord =
-      buffer->SerializedRecord();
+    const void *            pointer = cudaBuffer.Data();
+    std::unique_ptr<Buffer> buffer = agent.Register(pointer, cudaBuffer.Size());
+    std::unique_ptr<const SerializedRecord> serializedRecord =
+        buffer->SerializedRecord();
 
-  Write(ostream, *serializedRecord);
+    Write(ostream, *serializedRecord);
 
-  return buffer;
+    return buffer;
+  }
 }
 
 #define IOHELPERS_FACTORY(T)                                                   \
