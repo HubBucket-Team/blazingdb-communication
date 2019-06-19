@@ -95,13 +95,11 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
     std::unique_ptr<GdfColumnValue> gdfColumnValue = GdfColumnValue::Make(
         static_cast<const GdfColumnPayload &>(payload), agent);
 
-    const gdf_column col{
+    gdfColumns.emplace_back(gdf_column{
         gdfColumnValue->data(),
         gdfColumnValue->valid(),
         gdfColumnValue->size(),
-    };
-
-    gdfColumns.push_back(col);
+    });
   }
 
   return gdfColumns;

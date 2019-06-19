@@ -312,6 +312,11 @@ public:
   MOCK_CONST_METHOD0(SizeMember, std::size_t());
 };
 
+class MockBUCTransport : public blazingdb::uc::Transport {
+public:
+  MOCK_METHOD0(Get, std::future<void>());
+};
+
 TEST(GdfColumnBuilderTest, CheckPayload) {
   auto categoryFixture  = CreateBasicCategoryFixture();
   auto dtypeInfoFixture = CreateBasicDTypeInfoFixture(categoryFixture);
@@ -417,8 +422,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
 class gdf_column {
 public:
-  const void *            data;
-  const void *            valid;
+  const void *      data;
+  const void *      valid;
   std::size_t       size;
   std::int_fast32_t dtype;
   std::size_t       null_count;
@@ -487,6 +492,15 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
                   .WillRepeatedly(::testing::Return(5));
               return serialized;
             }));
+        EXPECT_CALL(*buffer, Link(::testing::_))
+            .WillRepeatedly(::testing::InvokeWithoutArgs([]() {
+              std::unique_ptr<MockBUCTransport> transport =
+                  std::make_unique<MockBUCTransport>();
+              EXPECT_CALL(*transport, Get)
+                  .WillRepeatedly(::testing::InvokeWithoutArgs(
+                      []() { return std::async([]() {}); }));
+              return transport;
+            }));
         return buffer;
       }));
 
@@ -520,8 +534,11 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   EXPECT_EQ(50,
             static_cast<const GdfColumnPayload &>(collector->Get(2)).Size());
 
-  blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
-      gdf_column>(result, agent);
+  std::vector<gdf_column> gdf_columns =
+      blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
+          gdf_column>(result, agent);
 
-  // TODO(in progress): check collect from result
+  EXPECT_EQ(10, gdf_columns[0].size);
+  EXPECT_EQ(25, gdf_columns[1].size);
+  EXPECT_EQ(50, gdf_columns[2].size);
 }
