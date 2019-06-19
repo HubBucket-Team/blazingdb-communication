@@ -1,5 +1,9 @@
 #include "../../gdf_columns.h"
 
+#include "InHostCategoryBuilder.hpp"
+
+#include "InHostCategoryPayload.hpp"
+
 #include <cstring>
 
 #include <cuda_runtime_api.h>
@@ -172,7 +176,7 @@ public:
 };
 
 TEST(CategoryBuilderTest, CheckPayload) {
-  auto categoryFixture  = CreateBasicCategoryFixture();
+  auto categoryFixture = CreateBasicCategoryFixture();
 
   MockBUCAgent agent;
   EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
@@ -199,32 +203,23 @@ TEST(CategoryBuilderTest, CheckPayload) {
         return buffer;
       }));
 
-  using blazingdb::communication::messages::tools::gdf_columns::CategoryBuilder;
-  auto categoryBuilder = CategoryBuilder::MakeInHost(agent);
+  using blazingdb::communication::messages::tools::gdf_columns::
+      InHostCategoryBuilder;
+  InHostCategoryBuilder categoryBuilder{agent};
 
-  auto payload = categoryBuilder->Strs(categoryFixture.strs())
-                             .Mem(categoryFixture.mem())
-                             .Map(categoryFixture.map())
-                             .Count(categoryFixture.count())
-                             .Keys(categoryFixture.keys())
-                             .Size(categoryFixture.size())
-                             .BaseAddress(categoryFixture.baseAddress())
-                             .Build();
-
-  auto &buffer = payload->Deliver();
+  auto payload = categoryBuilder.Strs(categoryFixture.strs())
+                     .Mem(categoryFixture.mem())
+                     .Map(categoryFixture.map())
+                     .Count(categoryFixture.count())
+                     .Keys(categoryFixture.keys())
+                     .Size(categoryFixture.size())
+                     .BaseAddress(categoryFixture.baseAddress())
+                     .Build();
 
   using blazingdb::communication::messages::tools::gdf_columns::
-      CategorySpecialized;
-  auto specialized = CategorySpecialized::MakeInHost(buffer);
+      InHostCategoryPayload;
 
-  using blazingdb::communication::messages::tools::gdf_columns::
-      CategoryPayload;
-  auto resultPayload = specialized->Apply();
-
-  const CategoryPayload &categoryPayload =
-      *static_cast<CategoryPayload *>(resultPayload.get());
-
-  EXPECT_EQ(buffer.Size(), categoryPayload.Deliver().Size());
+  auto &categoryPayload = static_cast<const InHostCategoryPayload &>(*payload);
 
   EXPECT_EQ(5, categoryPayload.Strs().Size());
   EXPECT_FALSE(std::memcmp("12345", categoryPayload.Strs().Data(), 5));
