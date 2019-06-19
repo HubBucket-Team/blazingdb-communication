@@ -1,9 +1,10 @@
 #include "InHostDTypeInfoBuilder.hpp"
-#include "InHostGdfColumnIOHelpers.hpp"
 
 #include <cstring>
 
+#include "../payloads/BlankPayload.hpp"
 #include "InHostDTypeInfoPayload.hpp"
+#include "InHostGdfColumnIOHelpers.hpp"
 
 namespace blazingdb {
 namespace communication {
@@ -12,7 +13,9 @@ namespace tools {
 namespace gdf_columns {
 
 InHostDTypeInfoBuilder::InHostDTypeInfoBuilder(blazingdb::uc::Agent &agent)
-    : agent_{agent} {}
+    : timeUnit_{std::numeric_limits<std::int_fast32_t>::max()},
+      categoryPayload_{&BlankPayload::Payload()},
+      agent_{agent} {}
 
 std::unique_ptr<Payload>
 InHostDTypeInfoBuilder::Build() const noexcept {
@@ -20,11 +23,7 @@ InHostDTypeInfoBuilder::Build() const noexcept {
 
   using BUBuffer = blazingdb::uc::Buffer;
 
-  // Writing may generate blazingdb-uc descriptors
-  // TODO: each Write should be return a ticket about resouces ownership
-
   inhost_iohelpers::Write(ostream, timeUnit_);
-
   inhost_iohelpers::Write(ostream, *categoryPayload_);
 
   ostream.flush();
@@ -41,8 +40,7 @@ InHostDTypeInfoBuilder::TimeUnit(const std::int_fast32_t timeUnit) noexcept {
 };
 
 DTypeInfoBuilder &
-InHostDTypeInfoBuilder::Category(
-    const Payload &categoryPayload) noexcept {
+InHostDTypeInfoBuilder::Category(const Payload &categoryPayload) noexcept {
   categoryPayload_ = &categoryPayload;
   return *this;
 };

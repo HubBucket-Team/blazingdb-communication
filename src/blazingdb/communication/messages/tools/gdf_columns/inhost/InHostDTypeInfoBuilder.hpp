@@ -27,8 +27,8 @@ public:
   Category(const Payload &categoryPayload) noexcept final;
 
 private:
-  std::int_fast32_t      timeUnit_;
-  const Payload *categoryPayload_;
+  std::int_fast32_t timeUnit_;
+  const Payload *   categoryPayload_;
 
   blazingdb::uc::Agent &agent_;
 };
