@@ -50,6 +50,11 @@ class HostBuffer : public NullableBuffer {
 public:
   static std::unique_ptr<HostBuffer>
   Make(const void *const data, const std::size_t size);
+
+  static UC_INLINE constexpr const HostBuffer &
+  From(const NullableBuffer &buffer) noexcept {
+    return static_cast<const HostBuffer &>(buffer);
+  }
 };
 
 class CudaBuffer : public NullableBuffer {
@@ -58,14 +63,20 @@ class CudaBuffer : public NullableBuffer {
 public:
   static std::unique_ptr<CudaBuffer>
   Make(const void *const data, const std::size_t size);
+
+  static UC_INLINE constexpr const CudaBuffer &
+  From(const NullableBuffer &buffer) noexcept {
+    return static_cast<const CudaBuffer &>(buffer);
+  }
 };
 
 class UCBuffer : public HostBuffer {
   UC_INTERFACE(UCBuffer);
 
 public:
-  static UC_INLINE const UCBuffer &
-                         From(const Buffer &buffer) noexcept {
+  // TODO(api): move to nullable
+  static UC_INLINE constexpr const UCBuffer &
+  From(const Buffer &buffer) noexcept {
     return static_cast<const UCBuffer &>(buffer);
   }
 };

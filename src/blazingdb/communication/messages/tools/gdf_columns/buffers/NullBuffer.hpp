@@ -25,6 +25,9 @@ public:
 
   bool
   IsNull() const noexcept final;
+
+  static const NullBuffer&
+  Buffer() noexcept;
 };
 
 }  // namespace gdf_columns

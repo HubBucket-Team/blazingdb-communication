@@ -46,6 +46,7 @@ blazingdb_artifact (
     messages/tools/gdf_columns/inhost/InHostGdfColumnSpecialized.cpp
     messages/tools/gdf_columns/inhost/InHostDTypeInfoSpecialized.cpp
     messages/tools/gdf_columns/inhost/InHostCategorySpecialized.cpp
+    messages/tools/gdf_columns/payloads/BlankPayload.cpp
     messages/tools/gdf_columns/values/UCGdfColumnValue.cpp
     messages/tools/gdf_columns/values/interfaces.cpp
     messages/tools/gdf_columns/values/CudaMemoryRuntime.cpp

@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cstring>
 
+#include "../buffers/NullBuffer.hpp"
+#include "../payloads/BlankPayload.hpp"
 #include "InHostGdfColumnPayload.hpp"
 
 namespace blazingdb {
@@ -13,26 +15,17 @@ namespace tools {
 namespace gdf_columns {
 
 InHostGdfColumnBuilder::InHostGdfColumnBuilder(blazingdb::uc::Agent &agent)
-    : dataCudaBuffer_{nullptr},
-      validCudaBuffer_{nullptr},
+    : dataCudaBuffer_{&CudaBuffer::From(NullBuffer::Buffer())},
+      validCudaBuffer_{&CudaBuffer::From(NullBuffer::Buffer())},
       size_{std::numeric_limits<std::size_t>::max()},
       dtype_{std::numeric_limits<std::int_fast32_t>::max()},
       nullCount_{std::numeric_limits<std::size_t>::max()},
-      dtypeInfoPayload_{nullptr},
-      columnNameHostBuffer_{nullptr},
+      dtypeInfoPayload_{&BlankPayload::Payload()},
+      columnNameHostBuffer_{&HostBuffer::From(NullBuffer::Buffer())},
       agent_{agent} {}
 
 std::unique_ptr<Payload>
 InHostGdfColumnBuilder::Build() const noexcept {
-  assert(nullptr != dataCudaBuffer_);
-  assert(nullptr != validCudaBuffer_);
-  assert(std::numeric_limits<std::size_t>::max() != size_);
-  assert(std::numeric_limits<std::int_fast32_t>::max() != dtype_);
-  assert(std::numeric_limits<std::size_t>::max() != nullCount_);
-  // TODO(support):
-  // assert(nullptr != dtypeInfoPayload_);
-  // assert(nullptr != columnNameHostBuffer_);
-
   std::ostringstream ostream;
 
   using BUBuffer = blazingdb::uc::Buffer;

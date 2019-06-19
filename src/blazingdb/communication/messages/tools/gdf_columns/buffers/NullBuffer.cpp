@@ -23,6 +23,12 @@ NullBuffer::IsNull() const noexcept {
   return true;
 }
 
+const NullBuffer&
+NullBuffer::Buffer() noexcept {
+  static NullBuffer buffer;
+  return buffer;
+}
+
 }  // namespace gdf_columns
 }  // namespace tools
 }  // namespace messages
