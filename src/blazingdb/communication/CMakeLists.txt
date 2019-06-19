@@ -32,12 +32,20 @@ blazingdb_artifact (
     messages/tools/gdf_columns/buffers/ValueBuffer.cpp
     messages/tools/gdf_columns/buffers/ViewBuffer.cpp
     messages/tools/gdf_columns/inhost/GdfColumnPayloadInHostBase.cpp
+    messages/tools/gdf_columns/inhost/DTypeInfoPayloadInHostBase.cpp
+    messages/tools/gdf_columns/inhost/CategoryPayloadInHostBase.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnBuilder.cpp
+    messages/tools/gdf_columns/inhost/InHostCategoryBuilder.cpp
+    messages/tools/gdf_columns/inhost/InHostDTypeInfoBuilder.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnCollector.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnDispatcher.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnIOHelpers.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnPayload.cpp
+    messages/tools/gdf_columns/inhost/InHostCategoryPayload.cpp
+    messages/tools/gdf_columns/inhost/InHostDTypeInfoPayload.cpp
     messages/tools/gdf_columns/inhost/InHostGdfColumnSpecialized.cpp
+    messages/tools/gdf_columns/inhost/InHostDTypeInfoSpecialized.cpp
+    messages/tools/gdf_columns/inhost/InHostCategorySpecialized.cpp
     messages/tools/gdf_columns/values/UCGdfColumnValue.cpp
     messages/tools/gdf_columns/values/interfaces.cpp
     messages/tools/gdf_columns/values/CudaMemoryRuntime.cpp

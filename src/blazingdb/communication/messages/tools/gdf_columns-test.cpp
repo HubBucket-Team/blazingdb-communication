@@ -232,16 +232,14 @@ CreateBasicCategoryFixture() {
 }
 
 static inline DTypeInfoFixture
-CreateBasicDTypeInfoFixture() {
+CreateBasicDTypeInfoFixture(CategoryFixture &category) {
   const std::size_t timeUnit = 1;
-
-  CategoryFixture category = CreateBasicCategoryFixture();
 
   return DTypeInfoFixture{timeUnit, category};
 }
 
 static inline GdfColumnFixture
-CreateBasicGdfColumnFixture() {
+CreateBasicGdfColumnFixture(DTypeInfoFixture &dtypeInfo) {
   const std::size_t dataSize = 2000;
   const void *const data     = CreateCudaSequence(dataSize);
 
@@ -255,8 +253,6 @@ CreateBasicGdfColumnFixture() {
   const std::size_t nullCount = 5;
 
   const std::string columnName = "ColName";
-
-  DTypeInfoFixture dtypeInfo = CreateBasicDTypeInfoFixture();
 
   return GdfColumnFixture{data,
                           dataSize,
@@ -317,9 +313,9 @@ public:
 };
 
 TEST(GdfColumnBuilderTest, CheckPayload) {
-  auto fixture          = CreateBasicGdfColumnFixture();
   auto categoryFixture  = CreateBasicCategoryFixture();
-  auto dtypeInfoFixture = CreateBasicDTypeInfoFixture();
+  auto dtypeInfoFixture = CreateBasicDTypeInfoFixture(categoryFixture);
+  auto fixture          = CreateBasicGdfColumnFixture(dtypeInfoFixture);
 
   MockBUCAgent agent;
   EXPECT_CALL(agent, RegisterMember(::testing::_, ::testing::_))
@@ -358,18 +354,18 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                              .BaseAddress(categoryFixture.baseAddress())
                              .Build();
 
-  using blazingdb::communication::messages::tools::gdf_columns::DTypeInfoBuilder;
+  using blazingdb::communication::messages::tools::gdf_columns::
+      DTypeInfoBuilder;
   auto dtypeInfoBuilder = DTypeInfoBuilder::MakeInHost(agent);
 
   using blazingdb::communication::messages::tools::gdf_columns::CategoryPayload;
   auto dtypeInfoPayload =
       dtypeInfoBuilder->TimeUnit(dtypeInfoFixture.timeUnit())
-          //.Category(*static_cast<std::unique_ptr<CategoryPayload>>(
-          //    categoryPayload))
+          .Category(*categoryPayload)
           .Build();
 
-  using blazingdb::communication::messages::
-                                     tools::gdf_columns::GdfColumnBuilder;
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnBuilder;
   auto builder = GdfColumnBuilder::MakeInHost(agent);
 
   auto payload = builder->Data(fixture.data())
@@ -378,7 +374,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
                      .DType(fixture.dtype())
                      .NullCount(fixture.nullCount())
                      .ColumnName(fixture.columnName())
-                     //.DTypeInfo(*dtypeInfoPayload)
+                     .DTypeInfo(*dtypeInfoPayload)
                      .Build();
 
   auto &buffer = payload->Deliver();
@@ -407,6 +403,8 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
   EXPECT_EQ(fixture.dtype(), gdfColumnPayload.DType());
 
   EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
+
+  EXPECT_EQ(fixture.dtypeInfo().timeUnit(), gdfColumnPayload.DTypeInfo().TimeUnit());
 
   EXPECT_EQ(7, gdfColumnPayload.ColumnName().Size());
   EXPECT_FALSE(std::memcmp("ColName", gdfColumnPayload.ColumnName().Data(), 7));

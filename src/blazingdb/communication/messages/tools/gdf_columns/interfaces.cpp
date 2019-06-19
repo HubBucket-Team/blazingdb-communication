@@ -8,6 +8,8 @@
 #include "inhost/InHostGdfColumnSpecialized.hpp"
 #include "inhost/InHostCategoryBuilder.hpp"
 #include "inhost/InHostDTypeInfoBuilder.hpp"
+#include "inhost/InHostDTypeInfoSpecialized.hpp"
+#include "inhost/InHostCategorySpecialized.hpp"
 
 #include "values/UCGdfColumnValue.hpp"
 #include "values/interfaces.hpp"
@@ -63,6 +65,16 @@ GdfColumnDispatcher::MakeInHost(const Buffer &buffer) {
 std::unique_ptr<Specialized>
 GdfColumnSpecialized::MakeInHost(const Buffer &buffer) {
   return std::make_unique<InHostGdfColumnSpecialized>(buffer);
+}
+
+std::unique_ptr<Specialized>
+DTypeInfoSpecialized::MakeInHost(const Buffer &buffer) {
+  return std::make_unique<InHostDTypeInfoSpecialized>(buffer);
+}
+
+std::unique_ptr<Specialized>
+CategorySpecialized::MakeInHost(const Buffer &buffer) {
+  return std::make_unique<InHostCategorySpecialized>(buffer);
 }
 
 }  // namespace gdf_columns

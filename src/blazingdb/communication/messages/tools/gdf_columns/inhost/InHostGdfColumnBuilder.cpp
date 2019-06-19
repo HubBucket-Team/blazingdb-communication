@@ -35,6 +35,8 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   inhost_iohelpers::Write(ostream, nullCount_);
 
+  inhost_iohelpers::Write(ostream, *dtypeInfoPayload_);
+
   inhost_iohelpers::Write(ostream, *columnNameHostBuffer_);
 
   ostream.flush();
@@ -75,8 +77,8 @@ InHostGdfColumnBuilder::NullCount(const std::size_t nullCount) noexcept {
 };
 
 GdfColumnBuilder &
-InHostGdfColumnBuilder::DTypeInfo(
-    const DTypeInfoPayload &dtypeInfoPayload) noexcept {
+InHostGdfColumnBuilder::DTypeInfo(const Payload &dtypeInfoPayload) noexcept {
+  dtypeInfoPayload_ = &dtypeInfoPayload;
   return *this;
 };
 

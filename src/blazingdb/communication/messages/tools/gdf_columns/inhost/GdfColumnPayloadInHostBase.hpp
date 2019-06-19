@@ -49,7 +49,8 @@ private:
   const std::size_t*       size_;
   const std::int_fast32_t* dtype_;
   const std::size_t*       nullCount_;
-  std::unique_ptr<Buffer>        columnNameBuffer_;
+  DTypeInfoPayload*        dtypeInfoPayload_;
+  std::unique_ptr<Buffer>  columnNameBuffer_;
 };
 
 }  // namespace gdf_columns

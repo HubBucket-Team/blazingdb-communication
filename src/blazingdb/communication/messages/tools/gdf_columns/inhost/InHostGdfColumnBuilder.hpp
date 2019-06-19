@@ -36,7 +36,7 @@ public:
   NullCount(const std::size_t nullCount) noexcept final;
 
   GdfColumnBuilder &
-  DTypeInfo(const DTypeInfoPayload &dtypeInfoPayload) noexcept final;
+  DTypeInfo(const Payload &dtypeInfoPayload) noexcept final;
 
   GdfColumnBuilder &
   ColumnName(const HostBuffer &hostBuffer) noexcept final;
@@ -47,6 +47,7 @@ private:
   std::size_t       size_;
   std::int_fast32_t dtype_;
   std::size_t       nullCount_;
+  const Payload *   dtypeInfoPayload_;
   const HostBuffer *columnNameHostBuffer_;
 
   blazingdb::uc::Agent &agent_;

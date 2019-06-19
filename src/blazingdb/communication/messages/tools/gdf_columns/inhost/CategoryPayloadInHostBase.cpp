@@ -1,4 +1,4 @@
-#include "GdfColumnPayloadInHostBase.hpp"
+#include "CategoryPayloadInHostBase.hpp"
 
 #include "../buffers/StringBuffer.hpp"
 
@@ -10,7 +10,7 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
+CategoryPayloadInHostBase::CategoryPayloadInHostBase(const Buffer& buffer)
     : buffer_{buffer} {
   inhost_iohelpers::StreamBuffer streamBuffer(buffer);
   std::istream                   istream{&streamBuffer};
@@ -19,53 +19,52 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   std::istream::pos_type begin = std::istream::pos_type(
       reinterpret_cast<std::istream::streamoff>(buffer_.Data()));
 
-  inhost_iohelpers::Read(istream, begin, &dataBuffer_);
-  inhost_iohelpers::Read(istream, begin, &validBuffer_);
+  inhost_iohelpers::Read(istream, begin, &strsBuffer_);
+  inhost_iohelpers::Read(istream, begin, &memBuffer_);
+  inhost_iohelpers::Read(istream, begin, &mapBuffer_);
+  inhost_iohelpers::Read(istream, begin, &count_);
+  inhost_iohelpers::Read(istream, begin, &keys_);
   inhost_iohelpers::Read(istream, begin, &size_);
-  inhost_iohelpers::Read(istream, begin, &dtype_);
-  inhost_iohelpers::Read(istream, begin, &nullCount_);
-  inhost_iohelpers::Read(istream, begin, &columnNameBuffer_);
+  inhost_iohelpers::Read(istream, begin, &base_address_);
 }
 
 const UCBuffer&
-GdfColumnPayloadInHostBase::Data() const noexcept {
-  return UCBuffer::From(*dataBuffer_);
+CategoryPayloadInHostBase::Strs() const noexcept {
+  return UCBuffer::From(*strsBuffer_);
 }
 
 const UCBuffer&
-GdfColumnPayloadInHostBase::Valid() const noexcept {
-  return UCBuffer::From(*validBuffer_);
+CategoryPayloadInHostBase::Mem() const noexcept {
+  return UCBuffer::From(*memBuffer_);
+}
+
+const UCBuffer&
+CategoryPayloadInHostBase::Map() const noexcept {
+  return UCBuffer::From(*mapBuffer_);
 }
 
 std::size_t
-GdfColumnPayloadInHostBase::Size() const noexcept {
+CategoryPayloadInHostBase::Count() const noexcept {
+  return *count_;
+}
+
+std::size_t
+CategoryPayloadInHostBase::Keys() const noexcept {
+  return *keys_;
+}
+
+std::size_t
+CategoryPayloadInHostBase::Size() const noexcept {
   return *size_;
 }
 
-std::int_fast32_t
-GdfColumnPayloadInHostBase::DType() const noexcept {
-  return *dtype_;
-}
-
 std::size_t
-GdfColumnPayloadInHostBase::NullCount() const noexcept {
-  return *nullCount_;
-}
-
-DTypeInfoPayload&
-GdfColumnPayloadInHostBase::DTypeInfo() const noexcept {
-  static DTypeInfoPayload* dtypeInfoPayload_;
-  UC_ABORT("Not support");
-  return *dtypeInfoPayload_;
-}
-
-const UCBuffer&
-GdfColumnPayloadInHostBase::ColumnName() const noexcept {
-  return UCBuffer::From(*columnNameBuffer_);
+CategoryPayloadInHostBase::BaseAddress() const noexcept {
+  return *base_address_;
 }
 
 const Buffer&
-GdfColumnPayloadInHostBase::Deliver() const noexcept {
+CategoryPayloadInHostBase::Deliver() const noexcept {
   return buffer_;
 }
 

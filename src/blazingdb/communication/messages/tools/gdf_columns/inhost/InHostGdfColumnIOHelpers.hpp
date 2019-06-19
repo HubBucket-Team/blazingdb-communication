@@ -52,6 +52,9 @@ void UC_NOEXPORT
 void UC_NOEXPORT
      Write(std::ostream& ostream, const HostBuffer& buffer);
 
+void UC_NOEXPORT
+     Write(std::ostream& ostream, const Payload& payload);
+
 std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
                                        Write(std::ostream&         ostream,
                                              blazingdb::uc::Agent& agent,

@@ -25,6 +25,8 @@ InHostDTypeInfoBuilder::Build() const noexcept {
 
   inhost_iohelpers::Write(ostream, timeUnit_);
 
+  inhost_iohelpers::Write(ostream, *categoryPayload_);
+
   ostream.flush();
   std::string content = ostream.str();
 
@@ -40,7 +42,8 @@ InHostDTypeInfoBuilder::TimeUnit(const std::int_fast32_t timeUnit) noexcept {
 
 DTypeInfoBuilder &
 InHostDTypeInfoBuilder::Category(
-    const CategoryPayload &categoryPayload) noexcept {
+    const Payload &categoryPayload) noexcept {
+  categoryPayload_ = &categoryPayload;
   return *this;
 };
 

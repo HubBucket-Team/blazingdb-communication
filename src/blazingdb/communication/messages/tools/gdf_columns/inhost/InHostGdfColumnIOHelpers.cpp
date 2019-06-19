@@ -103,6 +103,13 @@ void UC_NOEXPORT
   Write(ostream, buffer.Data(), buffer.Size());
 }
 
+void UC_NOEXPORT
+     Write(std::ostream &ostream, const Payload &payload) {
+  const Buffer &buffer = payload.Deliver();
+  Write(ostream, buffer.Size());
+  Write(ostream, buffer.Data(), buffer.Size());
+}
+
 std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
                                        Write(std::ostream &        ostream,
                                              blazingdb::uc::Agent &agent,
