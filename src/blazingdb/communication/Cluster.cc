@@ -3,6 +3,7 @@
 #include <blazingdb/communication/Address-Internal.h>
 
 #include <algorithm>
+#include <iostream>
 
 using namespace blazingdb::communication;
 
