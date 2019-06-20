@@ -4,9 +4,6 @@ namespace blazingdb {
 namespace communication {
 namespace internal {
 
-ConcreteAddress::ConcreteAddress(const std::string &ip, const std::int16_t port)
-    : ip_{ip}, port_{port}, trader_{ip, port} {}
-
 bool
 ConcreteAddress::SameValueAs(const Address &address) const {
   const ConcreteAddress &concreteAddress =
