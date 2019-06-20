@@ -7,6 +7,9 @@ namespace communication {
 namespace network {
 
 std::shared_ptr<Message> MessageQueue::getMessage(const MessageTokenType& messageToken) {
+    
+    
+    
     std::unique_lock<std::mutex> lock(mutex_);
     condition_variable_.wait(lock,
                             [&, this]{ return std::any_of(this->message_queue_.cbegin(),

@@ -12,15 +12,22 @@ class ConcreteManager : public Manager {
 public:
   using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
-  ConcreteManager() = default;
+  ConcreteManager(int communicationTcpPort) : communicationTcpPort_(communicationTcpPort) {
+  }
 
   ConcreteManager(const std::vector<Node>& nodes) {
     for (auto& n : nodes) { cluster_.addNode(n); }
   }
+    
+  ConcreteManager(int communicationTcpPort, const std::vector<Node>& nodes)
+      : communicationTcpPort_(communicationTcpPort) {
+    for (auto& n : nodes) {
+      cluster_.addNode(n);
+    }
+  }
 
-  void
-  Run() final {
-    httpServer_.config.port = 9000;
+  void Run() final {
+    httpServer_.config.port = this->communicationTcpPort_;
 
     httpServer_.resource["^/register_node$"]["POST"] =
         [this](std::shared_ptr<HttpServer::Response> response,
@@ -69,17 +76,17 @@ public:
 private:
   Cluster                               cluster_;
   std::vector<std::unique_ptr<Context>> runningTasks_;
-  HttpServer                            httpServer_;
+  HttpServer httpServer_;
+  int communicationTcpPort_;
 };
 
 }  // namespace
 
-std::unique_ptr<Manager>
-Manager::Make() {
-  return std::unique_ptr<Manager>{new ConcreteManager};
+
+std::unique_ptr<Manager> Manager::Make(int communicationTcpPort) {
+  return std::unique_ptr<Manager>{new ConcreteManager(communicationTcpPort)};
 }
 
-std::unique_ptr<Manager>
-Manager::Make(const std::vector<Node>& nodes) {
-  return std::unique_ptr<Manager>{new ConcreteManager{nodes}};
+std::unique_ptr<Manager> Manager::Make(int communicationTcpPort, const std::vector<Node>& nodes) {
+  return std::unique_ptr<Manager>{new ConcreteManager{communicationTcpPort, nodes}};
 }
