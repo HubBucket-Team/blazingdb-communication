@@ -1,5 +1,7 @@
 #include "Node.h"
 
+#include <iostream>
+
 using namespace blazingdb::communication;
 
 Node::Node() : address_{}, unixSocketId_{0}, isAvailable_{false} {}
