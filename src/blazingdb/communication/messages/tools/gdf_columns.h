@@ -96,9 +96,10 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
         static_cast<const GdfColumnPayload &>(payload), agent);
 
     gdfColumns.emplace_back(gdf_column{
-        gdfColumnValue->data(),
-        gdfColumnValue->valid(),
-        gdfColumnValue->size(),
+        const_cast<void *>(gdfColumnValue->data()),
+        reinterpret_cast<unsigned char *>(
+            const_cast<void *>(gdfColumnValue->valid())),
+        static_cast<int>(gdfColumnValue->size()),
     });
   }
 
