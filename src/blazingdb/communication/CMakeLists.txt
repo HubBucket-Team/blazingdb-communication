@@ -71,6 +71,9 @@ blazingdb_artifact (
     Listener.h
     Node.h
 
+    # TODO percy c.gonzales do not install internal headers
+    Address-Internal.h
+
   TESTS
     configuration-test.cc
     manager-test.cc

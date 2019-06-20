@@ -31,6 +31,10 @@ include(ConfigureSimpleWebServer)
 include(ConfigureUCX)
 
 # BEGIN MAIN #
+
+# TODO percy manage cuda definitions
+add_definitions(${CXX_DEFINES})
+
 include_directories(
     ${LIB_BLAZINGIO_INCLUDEDIR}
     ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}

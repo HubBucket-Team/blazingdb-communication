@@ -32,7 +32,8 @@ public:
   static std::unique_ptr<Node> makeUnique(const rapidjson::Value::Object& object);
 
   static std::unique_ptr<Node> make(int unixSocketId, const std::string& ip,
-                                    int16_t port);
+                                    int16_t communication_port,
+                                    int16_t protocol_port);
 
   virtual const std::shared_ptr<Buffer> ToBuffer() const noexcept {
     return std::make_shared<Buffer>(nullptr, 0);
@@ -42,9 +43,9 @@ public:
   static std::shared_ptr<Node> Make(const Buffer&);
 
 public:
-    static std::shared_ptr<Node> makeShared(int unixSocketId, std::string&& ip, int16_t port);
+    static std::shared_ptr<Node> makeShared(int unixSocketId, std::string&& ip, int16_t communication_port, int16_t protocol_port);
 
-    static std::shared_ptr<Node> makeShared(int unixSocketId, const std::string& ip, int16_t port);
+    static std::shared_ptr<Node> makeShared(int unixSocketId, const std::string& ip, int16_t communication_port, int16_t protocol_port);
 
     static std::shared_ptr<Node> makeShared(const Node& node);
 
