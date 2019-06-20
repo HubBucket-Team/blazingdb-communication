@@ -32,7 +32,7 @@ public:
   std::size_t
   NullCount() const noexcept final;
 
-  DTypeInfoPayload&
+  const PayloadableBuffer&
   DTypeInfo() const noexcept final;
 
   const UCBuffer&
@@ -44,13 +44,13 @@ public:
 private:
   const Buffer& buffer_;
 
-  std::unique_ptr<Buffer>  dataBuffer_;
-  std::unique_ptr<Buffer>  validBuffer_;
-  const std::size_t*       size_;
-  const std::int_fast32_t* dtype_;
-  const std::size_t*       nullCount_;
-  DTypeInfoPayload*        dtypeInfoPayload_;
-  std::unique_ptr<Buffer>  columnNameBuffer_;
+  std::unique_ptr<Buffer>           dataBuffer_;
+  std::unique_ptr<Buffer>           validBuffer_;
+  const std::size_t*                size_;
+  const std::int_fast32_t*          dtype_;
+  const std::size_t*                nullCount_;
+  std::unique_ptr<DTypeInfoPayload> dtypeInfoPayload_;
+  std::unique_ptr<Buffer>           columnNameBuffer_;
 };
 
 }  // namespace gdf_columns

@@ -25,10 +25,10 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   inhost_iohelpers::Read(istream, begin, &dtype_);
   inhost_iohelpers::Read(istream, begin, &nullCount_);
 
-  std::unique_ptr<Buffer> dtypeInfoBuffer;
-  inhost_iohelpers::Read(istream, begin, &dtypeInfoBuffer);
+  // std::unique_ptr<Buffer> dtypeInfoBuffer;
+  // inhost_iohelpers::Read(istream, begin, &dtypeInfoBuffer);
 
-  auto specialized = DTypeInfoSpecialized::MakeInHost(*dtypeInfoBuffer);
+  // auto specialized = DTypeInfoSpecialized::MakeInHost(*dtypeInfoBuffer);
 
   // TODO(bug): pending... I think we generalize reading as writing helpers
   // auto resultPayload = specialized->Apply();
@@ -62,9 +62,9 @@ GdfColumnPayloadInHostBase::NullCount() const noexcept {
   return *nullCount_;
 }
 
-DTypeInfoPayload&
-GdfColumnPayloadInHostBase::DTypeInfo() const noexcept {
-  return *dtypeInfoPayload_;
+const PayloadableBuffer& UC_NORETURN
+GdfColumnPayloadInHostBase::DTypeInfo() const noexcept{
+  UC_ABORT("Not support");
 }
 
 const UCBuffer&

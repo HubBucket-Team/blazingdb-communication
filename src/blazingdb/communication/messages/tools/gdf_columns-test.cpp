@@ -409,8 +409,12 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   EXPECT_EQ(fixture.nullCount(), gdfColumnPayload.NullCount());
 
+  using blazingdb::communication::messages::tools::gdf_columns::
+      DTypeInfoPayload;
   EXPECT_EQ(fixture.dtypeInfo().timeUnit(),
-            gdfColumnPayload.DTypeInfo().TimeUnit());
+            static_cast<const DTypeInfoPayload &>(
+                *gdfColumnPayload.DTypeInfo().ToPayload())
+                .TimeUnit());
 
   EXPECT_EQ(7, gdfColumnPayload.ColumnName().Size());
   EXPECT_FALSE(std::memcmp("ColName", gdfColumnPayload.ColumnName().Data(), 7));

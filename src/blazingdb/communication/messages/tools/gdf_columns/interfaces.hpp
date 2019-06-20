@@ -171,7 +171,7 @@ public:
   virtual std::size_t
   NullCount() const noexcept = 0;
 
-  virtual const DTypeInfoPayload &
+  virtual const PayloadableBuffer &
   DTypeInfo() const noexcept = 0;
 
   virtual const UCBuffer &

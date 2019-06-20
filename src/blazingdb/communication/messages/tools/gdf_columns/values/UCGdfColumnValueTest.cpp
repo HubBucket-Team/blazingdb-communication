@@ -24,7 +24,7 @@ public:
   MOCK_CONST_METHOD0_NE(Size, std::size_t());
   MOCK_CONST_METHOD0_NE(DType, std::int_fast32_t());
   MOCK_CONST_METHOD0_NE(NullCount, std::size_t());
-  MOCK_CONST_METHOD0_NE(DTypeInfo, const DTypeInfoPayload &());
+  MOCK_CONST_METHOD0_NE(DTypeInfo, const PayloadableBuffer &());
   MOCK_CONST_METHOD0_NE(ColumnName, const UCBuffer &());
 };
 
