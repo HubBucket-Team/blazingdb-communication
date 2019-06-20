@@ -45,6 +45,35 @@ void UC_NOEXPORT
           const std::istream::pos_type begin,
           const T** const              type);
 
+static UC_INLINE const void*
+CarryDataFrom(std::istream&                istream,
+              const std::istream::pos_type begin,
+              const std::size_t            size) {
+  if (0 == size) {
+    return nullptr;
+  } else {
+    const std::istream::streamoff streamoff = begin + istream.tellg();
+    return reinterpret_cast<const void* const>(streamoff);
+  }
+}
+
+template <class BufferBase>
+void UC_NOEXPORT
+     Read(std::istream&                       istream,
+          const std::istream::pos_type        begin,
+          std::unique_ptr<PayloadableBuffer>* buffer) {
+  static constexpr std::ptrdiff_t sizePtrDiff = sizeof(const std::size_t);
+
+  std::size_t size;
+  istream.read(static_cast<char*>(static_cast<void*>(&size)), sizePtrDiff);
+
+  const void* const data = CarryDataFrom(istream, begin, size);
+
+  istream.seekg(size, std::ios_base::cur);
+
+  *buffer = std::make_unique<BufferBase>(data, size);
+}
+
 template <class T>
 void UC_NOEXPORT
      Write(std::ostream& ostream, const T type);

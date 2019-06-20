@@ -45,18 +45,6 @@ StreamBuffer::data() const noexcept {
 /// ----------------------------------------------------------------------
 /// Read functions
 
-static UC_INLINE const void *
-CarryDataFrom(std::istream &               istream,
-              const std::istream::pos_type begin,
-              const std::size_t            size) {
-  if (0 == size) {
-    return nullptr;
-  } else {
-    const std::istream::streamoff streamoff = begin + istream.tellg();
-    return reinterpret_cast<const void *const>(streamoff);
-  }
-}
-
 void UC_NOEXPORT
      Read(std::istream &               istream,
           const std::istream::pos_type begin,

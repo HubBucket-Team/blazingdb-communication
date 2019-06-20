@@ -15,6 +15,7 @@ class UC_NOEXPORT InHostDTypeInfoBuilder : public DTypeInfoBuilder {
   UC_CONCRETE(InHostDTypeInfoBuilder);
 
 public:
+  // TODO(improve): remove unnecessary agent
   explicit InHostDTypeInfoBuilder(blazingdb::uc::Agent &agent);
 
   std::unique_ptr<Payload>

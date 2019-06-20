@@ -64,7 +64,7 @@ using owner = T;  // think about use a uniquer_ptr or shared_ptr when apply this
 #define UC_INLINE inline __attribute__((__always_inline__))
 #endif
 #ifndef UC_DEPRECATED
-#define UC_DEPRECATED __attribute__((deprecated));
+#define UC_DEPRECATED __attribute__((deprecated))
 #endif
 
 #define uc_likely(x) __builtin_expect(x, 1)

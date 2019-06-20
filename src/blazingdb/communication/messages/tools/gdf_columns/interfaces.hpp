@@ -81,6 +81,16 @@ public:
   }
 };
 
+class Payload;
+
+class PayloadableBuffer : public Buffer {
+  UC_INTERFACE(PayloadableBuffer);
+
+public:
+  virtual std::unique_ptr<Payload>
+  ToPayload() const noexcept = 0;
+};
+
 /// ----------------------------------------------------------------------
 /// Payloads
 
@@ -132,14 +142,14 @@ public:
 };
 
 class DTypeInfoPayload : public Payload {
+  UC_INTERFACE(DTypeInfoPayload);
+
 public:
   virtual std::int_fast32_t
   TimeUnit() const noexcept = 0;
 
-  virtual const CategoryPayload &
+  virtual const PayloadableBuffer &
   Category() const noexcept = 0;
-
-  UC_INTERFACE(DTypeInfoPayload);
 };
 
 class GdfColumnPayload : public Payload {
