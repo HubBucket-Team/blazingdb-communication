@@ -11,7 +11,7 @@ namespace internal {
 class ConcreteAddress : public Address {
 public:
   ConcreteAddress(const std::string &ip, const std::int16_t communication_port, const std::int16_t protocol_port)
-      : ip_{std::move(ip)}, communication_port_{communication_port}, protocol_port_{protocol_port} {}
+      : ip_{ip}, communication_port_{communication_port}, protocol_port_{protocol_port}, trader_(ip, communication_port) {}
 
   const std::string &
   ip() const noexcept {
