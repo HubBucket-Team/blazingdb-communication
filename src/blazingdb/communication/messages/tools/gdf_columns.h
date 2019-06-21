@@ -22,6 +22,12 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
   std::vector<std::unique_ptr<Payload>> payloads;
   payloads.reserve(gdfColumns.size());
 
+  std::vector<std::unique_ptr<const CudaBuffer>> dataBuffers;
+  std::vector<std::unique_ptr<const CudaBuffer>> validBuffers;
+
+  dataBuffers.reserve(gdfColumns.size());
+  validBuffers.reserve(gdfColumns.size());
+
   for (const auto &gdfColumn : gdfColumns) {
     // auto *column_ptr = gdfColumn.get_gdf_column();
 
@@ -29,17 +35,19 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
         GdfColumnBuilder::MakeInHost(agent);
 
     // TODO: Add other members y compute correct buffer size
-    const std::unique_ptr<const CudaBuffer> dataBuffer = CudaBuffer::Make(
-        gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn));
-    const std::unique_ptr<const CudaBuffer> validBuffer = CudaBuffer::Make(
-        gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn));
+    dataBuffers.emplace_back(CudaBuffer::Make(
+        gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn)));
+    
+    dataBuffers.emplace_back(CudaBuffer::Make(
+        gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn)));
+
     const std::size_t       size      = gdfColumn.size;
     const std::int_fast32_t dtype     = gdfColumn.dtype;
     const std::size_t       nullCount = gdfColumn.null_count;
 
     // TODO(potential bug): optional setters
-    payloads.emplace_back(builder->Data(*dataBuffer)
-                              .Valid(*validBuffer)
+    payloads.emplace_back(builder->Data(*dataBuffers.back())
+                              .Valid(*validBuffers.back())
                               .Size(size)
                               .DType(dtype)
                               .NullCount(nullCount)
