@@ -71,9 +71,7 @@ namespace {
 class NodeBuffer : public Buffer {
 public:
   explicit NodeBuffer(const std::string& nodeAsString)
-      :  nodeAsString_{nodeAsString}, Buffer{nodeAsString_.data(), nodeAsString_.size()} {
-        // data_ = const_cast<char *>(nodeAsString_.data());
-        // size_ = nodeAsString_.size();
+      :  nodeAsString_{nodeAsString}, Buffer{const_cast<char *>(nodeAsString.data()), nodeAsString.size()} {
   }
 
   const char*
@@ -113,7 +111,7 @@ public:
 
     std::cout << nodeAsString << "\n";
 
-    return std::make_shared<NodeBuffer>(std::move(nodeAsString));
+    return std::make_shared<NodeBuffer>(nodeAsString);
   }
 
 private:
