@@ -176,6 +176,11 @@ public:
 
   virtual const UCBuffer &
   ColumnName() const noexcept = 0;
+
+  static UC_INLINE constexpr const GdfColumnPayload &
+  From(const Payload &payload) noexcept {
+    return static_cast<const GdfColumnPayload &>(payload);
+  }
 };
 
 /// ----------------------------------------------------------------------

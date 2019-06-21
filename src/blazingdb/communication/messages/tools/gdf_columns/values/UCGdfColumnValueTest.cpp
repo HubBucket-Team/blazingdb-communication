@@ -55,15 +55,15 @@ TEST(UCGdfColumnValueTest, MakeValue) {
   EXPECT_CALL(gdfColumnPayload, DType).WillRepeatedly(testing::Return(444));
   EXPECT_CALL(gdfColumnPayload, NullCount).WillRepeatedly(testing::Return(555));
 
-  MockUCAgent ucAgent;
+  uc::MockAgent ucAgent;
   EXPECT_CALL(ucAgent, Register(testing::_, testing::_))
       .WillRepeatedly(testing::InvokeWithoutArgs([]() {
-        std::unique_ptr<MockUCBuffer> ucBuffer =
-            std::make_unique<MockUCBuffer>();
+        std::unique_ptr<uc::MockBuffer> ucBuffer =
+            std::make_unique<uc::MockBuffer>();
         EXPECT_CALL(*ucBuffer, Link(testing::_))
             .WillRepeatedly(testing::InvokeWithoutArgs([]() {
-              std::unique_ptr<MockUCTransport> ucTransport =
-                  std::make_unique<MockUCTransport>();
+              std::unique_ptr<uc::MockTransport> ucTransport =
+                  std::make_unique<uc::MockTransport>();
               EXPECT_CALL(*ucTransport, Get).WillOnce([]() {
                 return std::async([]() {});
               });
