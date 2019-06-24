@@ -91,6 +91,7 @@ namespace test {
         column_token = 0;
     }
 
+
     void gdf_column_cpp::create_gdf_column_for_ipc(gdf_dtype dtype,
                                                    void* input_data,
                                                    gdf_valid_type* input_valid,

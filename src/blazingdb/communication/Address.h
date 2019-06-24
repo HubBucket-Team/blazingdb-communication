@@ -20,11 +20,11 @@ public:
   virtual void
   serializeToJson(JsonSerializable::Writer& writer) const = 0;
 
-  static std::shared_ptr<Address>
-  Make(const std::string& ip, const std::int16_t port);
+  static std::shared_ptr<Address> Make(const std::string& ip,
+                                       const std::int16_t communication_port,
+                                       const std::int16_t protocol_port);
+  static std::shared_ptr<Address> Make(const rapidjson::Value::Object& object);
 
-  static std::shared_ptr<Address>
-  Make(const rapidjson::Value::Object& object);
 };
 
 }  // namespace communication

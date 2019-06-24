@@ -4,15 +4,16 @@
 namespace blazingdb {
 namespace communication {
 
-std::shared_ptr<Address>
-Address::Make(const std::string& ip, const std::int16_t port) {
-  return std::make_shared<internal::ConcreteAddress>(ip, port);
+std::shared_ptr<Address> Address::Make(const std::string& ip,
+                                       const std::int16_t communication_port,
+                                       const std::int16_t protocol_port) {
+  return std::make_shared<internal::ConcreteAddress>(ip, communication_port, protocol_port);
 }
 
-std::shared_ptr<Address>
-Address::Make(const rapidjson::Value::Object& object) {
+// TODO percy ?????
+std::shared_ptr<Address> Address::Make(const rapidjson::Value::Object& object) {
   return std::make_shared<internal::ConcreteAddress>(
-      object["addressIp"].GetString(), object["addressPort"].GetInt());
+      object["addressIp"].GetString(), object["addressCommunicationPort"].GetInt(), object["addressProtocolPort"].GetInt());
 }
 
 }  // namespace communication

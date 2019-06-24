@@ -71,6 +71,11 @@ blazingdb_artifact (
     Listener.h
     Node.h
 
+    # TODO percy c.gonzales do not install internal headers
+    Address-Internal.h
+    internal/Trader.hpp
+    internal/TraderLock.hpp
+
   TESTS
     configuration-test.cc
     manager-test.cc
