@@ -117,25 +117,29 @@ namespace messages {
           if (configuration.WithGDR()) {
             context = blazingdb::uc::Context::GDR();
           } else {
-            context = blazingdb::uc::Context::IPC();
+            context = blazingdb::uc::Context::IPCView();
           }
 
           auto agent = context->Agent();
 
           // Get samples
           std::vector<RalColumn> columns;
-          std::size_t            binary_offset = 0;
+          std::size_t            binary_pointer = 0;
           const auto& gpu_data_array = document["samples"].GetArray();
-          
-          std::hash<std::string> hasher;
-          auto hashed = hasher(binary); 
-          std::cout << "****Make message from bin: " << binary  << std::endl; 
-          std::cout << "****Make message from: " << hashed << std::endl; 
+          auto offset = 0;
+          auto buffer_size = context->serializedRecordSize();
           for (const auto& gpu_data : gpu_data_array) {
-            std::cout << "\t offset: " << binary_offset << std::endl; 
-            columns.emplace_back(BaseClass::deserializeRalColumn(
-                binary_offset, binary, gpu_data.GetObject(), agent.get()));
+            RalColumn column 
+                = BaseClass::deserializeRalColumn(
+                    binary.substr(offset),
+                    buffer_size,
+                    gpu_data.GetObject(),
+                    agent.get());
+
+            columns.emplace_back(std::move(column));
+            offset += 2 * buffer_size;
           }
+
           // Create the message
           return std::make_shared<MessageType>(std::move(messageToken),
                                                std::move(contextToken),

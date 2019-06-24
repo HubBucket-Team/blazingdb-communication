@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cuda_runtime.h>
-
+#include <blazingdb/result/Result.h>
 #include "records/RemotableRecord.hpp"
 #include "transports/ZCopyTransport.hpp"
 
@@ -39,72 +39,48 @@ ViewBuffer::~ViewBuffer() {
   }                                                                  \
 }
 
-
-void PrintRaw(const std::string &name, const void *&data, const std::size_t size) {
-  std::uint8_t *host = new std::uint8_t[size];
-
-  CheckCudaErrors(cudaMemcpy(host, data, size, cudaMemcpyDeviceToHost));
-  
-  std::stringstream ss;
-
-  ss << ">>> [" <<  name << "]";
-  for (std::size_t i = 0; i < size; i++) {
-    ss << ' ' <<  static_cast<std::uint32_t>(host[i]);
-  }
-  ss << std::endl;
-  std::cout << ss.str();
-  delete[] host;
-}
-
-
 std::unique_ptr<const Record::Serialized>
 ViewBuffer::SerializedRecord() const noexcept {
-  cudaIpcMemHandle_t ipc_memhandle;
-  if (this->data_ == nullptr) {
-    std::cout << "***NULL - sender-ipc-handler***\n";
-    std::basic_string<uint8_t> bytes;
-    return std::make_unique<IpcViewSerialized>(bytes);
+  std::basic_string<uint8_t> bytes(sizeof(cudaIpcMemHandle_t), '\0');
+  if (this->data_ != nullptr) {
+    cudaIpcMemHandle_t ipc_memhandle;
+    CheckCudaErrors(cudaIpcGetMemHandle(&ipc_memhandle, (void *) this->data_));
+    memcpy((void*)bytes.data(), (uint8_t*)(&ipc_memhandle), sizeof(cudaIpcMemHandle_t));
   }
-  std::cout << "SerializedRecord: pointer address : " << this->data_ << std::endl;
 
-  CheckCudaErrors(cudaIpcGetMemHandle(&ipc_memhandle, (void *) this->data_));
-  // PrintRaw("SerializedRecord data:", this->data_, 128);
-
-  std::basic_string<uint8_t> bytes;
-  bytes.resize(104);
-  memcpy((void*)bytes.data(), (uint8_t*)(&ipc_memhandle), sizeof(cudaIpcMemHandle_t));
-
-  std::cout << "***sender-ipc-handler***\n";
-  for (auto c : bytes)
-    std::cout << (int) c << ", ";
-  std::cout << std::endl;
-
+  std::cout << "send-serialized: ";
+  for(auto c : bytes) {
+    std::cout << (int)c << ",";
+  }
+  std::cout << "\n";
   return std::make_unique<IpcViewSerialized>(bytes);
 }
 
-
 static void* CudaIpcMemHandlerFrom (const std::basic_string<uint8_t>& handler) {
+  std::cout << "buffer-received: ";
+  for(auto c : handler) {
+    std::cout << (int)c << ",";
+  }
+  std::cout << "\n";
   void * response = nullptr;
-  std::cout << "handler-content: " <<  handler.size() <<  std::endl;
-  // if (handler.size() == sizeof(cudaIpcMemHandle_t)) {
+  if (handler.size() == sizeof(cudaIpcMemHandle_t)) {
+    if (handler == std::basic_string<uint8_t>(sizeof(cudaIpcMemHandle_t), '\0')) {
+      std::cerr << "buffer descriptor are all nulls\n";
+      return response;
+    }
     cudaIpcMemHandle_t ipc_memhandle;
-    memcpy((int8_t*)&ipc_memhandle, handler.data(), sizeof(ipc_memhandle));
+    memcpy((uint8_t*)&ipc_memhandle, handler.data(), sizeof(ipc_memhandle));
     CheckCudaErrors(cudaIpcOpenMemHandle((void **)&response, ipc_memhandle, cudaIpcMemLazyEnablePeerAccess));
-  // }
+  } else {
+    std::cerr << "error handler.size() != 64 at CudaIpcMemHandlerFrom\n";
+  }
   return response;
 }
 
 std::unique_ptr<Transport>
 ViewBuffer::Link(const std::uint8_t *recordData) {
   std::basic_string<uint8_t> bytes{recordData, sizeof(cudaIpcMemHandle_t)};
-  std::cout << "***link-ipc-handler***\n";
-  for (auto c : bytes)
-    std::cout << (int) c << ", ";
-  std::cout << std::endl;
-
   this->data_ = CudaIpcMemHandlerFrom(bytes);
-  // PrintRaw("Link data:", this->data_, 128);
-
   return std::make_unique<ViewTransport>();
 } 
 
