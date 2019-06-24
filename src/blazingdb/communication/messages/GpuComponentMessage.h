@@ -86,12 +86,6 @@ namespace messages {
 
             std::basic_string<uint8_t> binary_buffer(serialized_data->Data(), serialized_data->Size());
 
-
-            std::cout << "***GetBufferDescriptor-ipc-handler***\n";
-            for (auto c : binary_buffer)
-                std::cout << (int) c << ", ";
-            std::cout << std::endl;
-
             UCPool::getInstance().push(data_buffer.release());
 
             std::string response;
@@ -121,7 +115,7 @@ namespace messages {
             if (configuration.WithGDR()) {
               context = blazingdb::uc::Context::GDR();
             } else {
-              context = blazingdb::uc::Context::IPC();
+              context = blazingdb::uc::Context::IPCView();
             }
 
             auto agent  = context->Agent();
@@ -129,6 +123,7 @@ namespace messages {
             for (const auto& column : columns) {
                 auto* column_ptr =  column.get_gdf_column();
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
+                // valid == null, [\0, ...  \0] 
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
             }
             std::hash<std::string> hasher;
@@ -154,8 +149,8 @@ namespace messages {
 
             return column;
         }
-
-        static RalColumn deserializeRalColumn(std::size_t& binary_pointer, const std::string& binary_data, rapidjson::Value::ConstObject&& object) {
+        //TODO: Remove this deserializer!
+        static RalColumn deserializeRalColumnCPUBuffer(std::size_t& binary_pointer, const std::string& binary_data, rapidjson::Value::ConstObject&& object) {
             const auto& column_name_data = object["column_name"];
             std::string column_name(column_name_data.GetString(), column_name_data.GetStringLength());
 
@@ -195,12 +190,13 @@ namespace messages {
 
             return ral_column;
         }
-        // TODO: elimitar todo rastro de simple-distribution.
+
         static RalColumn
-        deserializeRalColumn(std::size_t&                    binary_pointer,
-                             const std::string&              binary_data,
+        deserializeRalColumn(const std::string&              binary_data,
+                             size_t                          descriptor_size,
                              rapidjson::Value::ConstObject&& object,
                              const void*                     agent) {
+          std::size_t                     binary_pointer = 0;
           const auto& column_name_data = object["column_name"];
           std::string column_name(column_name_data.GetString(),
                                   column_name_data.GetStringLength());
@@ -214,35 +210,35 @@ namespace messages {
           // reserve for local data and valid for gdf column
           cudaError_t cudaStatus;
 
+          // TODO: hide allocation size!
+          // TODO: refactor api!
           void* data     = nullptr;
-          int   dataSize = 100;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
+          int   dataSize = cudf_column.size * 8;   //TODO: fix dataSize gdf_size_type, RalColumn::DataSize(cudf_column.size, cudf_column.dtype)
 
           cudaStatus = cudaMalloc(&data, dataSize);
           assert(cudaSuccess == cudaStatus);
 
-          void*       valid     = nullptr;
-          std::size_t validSize = std::ceil(dataSize);
-
-          cudaStatus = cudaMalloc(&valid, validSize);
-          assert(cudaSuccess == cudaStatus);
-
           auto dataRecordData =
-              reinterpret_cast<const std::uint8_t*>(binary_data.data()) +
-              binary_pointer;
-
-          // TODO(issue): get magic number 104 from json data
-          auto validRecordData =
-              reinterpret_cast<const std::uint8_t*>(binary_data.data()) +
-              binary_pointer + 104;
+              reinterpret_cast<const std::uint8_t*>(binary_data.data());
 
           GpuComponentMessage::LinkDataRecordAndWaitForGpuData(
               agent, dataRecordData, data, dataSize);
-          GpuComponentMessage::LinkDataRecordAndWaitForGpuData(
-              agent, validRecordData, valid, validSize);
 
+          void*       valid     = nullptr;
+          auto validRecordData =
+              reinterpret_cast<const std::uint8_t*>(binary_data.data()) + descriptor_size;
+
+          if (cudf_column.null_count != 0) { 
+            // So, there are some valids.
+            std::size_t validSize = std::ceil(dataSize);
+            cudaStatus = cudaMalloc(&valid, validSize);
+            assert(cudaSuccess == cudaStatus);
+
+            GpuComponentMessage::LinkDataRecordAndWaitForGpuData(
+                agent, validRecordData, valid, validSize);
+          }
           // set gdf column
           RalColumn ral_column; 
-          //@todo: is ipc columnn?
           ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
                                                     data,
                                                     (unsigned char*)valid,
@@ -253,9 +249,6 @@ namespace messages {
           ral_column.set_column_token(column_token);
           ral_column.get_gdf_column()->null_count = cudf_column.null_count;
           ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
-        
-          binary_pointer += 208;
-
           return ral_column;
         }
     };
