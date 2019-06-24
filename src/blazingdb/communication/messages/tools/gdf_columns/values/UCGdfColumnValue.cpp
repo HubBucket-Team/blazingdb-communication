@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 #include <cuda_runtime_api.h>
 
@@ -25,17 +26,21 @@ LinkThrough(std::unique_ptr<MemoryRuntime>&         memoryRuntime,
             blazingdb::uc::Agent&                   agent,
             const Buffer&                           buffer,
             const std::size_t                       size,
-            std::unique_ptr<blazingdb::uc::Buffer>& outputUcBuffer) {
+            std::unique_ptr<blazingdb::uc::Buffer>& outputUcBuffer,
+            std::unique_ptr<blazingdb::uc::Transport>& outputUcTransport) {
   if (nullptr == buffer.Data()) { return nullptr; }
 
   const void* data = Reserve(memoryRuntime, size);
 
   outputUcBuffer = agent.Register(data, size);
 
-  std::unique_ptr<blazingdb::uc::Transport> transport =
-      outputUcBuffer->Link(static_cast<const std::uint8_t*>(buffer.Data()));
+  outputUcTransport = outputUcBuffer->Link(static_cast<const std::uint8_t*>(buffer.Data()));
 
-  transport->Get().wait();
+  std::cout<<"1!!!!!!!!!!!!!!\n"<<std::flush;
+  std::future<void> future = outputUcTransport->Get();
+  std::cout<<"2!!!!!!!!!!!!!!\n"<<std::flush;
+  future.wait();
+  std::cout<<"3!!!!!!!!!!!!!!\n"<<std::flush;
 
   return data;
 }
@@ -45,18 +50,19 @@ LinkThrough(std::unique_ptr<MemoryRuntime>&         memoryRuntime,
 UCGdfColumnValue::UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
                                    const GdfColumnPayload& gdfColumnPayload,
                                    blazingdb::uc::Agent&   agent)
-    : gdfColumnPayload_{gdfColumnPayload},
-      data_{LinkThrough(memoryRuntime,
-                        agent,
-                        gdfColumnPayload.Data(),
-                        gdfColumnPayload.Size() * 8,  // TODO: calculate
-                        dataUcBuffer_)},
-      valid_{LinkThrough(
-          memoryRuntime,
-          agent,
-          gdfColumnPayload.Valid(),
-          std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate
-          validUcBuffer_)} {}
+    : gdfColumnPayload_{gdfColumnPayload} {
+  data_  = LinkThrough(memoryRuntime,
+                      agent,
+                      gdfColumnPayload.Data(),
+                      gdfColumnPayload.Size() * 8,  // TODO: calculate
+                      dataUcBuffer_, dataUcTransport_);
+  valid_ = LinkThrough(
+      memoryRuntime,
+      agent,
+      gdfColumnPayload.Valid(),
+      std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate
+      validUcBuffer_, validUcTransport_);
+}
 
 const void*
 UCGdfColumnValue::data() const noexcept {
@@ -92,8 +98,7 @@ UCGdfColumnValue::dtype_info() const noexcept {
 
 const char*
 UCGdfColumnValue::column_name() const noexcept {
-  UC_ABORT("Not support");
-  return nullptr;
+  return static_cast<const char*>(gdfColumnPayload_.ColumnName().Data());
 }
 
 }  // namespace gdf_columns

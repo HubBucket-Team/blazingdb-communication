@@ -98,13 +98,16 @@ public:
 
       std::unique_ptr<blazingdb::uc::Context> context =
           configuration.WithGDR() ? blazingdb::uc::Context::GDR()
-                                  : blazingdb::uc::Context::IPC();
+                                  : blazingdb::uc::Context::IPCView();
 
       auto agent = context->Agent();
 
       // Get array columns (payload)
       std::vector<RalColumn> columns =
           BaseClass::deserializeRalColumns(binary, *agent);
+
+      agent.release();
+      context.release();
 
       // Create the message
       return std::make_shared<MessageType>(std::move(messageToken),

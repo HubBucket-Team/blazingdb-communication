@@ -47,9 +47,12 @@ private:
 
   std::unique_ptr<blazingdb::uc::Buffer> dataUcBuffer_;
   std::unique_ptr<blazingdb::uc::Buffer> validUcBuffer_;
+  
+  std::unique_ptr<blazingdb::uc::Transport> dataUcTransport_;
+  std::unique_ptr<blazingdb::uc::Transport> validUcTransport_;
 
-  const void* const data_;
-  const void* const valid_;
+  const void* data_;
+  const void* valid_;
 };
 
 }  // namespace gdf_columns

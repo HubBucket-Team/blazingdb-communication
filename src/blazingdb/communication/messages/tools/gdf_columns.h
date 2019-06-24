@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 #include "gdf_columns/interfaces.hpp"
 
@@ -24,9 +25,11 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
 
   std::vector<std::unique_ptr<const CudaBuffer>> dataBuffers;
   std::vector<std::unique_ptr<const CudaBuffer>> validBuffers;
+  std::vector<std::unique_ptr<const HostBuffer>> columnNameBuffers;
 
   dataBuffers.reserve(gdfColumns.size());
   validBuffers.reserve(gdfColumns.size());
+  columnNameBuffers.reserve(gdfColumns.size());
 
   for (const auto &gdfColumn : gdfColumns) {
     // auto *column_ptr = gdfColumn.get_gdf_column();
@@ -38,20 +41,33 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
     dataBuffers.emplace_back(CudaBuffer::Make(
         gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn)));
     
-    dataBuffers.emplace_back(CudaBuffer::Make(
+    validBuffers.emplace_back(CudaBuffer::Make(
         gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn)));
+
+    columnNameBuffers.emplace_back(HostBuffer::Make(
+        gdfColumn.col_name, std::strlen(gdfColumn.col_name)));
 
     const std::size_t       size      = gdfColumn.size;
     const std::int_fast32_t dtype     = gdfColumn.dtype;
     const std::size_t       nullCount = gdfColumn.null_count;
 
     // TODO(potential bug): optional setters
+    if(nullCount>0){
     payloads.emplace_back(builder->Data(*dataBuffers.back())
                               .Valid(*validBuffers.back())
                               .Size(size)
                               .DType(dtype)
                               .NullCount(nullCount)
+                              .ColumnName(*columnNameBuffers.back())
                               .Build());
+    }else{
+    payloads.emplace_back(builder->Data(*dataBuffers.back())
+                              .Size(size)
+                              .DType(dtype)
+                              .NullCount(nullCount)
+                              .ColumnName(*columnNameBuffers.back())
+                              .Build());
+    }
 
     collector->Add(*payloads.back());
   }
@@ -108,6 +124,10 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
         reinterpret_cast<unsigned char *>(
             const_cast<void *>(gdfColumnValue->valid())),
         static_cast<int>(gdfColumnValue->size()),
+        static_cast<decltype(gdf_column::dtype)>(gdfColumnValue->dtype()),
+        static_cast<int>(gdfColumnValue->null_count()),
+        {},
+        const_cast<char *>(gdfColumnValue->column_name()),
     });
   }
 
