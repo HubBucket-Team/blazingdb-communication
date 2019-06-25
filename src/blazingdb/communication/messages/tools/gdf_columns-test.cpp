@@ -361,7 +361,7 @@ TEST(GdfColumnBuilderTest, CheckPayload) {
 
   using blazingdb::communication::messages::tools::gdf_columns::
       DTypeInfoBuilder;
-  auto dtypeInfoBuilder = DTypeInfoBuilder::MakeInHost(agent);
+  auto dtypeInfoBuilder = DTypeInfoBuilder::MakeInHost();
 
   using blazingdb::communication::messages::tools::gdf_columns::CategoryPayload;
   auto dtypeInfoPayload =

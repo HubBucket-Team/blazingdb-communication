@@ -12,10 +12,9 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-InHostDTypeInfoBuilder::InHostDTypeInfoBuilder(blazingdb::uc::Agent &agent)
+InHostDTypeInfoBuilder::InHostDTypeInfoBuilder()
     : timeUnit_{std::numeric_limits<std::int_fast32_t>::max()},
-      categoryPayload_{&BlankPayload::Payload()},
-      agent_{agent} {}
+      categoryPayload_{&BlankPayload::Payload()} {}
 
 std::unique_ptr<Payload>
 InHostDTypeInfoBuilder::Build() const noexcept {

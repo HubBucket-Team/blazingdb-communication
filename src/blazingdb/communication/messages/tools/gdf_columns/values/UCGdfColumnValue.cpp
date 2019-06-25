@@ -22,11 +22,11 @@ Reserve(std::unique_ptr<MemoryRuntime>& memoryRuntime, const std::size_t size) {
 }
 
 static UC_INLINE const void*
-LinkThrough(std::unique_ptr<MemoryRuntime>&         memoryRuntime,
-            blazingdb::uc::Agent&                   agent,
-            const Buffer&                           buffer,
-            const std::size_t                       size,
-            std::unique_ptr<blazingdb::uc::Buffer>& outputUcBuffer,
+LinkThrough(std::unique_ptr<MemoryRuntime>&            memoryRuntime,
+            blazingdb::uc::Agent&                      agent,
+            const Buffer&                              buffer,
+            const std::size_t                          size,
+            std::unique_ptr<blazingdb::uc::Buffer>&    outputUcBuffer,
             std::unique_ptr<blazingdb::uc::Transport>& outputUcTransport) {
   if (nullptr == buffer.Data()) { return nullptr; }
 
@@ -34,13 +34,14 @@ LinkThrough(std::unique_ptr<MemoryRuntime>&         memoryRuntime,
 
   outputUcBuffer = agent.Register(data, size);
 
-  outputUcTransport = outputUcBuffer->Link(static_cast<const std::uint8_t*>(buffer.Data()));
+  outputUcTransport =
+      outputUcBuffer->Link(static_cast<const std::uint8_t*>(buffer.Data()));
 
-  std::cout<<"1!!!!!!!!!!!!!!\n"<<std::flush;
+  std::cout << "1!!!!!!!!!!!!!!\n" << std::flush;
   std::future<void> future = outputUcTransport->Get();
-  std::cout<<"2!!!!!!!!!!!!!!\n"<<std::flush;
+  std::cout << "2!!!!!!!!!!!!!!\n" << std::flush;
   future.wait();
-  std::cout<<"3!!!!!!!!!!!!!!\n"<<std::flush;
+  std::cout << "3!!!!!!!!!!!!!!\n" << std::flush;
 
   return data;
 }
@@ -55,13 +56,15 @@ UCGdfColumnValue::UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
                       agent,
                       gdfColumnPayload.Data(),
                       gdfColumnPayload.Size() * 8,  // TODO: calculate
-                      dataUcBuffer_, dataUcTransport_);
+                      dataUcBuffer_,
+                      dataUcTransport_);
   valid_ = LinkThrough(
       memoryRuntime,
       agent,
       gdfColumnPayload.Valid(),
       std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate
-      validUcBuffer_, validUcTransport_);
+      validUcBuffer_,
+      validUcTransport_);
 }
 
 const void*

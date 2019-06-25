@@ -2,14 +2,14 @@
 
 #include "BufferBase.hpp"
 
+#include "inhost/InHostCategoryBuilder.hpp"
+#include "inhost/InHostCategorySpecialized.hpp"
+#include "inhost/InHostDTypeInfoBuilder.hpp"
+#include "inhost/InHostDTypeInfoSpecialized.hpp"
 #include "inhost/InHostGdfColumnBuilder.hpp"
 #include "inhost/InHostGdfColumnCollector.hpp"
 #include "inhost/InHostGdfColumnDispatcher.hpp"
 #include "inhost/InHostGdfColumnSpecialized.hpp"
-#include "inhost/InHostCategoryBuilder.hpp"
-#include "inhost/InHostDTypeInfoBuilder.hpp"
-#include "inhost/InHostDTypeInfoSpecialized.hpp"
-#include "inhost/InHostCategorySpecialized.hpp"
 
 #include "values/UCGdfColumnValue.hpp"
 #include "values/interfaces.hpp"
@@ -31,8 +31,8 @@ HostBuffer::Make(const void *const data, const std::size_t size) {
 }
 
 std::unique_ptr<DTypeInfoBuilder>
-DTypeInfoBuilder::MakeInHost(blazingdb::uc::Agent &agent) {
-  return std::make_unique<InHostDTypeInfoBuilder>(agent);
+DTypeInfoBuilder::MakeInHost() {
+  return std::make_unique<InHostDTypeInfoBuilder>();
 }
 
 std::unique_ptr<CategoryBuilder>

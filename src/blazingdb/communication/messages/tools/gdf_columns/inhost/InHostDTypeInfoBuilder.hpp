@@ -15,8 +15,7 @@ class UC_NOEXPORT InHostDTypeInfoBuilder : public DTypeInfoBuilder {
   UC_CONCRETE(InHostDTypeInfoBuilder);
 
 public:
-  // TODO(improve): remove unnecessary agent
-  explicit InHostDTypeInfoBuilder(blazingdb::uc::Agent &agent);
+  explicit InHostDTypeInfoBuilder();
 
   std::unique_ptr<Payload>
   Build() const noexcept final;
@@ -30,8 +29,6 @@ public:
 private:
   std::int_fast32_t timeUnit_;
   const Payload *   categoryPayload_;
-
-  blazingdb::uc::Agent &agent_;
 };
 
 }  // namespace gdf_columns

@@ -10,13 +10,6 @@
 #include "../buffers/StringBuffer.hpp"
 #include "../common/test-helpers.hpp"
 
-class MockAgent : public blazingdb::uc::Agent {
-public:
-  MOCK_CONST_METHOD2_NE(
-      Register,
-      std::unique_ptr<blazingdb::uc::Buffer>(const void *&, const std::size_t));
-};
-
 class MockCategoryPayload : public blazingdb::communication::messages::tools::
                                 gdf_columns::CategoryPayload {
 public:
@@ -40,9 +33,7 @@ using blazingdb::communication::messages::tools::gdf_columns::
     InHostDTypeInfoPayload;
 
 TEST(InHostDTypeInfoBuilderTest, BuildWithoutCategory) {
-  MockAgent agent;  // TODO(api): unnecessary agent
-
-  InHostDTypeInfoBuilder builder{agent};
+  InHostDTypeInfoBuilder builder;
 
   auto  payload = builder.TimeUnit(12345).Build();
   auto &dtypeInfoPayload =
@@ -52,14 +43,12 @@ TEST(InHostDTypeInfoBuilderTest, BuildWithoutCategory) {
 }
 
 TEST(InHostDTypeInfoBuilderTest, BuildWithCategory) {
-  MockAgent agent;
-
   MockCategoryPayload categoryPayload;
   using blazingdb::communication::messages::tools::gdf_columns::StringBuffer;
   EXPECT_CALL(categoryPayload, Deliver)
       .WillOnce(testing::ReturnPointee(new StringBuffer{"12345"}));
 
-  InHostDTypeInfoBuilder builder{agent};
+  InHostDTypeInfoBuilder builder;
 
   auto  payload = builder.TimeUnit(12345).Category(categoryPayload).Build();
   auto &dtypeInfoPayload =

@@ -21,6 +21,9 @@
 /// Remark: This is a internal domain layer to build transportable buffer with
 /// gdf columns. The file {@file messages/tools/gdf_columns.h} contains the top
 /// level functions to work in the RAL.
+///
+/// Remark: The suffix "InHost" refers to a family of concrete classes
+/// implementing the packaging using std::string.
 
 #include <memory>
 
@@ -344,7 +347,7 @@ public:
   /// ----------------------------------------------------------------------
   /// Builders
   static std::unique_ptr<DTypeInfoBuilder>
-  MakeInHost(blazingdb::uc::Agent &agent);
+  MakeInHost();
 
   UC_INTERFACE(DTypeInfoBuilder);
 };
