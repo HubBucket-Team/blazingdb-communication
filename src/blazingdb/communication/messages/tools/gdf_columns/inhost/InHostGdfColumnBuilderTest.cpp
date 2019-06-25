@@ -32,11 +32,17 @@ TEST(InHostGdfColumnBuilder, Build) {
   static const void *data222 = reinterpret_cast<const void *>(222);
 
   using blazingdb::communication::messages::tools::gdf_columns::CudaBuffer;
+  using blazingdb::communication::messages::tools::gdf_columns::HostBuffer;
   const std::unique_ptr<const CudaBuffer> dataCudaBuffer =
       CudaBuffer::Make(data111, 1);
   const std::unique_ptr<const CudaBuffer> validCudaBuffer =
       CudaBuffer::Make(data222, 2);
-  const std::size_t size = 333;
+  const std::size_t                       size          = 333;
+  const std::int_fast32_t                 dtype         = 444;
+  const std::size_t                       nullCount     = 555;
+  const std::string                       rawColumnName = "666";
+  const std::unique_ptr<const HostBuffer> columnNameBuffer =
+      HostBuffer::Make(rawColumnName.data(), rawColumnName.length());
 
   uc::MockAgent agent;
   {
@@ -50,8 +56,13 @@ TEST(InHostGdfColumnBuilder, Build) {
   InHostGdfColumnBuilder builder{agent};
 
   using blazingdb::communication::messages::tools::gdf_columns::Payload;
-  std::unique_ptr<const Payload> payload =
-      builder.Data(*dataCudaBuffer).Valid(*validCudaBuffer).Size(size).Build();
+  std::unique_ptr<const Payload> payload = builder.Data(*dataCudaBuffer)
+                                               .Valid(*validCudaBuffer)
+                                               .Size(size)
+                                               .DType(dtype)
+                                               .NullCount(nullCount)
+                                               .ColumnName(*columnNameBuffer)
+                                               .Build();
 
   using blazingdb::communication::messages::tools::gdf_columns::
       GdfColumnPayload;
@@ -66,4 +77,10 @@ TEST(InHostGdfColumnBuilder, Build) {
   EXPECT_FALSE(std::memcmp("123456", gdfColumnPayload.Valid().Data(), 6));
 
   EXPECT_EQ(333, gdfColumnPayload.Size());
+
+  EXPECT_EQ(444, gdfColumnPayload.DType());
+
+  EXPECT_EQ(555, gdfColumnPayload.NullCount());
+
+  EXPECT_FALSE(std::memcmp("666", gdfColumnPayload.ColumnName().Data(), 3));
 }

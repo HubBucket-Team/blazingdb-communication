@@ -17,6 +17,10 @@
 /// * for reading,
 ///   * Dispatcher: Convert buffer to collector
 ///   * Specialized: Convert buffer to payload
+///
+/// Remark: This is a internal domain layer to build transportable buffer with
+/// gdf columns. The file {@file messages/tools/gdf_columns.h} contains the top
+/// level functions to work in the RAL.
 
 #include <memory>
 

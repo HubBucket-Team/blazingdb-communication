@@ -17,7 +17,7 @@ static constexpr std::size_t length = 64;
 
 static const void *
 Malloc(const std::string &&payload) {
-  void *data;
+  void *      data;
   cudaError_t cudaError;
   cudaError = cudaMalloc(&data, payload.length());
   assert(cudaSuccess == cudaError);
@@ -26,8 +26,6 @@ Malloc(const std::string &&payload) {
   assert(cudaSuccess == cudaError);
   return data;
 }
-
-
 
 void
 Print(const std::string &name, const void *data, const std::size_t size) {
@@ -49,8 +47,6 @@ Print(const std::string &name, const void *data, const std::size_t size) {
   delete[] host;
 }
 
-
-
 static constexpr char endpoint[] = "testEndpoint";
 static constexpr blazingdb::communication::network::Server::ContextTokenValue
     contextTokenValueId = 1230;
@@ -67,7 +63,8 @@ class MockMessage : public messages::Message {
 public:
   static const std::string MesssageID;
   using ContextTokenPtr = std::shared_ptr<ContextToken>;
-  using MessageTokenPtr = std::unique_ptr<blazingdb::communication::messages::MessageToken>;
+  using MessageTokenPtr =
+      std::unique_ptr<blazingdb::communication::messages::MessageToken>;
 
   MockMessage(ContextTokenPtr &&contextToken, MessageTokenPtr &&messageToken)
       : Message{std::forward<MessageTokenPtr>(messageToken),
@@ -77,11 +74,10 @@ public:
   MOCK_CONST_METHOD0(serializeToBinary, const std::string());
 
   static std::shared_ptr<Message>
-  Make(const std::string & /*jsonData*/, const std::string & binaryData) {
-
+  Make(const std::string & /*jsonData*/, const std::string &binaryData) {
     std::cout << "make from bin: " << binaryData << std::endl;
-    auto init_content = std::string(length, '0');
-    const void *data = Malloc(std::move(init_content));
+    auto        init_content = std::string(length, '0');
+    const void *data         = Malloc(std::move(init_content));
     Print("initial peer", data, length);
     using namespace blazingdb::uc;
 
@@ -90,11 +86,8 @@ public:
     auto buffer  = agent->Register(data, length);
 
     std::uint8_t recordData[104];
-    for (size_t i = 0; i < 104; i++)
-    {
-      recordData[i] = binaryData[i];
-    }
-    
+    for (size_t i = 0; i < 104; i++) { recordData[i] = binaryData[i]; }
+
     auto transport = buffer->Link(recordData);
 
     auto future = transport->Get();
@@ -109,7 +102,8 @@ public:
                                          std::move(messageToken));
   }
 
-  static const std::string & getMessageID() {
+  static const std::string &
+  getMessageID() {
     return MesssageID;
   }
 };
@@ -120,25 +114,28 @@ using BufferPtr = std::unique_ptr<blazingdb::uc::Buffer>;
 class DataContainer {
 public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
-    agent_ = context_->Agent();
-    auto payload = std::string(length, 'P');
-    const void * d_ptr = Malloc(std::move(payload));
+    agent_              = context_->Agent();
+    auto        payload = std::string(length, 'P');
+    const void *d_ptr   = Malloc(std::move(payload));
     Print("own: ", d_ptr, length);
 
     buffers_.emplace_back(agent_->Register(d_ptr, length));
     data_.resize(buffers_.size() * context_->serializedRecordSize());
-    std::memcpy(&data_[0], buffers_[0]->SerializedRecord()->Data(), context_->serializedRecordSize());
+    std::memcpy(&data_[0],
+                buffers_[0]->SerializedRecord()->Data(),
+                context_->serializedRecordSize());
   }
 
-  const std::string & data() const noexcept {
+  const std::string &
+  data() const noexcept {
     return data_;
   }
 
 private:
-  std::unique_ptr<blazingdb::uc::Context>             context_;
-  std::unique_ptr<blazingdb::uc::Agent>               agent_;
-  std::vector<BufferPtr>                              buffers_;
-  std::string                                         data_;
+  std::unique_ptr<blazingdb::uc::Context> context_;
+  std::unique_ptr<blazingdb::uc::Agent>   agent_;
+  std::vector<BufferPtr>                  buffers_;
+  std::string                             data_;
 };
 
 }  // namespace
@@ -157,7 +154,8 @@ ExecServer() {
   std::thread serverThread{&Server::Run, server.get(), 8000};
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  auto message = server->getMessage(contextTokenValueId, MockMessage::getMessageID());
+  auto message =
+      server->getMessage(contextTokenValueId, MockMessage::getMessageID());
 
   auto concreteMessage = std::static_pointer_cast<MockMessage>(message);
 
@@ -179,7 +177,7 @@ ExecClient() {
 
   std::unique_ptr<Client> client = Client::Make();
 
-  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8000);
+  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8000, 8001);
   Node                     node{std::move(address)};
 
   std::shared_ptr<ContextToken> contextToken =
@@ -217,11 +215,6 @@ TEST(ProcessesTest, TwoProcesses) {
   }
 }
 
+TEST(ProcessesTest, Master) { ExecServer(); }
 
-TEST(ProcessesTest, Master) {
-  ExecServer(); 
-}
-
-TEST(ProcessesTest, Worker) {
-  ExecClient(); 
-}
+TEST(ProcessesTest, Worker) { ExecClient(); }

@@ -428,9 +428,12 @@ class gdf_column {
 public:
   const void *      data;
   const void *      valid;
-  std::size_t       size;
+  int               size;
   std::int_fast32_t dtype;
-  std::size_t       null_count;
+  int               null_count;
+  class {
+  } dtype_info;
+  char *col_name;
 };
 
 static inline void
@@ -442,9 +445,11 @@ AddTo(std::vector<gdf_column> &gdfColumns,
       std::size_t              null_count) {
   gdfColumns.push_back(gdf_column{reinterpret_cast<void *>(data),
                                   reinterpret_cast<void *>(valid),
-                                  size,
+                                  static_cast<int>(size),
                                   dtype,
-                                  null_count});
+                                  static_cast<int>(null_count),
+                                  {},
+                                  const_cast<char *>("column name")});
 }
 
 template <class gdf_column>
