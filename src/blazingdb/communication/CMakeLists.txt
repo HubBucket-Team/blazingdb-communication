@@ -115,6 +115,7 @@ blazingdb_artifact (
     messages/tools/gdf_columns/inhost/CollectorDispatcherIntegrationTest.cpp
     messages/tools/gdf_columns/inhost/InHostCategoryBuilderTest.cpp
     messages/tools/gdf_columns/inhost/InHostDTypeInfoBuilderTest.cpp
+    messages/tools/gdf_columns/inhost/InHostGdfColumnBuilderTest.cpp
     messages/tools/gdf_columns/values/UCGdfColumnValueTest.cpp
     node-test.cc
     network/integration-server-client-test.cc
