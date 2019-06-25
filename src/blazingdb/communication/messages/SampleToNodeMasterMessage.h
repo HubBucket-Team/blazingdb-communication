@@ -127,8 +127,11 @@ namespace messages {
           std::vector<RalColumn> columns =
               BaseClass::deserializeRalColumns(binary, *agent);
 
+          /// TODO(workaround): remove this.
+          /// Write code to manage the life cycle of a UC context.
           agent.release();
           context.release();
+
           // Create the message
           return std::make_shared<MessageType>(std::move(messageToken),
                                                std::move(contextToken),
