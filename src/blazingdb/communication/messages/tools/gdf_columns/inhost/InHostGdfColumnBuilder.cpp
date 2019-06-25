@@ -45,7 +45,7 @@ InHostGdfColumnBuilder::Build() const noexcept {
 
   inhost_iohelpers::Write(ostream, nullCount_);
 
-  //inhost_iohelpers::Write(ostream, *dtypeInfoPayload_);
+  inhost_iohelpers::Write(ostream, *dtypeInfoPayload_);
 
   inhost_iohelpers::Write(ostream, *columnNameHostBuffer_);
 

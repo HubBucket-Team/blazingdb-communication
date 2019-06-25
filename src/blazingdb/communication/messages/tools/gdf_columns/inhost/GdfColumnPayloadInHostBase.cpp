@@ -2,6 +2,8 @@
 
 #include "../buffers/StringBuffer.hpp"
 
+#include "DTypeInfoPayloadInHostBase.hpp"
+
 #include "InHostGdfColumnIOHelpers.hpp"
 
 namespace blazingdb {
@@ -25,14 +27,8 @@ GdfColumnPayloadInHostBase::GdfColumnPayloadInHostBase(const Buffer& buffer)
   inhost_iohelpers::Read(istream, begin, &dtype_);
   inhost_iohelpers::Read(istream, begin, &nullCount_);
 
-  // std::unique_ptr<Buffer> dtypeInfoBuffer;
-  // inhost_iohelpers::Read(istream, begin, &dtypeInfoBuffer);
-
-  // auto specialized = DTypeInfoSpecialized::MakeInHost(*dtypeInfoBuffer);
-
-  // TODO(bug): pending... I think we generalize reading as writing helpers
-  // auto resultPayload = specialized->Apply();
-  // dtypeInfoPayload_  = static_cast<DTypeInfoPayload*>(resultPayload.get());
+  inhost_iohelpers::Read<InHostDTypeInfoPayloadBuffer>(
+      istream, begin, &dtypeInfoBuffer_);
 
   inhost_iohelpers::Read(istream, begin, &columnNameBuffer_);
 }
@@ -62,9 +58,9 @@ GdfColumnPayloadInHostBase::NullCount() const noexcept {
   return *nullCount_;
 }
 
-const PayloadableBuffer& UC_NORETURN
+const PayloadableBuffer&
 GdfColumnPayloadInHostBase::DTypeInfo() const noexcept{
-  UC_ABORT("Not support");
+  return *dtypeInfoBuffer_;
 }
 
 const UCBuffer&

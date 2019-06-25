@@ -1,7 +1,7 @@
 #include "DTypeInfoPayloadInHostBase.hpp"
 
 #include "../buffers/StringBuffer.hpp"
-#include "CategoryPayloadInHostBase.hpp"
+
 #include "InHostGdfColumnIOHelpers.hpp"
 
 namespace blazingdb {
@@ -9,34 +9,6 @@ namespace communication {
 namespace messages {
 namespace tools {
 namespace gdf_columns {
-
-class UC_NOEXPORT InHostCategoryPayloadBuffer : public PayloadableBuffer {
-  UC_CONCRETE(InHostCategoryPayloadBuffer);
-
-public:
-  explicit InHostCategoryPayloadBuffer(const void* const data,
-                                       const std::size_t size)
-      : data_{data}, size_{size} {}
-
-  const void*
-  Data() const noexcept final {
-    return data_;
-  }
-
-  std::size_t
-  Size() const noexcept final {
-    return size_;
-  }
-
-  std::unique_ptr<Payload>
-  ToPayload() const noexcept final {
-    return std::make_unique<CategoryPayloadInHostBase>(*this);
-  }
-
-private:
-  const void* const data_;
-  const std::size_t size_;
-};
 
 DTypeInfoPayloadInHostBase::DTypeInfoPayloadInHostBase(const Buffer& buffer)
     : buffer_{buffer} {

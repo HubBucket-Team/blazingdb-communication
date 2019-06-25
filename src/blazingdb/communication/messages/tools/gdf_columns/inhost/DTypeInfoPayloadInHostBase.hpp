@@ -5,6 +5,8 @@
 
 #include <blazingdb/uc/internal/macros.hpp>
 
+#include "CategoryPayloadInHostBase.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -31,6 +33,34 @@ private:
 
   const std::int_fast32_t*           timeUnit_;
   std::unique_ptr<PayloadableBuffer> categoryBuffer_;
+};
+
+class UC_NOEXPORT InHostDTypeInfoPayloadBuffer : public PayloadableBuffer {
+  UC_CONCRETE(InHostDTypeInfoPayloadBuffer);
+
+public:
+  explicit InHostDTypeInfoPayloadBuffer(const void* const data,
+                                       const std::size_t size)
+      : data_{data}, size_{size} {}
+
+  const void*
+  Data() const noexcept final {
+    return data_;
+  }
+
+  std::size_t
+  Size() const noexcept final {
+    return size_;
+  }
+
+  std::unique_ptr<Payload>
+  ToPayload() const noexcept final {
+    return std::make_unique<CategoryPayloadInHostBase>(*this);
+  }
+
+private:
+  const void* const data_;
+  const std::size_t size_;
 };
 
 }  // namespace gdf_columns
