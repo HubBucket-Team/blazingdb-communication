@@ -166,6 +166,9 @@ class DTypeInfoPayload : public Payload {
   UC_INTERFACE(DTypeInfoPayload);
 
 public:
+  /// TODO(improve): std::int_fast32_t is a temporal representation of a enum
+  /// int value. The improvement is to use a EnumValue (with internal
+  /// ValueBuffer) to run into auto serialization of the current implementation.
   virtual std::int_fast32_t
   TimeUnit() const noexcept = 0;
 

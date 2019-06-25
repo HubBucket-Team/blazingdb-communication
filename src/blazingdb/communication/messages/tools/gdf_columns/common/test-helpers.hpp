@@ -3,6 +3,9 @@
 
 #include <gmock/gmock.h>
 
+/// These macros allow to gtest support qualifiers like const, noexcept or
+/// attributes of the compiler.
+
 #define GMOCK_METHOD0_NE_(tn, constness, ct, Method, ...)                      \
   static_assert(                                                               \
       0 == ::testing::internal::Function<__VA_ARGS__>::ArgumentCount,          \
