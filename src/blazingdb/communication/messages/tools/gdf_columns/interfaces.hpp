@@ -1,6 +1,27 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_INTERFACES_HPP_
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_INTERFACES_HPP_
 
+/// This module contains interfaces to implement the conversion of a collection
+/// of gdf columns to transportable buffer through a channel like HTTP or TCP
+/// supporting UCX for cuda pointers.
+///
+/// Workflow:
+/// Builder > Payload > Buffer > (channel) > Buffer > Specialized > Payload
+/// Collector > Buffer > (channel) > Buffer > Dispatcher > Collector
+///
+/// The main responsabilites are the following:
+/// * for writing,
+///   * Builders: To put the serializable data and build the payload
+///   * Payload: Produce a transportable buffer with the data set from builder
+///   * Collector: A payload collection
+/// * for reading,
+///   * Dispatcher: Convert buffer to collector
+///   * Specialized: Convert buffer to payload
+///
+/// Remark: This is a internal domain layer to build transportable buffer with
+/// gdf columns. The file {@file messages/tools/gdf_columns.h} contains the top
+/// level functions to work in the RAL.
+
 #include <memory>
 
 #include <blazingdb/uc/Agent.hpp>
@@ -145,6 +166,9 @@ class DTypeInfoPayload : public Payload {
   UC_INTERFACE(DTypeInfoPayload);
 
 public:
+  /// TODO(improve): std::int_fast32_t is a temporal representation of a enum
+  /// int value. The improvement is to use a EnumValue (with internal
+  /// ValueBuffer) to run into auto serialization of the current implementation.
   virtual std::int_fast32_t
   TimeUnit() const noexcept = 0;
 
@@ -176,6 +200,11 @@ public:
 
   virtual const UCBuffer &
   ColumnName() const noexcept = 0;
+
+  static UC_INLINE constexpr const GdfColumnPayload &
+  From(const Payload &payload) noexcept {
+    return static_cast<const GdfColumnPayload &>(payload);
+  }
 };
 
 /// ----------------------------------------------------------------------

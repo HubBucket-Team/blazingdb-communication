@@ -35,8 +35,8 @@ Malloc() {
 class DataContainer {
 public:
   DataContainer() : context_{blazingdb::uc::Context::IPC()} {
-    auto agent = context_->Agent();
-    const void* d_ptr = (const void* )Malloc();
+    auto        agent = context_->Agent();
+    const void *d_ptr = (const void *)Malloc();
     buffers_.emplace_back(agent->Register(d_ptr, length));
 
     data_.resize(buffers_.size() * 104);
@@ -78,7 +78,8 @@ public:
 
 static std::shared_ptr<blazingdb::communication::Node>
 CreateNode() {
-  auto address = blazingdb::communication::Address::Make("127.0.0.1", 8000);
+  auto address =
+      blazingdb::communication::Address::Make("127.0.0.1", 8000, 8001);
   return blazingdb::communication::Node::Make(std::move(address));
 }
 

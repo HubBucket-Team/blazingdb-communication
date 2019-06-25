@@ -1,6 +1,14 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_H_
 #define BLAZINGDB_COMMUNICATION_MESSAGES_TOOLS_GDFCOLUMNS_H_
 
+/// Helpers to (de)serialize gdf columns to transport between RALs.
+///
+/// The function `DeliverFrom` converts a collection of gdf columns
+/// to a transportable buffer.
+///
+/// The funtion `CollectFrom` converts a transported buffer to a collection of
+/// gdf columns.
+
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -40,7 +48,7 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
     // TODO: Add other members y compute correct buffer size
     dataBuffers.emplace_back(CudaBuffer::Make(
         gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn)));
-    
+
     validBuffers.emplace_back(CudaBuffer::Make(
         gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn)));
 

@@ -3,6 +3,9 @@
 
 #include <gmock/gmock.h>
 
+/// These macros allow to gtest support qualifiers like const, noexcept or
+/// attributes of the compiler.
+
 #define GMOCK_METHOD0_NE_(tn, constness, ct, Method, ...)                      \
   static_assert(                                                               \
       0 == ::testing::internal::Function<__VA_ARGS__>::ArgumentCount,          \
@@ -218,7 +221,9 @@ ReturnMake(Callable &&call, Args &&... args) {
 
 #include <blazingdb/uc/API.hpp>
 
-class MockUCAgent : public blazingdb::uc::Agent {
+namespace uc {
+
+class MockAgent : public blazingdb::uc::Agent {
 public:
   using Buffer = blazingdb::uc::Buffer;
 
@@ -226,7 +231,7 @@ public:
                         std::unique_ptr<Buffer>(const void *&, std::size_t));
 };
 
-class MockUCBuffer : public blazingdb::uc::Buffer {
+class MockBuffer : public blazingdb::uc::Buffer {
 public:
   using Transport  = blazingdb::uc::Transport;
   using Serialized = blazingdb::uc::Record::Serialized;
@@ -236,15 +241,17 @@ public:
   MOCK_METHOD1(Link, std::unique_ptr<Transport>(const std::uint8_t *));
 };
 
-class MockUCSerialized : public blazingdb::uc::Record::Serialized {
+class MockSerialized : public blazingdb::uc::Record::Serialized {
 public:
-  MOCK_CONST_METHOD0_NE(DataMember, const std::uint8_t *());
-  MOCK_CONST_METHOD0_NE(SizeMember, std::size_t());
+  MOCK_CONST_METHOD0_NE(Data, const std::uint8_t *());
+  MOCK_CONST_METHOD0_NE(Size, std::size_t());
 };
 
-class MockUCTransport : public blazingdb::uc::Transport {
+class MockTransport : public blazingdb::uc::Transport {
 public:
   MOCK_METHOD0(Get, std::future<void>());
 };
+
+}  // namespace uc
 
 #endif

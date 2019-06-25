@@ -127,6 +127,8 @@ std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
 
     Write(ostream, *serializedRecord);
 
+    /// TODO(workaround): remove this.
+    /// Write code to manage the life cycle of a UC buffer and records.
     buffer.release();
     serializedRecord.release();
 
