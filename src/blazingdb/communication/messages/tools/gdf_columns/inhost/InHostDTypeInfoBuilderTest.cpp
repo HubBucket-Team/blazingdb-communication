@@ -25,7 +25,6 @@ public:
       blazingdb::communication::messages::tools::gdf_columns::UCBuffer;
 
   MOCK_CONST_METHOD0_NE(Deliver, const Buffer &());
-
   MOCK_CONST_METHOD0_NE(Strs, const UCBuffer &());
   MOCK_CONST_METHOD0_NE(Mem, const UCBuffer &());
   MOCK_CONST_METHOD0_NE(Map, const UCBuffer &());
