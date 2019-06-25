@@ -99,12 +99,12 @@ Progress(const ucs_async_context_t &async_context,
          const uct_worker_h &       worker,
          const uct_iface_h &        iface,
          ucs_status_t               status) {
-  while (status == UCS_INPROGRESS) {
+  /* while (status == UCS_INPROGRESS) {
     uct_worker_progress(worker);
     CheckMiss(async_context);
     status = uct_iface_flush(iface, UCT_FLUSH_FLAG_LOCAL, nullptr);
   }
-  CHECK_UCS(status);
+  CHECK_UCS(status);*/
 }
 
 std::future<void>

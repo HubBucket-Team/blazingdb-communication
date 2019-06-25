@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 #include "gdf_columns/interfaces.hpp"
 
@@ -22,6 +23,14 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
   std::vector<std::unique_ptr<Payload>> payloads;
   payloads.reserve(gdfColumns.size());
 
+  std::vector<std::unique_ptr<const CudaBuffer>> dataBuffers;
+  std::vector<std::unique_ptr<const CudaBuffer>> validBuffers;
+  std::vector<std::unique_ptr<const HostBuffer>> columnNameBuffers;
+
+  dataBuffers.reserve(gdfColumns.size());
+  validBuffers.reserve(gdfColumns.size());
+  columnNameBuffers.reserve(gdfColumns.size());
+
   for (const auto &gdfColumn : gdfColumns) {
     // auto *column_ptr = gdfColumn.get_gdf_column();
 
@@ -29,21 +38,36 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
         GdfColumnBuilder::MakeInHost(agent);
 
     // TODO: Add other members y compute correct buffer size
-    const std::unique_ptr<const CudaBuffer> dataBuffer = CudaBuffer::Make(
-        gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn));
-    const std::unique_ptr<const CudaBuffer> validBuffer = CudaBuffer::Make(
-        gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn));
+    dataBuffers.emplace_back(CudaBuffer::Make(
+        gdfColumn.data, GdfColumnInfo<gdf_column>::DataSize(gdfColumn)));
+    
+    validBuffers.emplace_back(CudaBuffer::Make(
+        gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn)));
+
+    columnNameBuffers.emplace_back(HostBuffer::Make(
+        gdfColumn.col_name, std::strlen(gdfColumn.col_name)));
+
     const std::size_t       size      = gdfColumn.size;
     const std::int_fast32_t dtype     = gdfColumn.dtype;
     const std::size_t       nullCount = gdfColumn.null_count;
 
     // TODO(potential bug): optional setters
-    payloads.emplace_back(builder->Data(*dataBuffer)
-                              .Valid(*validBuffer)
+    if(nullCount>0){
+    payloads.emplace_back(builder->Data(*dataBuffers.back())
+                              .Valid(*validBuffers.back())
                               .Size(size)
                               .DType(dtype)
                               .NullCount(nullCount)
+                              .ColumnName(*columnNameBuffers.back())
                               .Build());
+    }else{
+    payloads.emplace_back(builder->Data(*dataBuffers.back())
+                              .Size(size)
+                              .DType(dtype)
+                              .NullCount(nullCount)
+                              .ColumnName(*columnNameBuffers.back())
+                              .Build());
+    }
 
     collector->Add(*payloads.back());
   }
@@ -96,9 +120,14 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
         static_cast<const GdfColumnPayload &>(payload), agent);
 
     gdfColumns.emplace_back(gdf_column{
-        gdfColumnValue->data(),
-        gdfColumnValue->valid(),
-        gdfColumnValue->size(),
+        const_cast<void *>(gdfColumnValue->data()),
+        reinterpret_cast<unsigned char *>(
+            const_cast<void *>(gdfColumnValue->valid())),
+        static_cast<int>(gdfColumnValue->size()),
+        static_cast<decltype(gdf_column::dtype)>(gdfColumnValue->dtype()),
+        static_cast<int>(gdfColumnValue->null_count()),
+        {},
+        const_cast<char *>(gdfColumnValue->column_name()),
     });
   }
 

@@ -127,6 +127,9 @@ std::unique_ptr<blazingdb::uc::Buffer> UC_NOEXPORT
 
     Write(ostream, *serializedRecord);
 
+    buffer.release();
+    serializedRecord.release();
+
     return buffer;
   }
 }

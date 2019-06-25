@@ -21,7 +21,7 @@ BufferBase::Size() const noexcept {
 
 bool
 BufferBase::IsNull() const noexcept {
-  return data_ == nullptr;
+  return size_ == 0;
 }
 
 std::unique_ptr<BufferBase>

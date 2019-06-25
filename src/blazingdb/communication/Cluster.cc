@@ -3,6 +3,7 @@
 #include <blazingdb/communication/Address-Internal.h>
 
 #include <algorithm>
+#include <iostream>
 
 using namespace blazingdb::communication;
 
@@ -15,7 +16,8 @@ void Cluster::addNode(const Node& node) {
       *static_cast<const internal::ConcreteAddress*>(node.address());
 
   const std::string nodeAsString =
-      concreteAddress.ip() + "," + std::to_string(concreteAddress.port());
+      concreteAddress.ip() + "," + std::to_string(concreteAddress.communication_port());
+  std::cout << nodeAsString << "\n";
 }
 
 size_t Cluster::getTotalNodes() const { return nodes_.size(); }

@@ -96,7 +96,7 @@ TEST_F(ComponentMessagesTest, ColumnDataMessage) {
 
     // Test data - create node
     using Address = blazingdb::communication::Address;
-    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234, 5678));
 
     // Test data - create context token
     const ContextToken::TokenType context_token_value = 2437;
@@ -254,7 +254,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 
     // Test data - create sender node
     using Address = blazingdb::communication::Address;
-    blazingdb::communication::Node sender_node(Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node sender_node(Address::Make("1.2.3.4", 1234, 5678));
 
 
 
@@ -366,7 +366,7 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
 TEST_F(ComponentMessagesTest, NodeDataMessage) {
     using Address = blazingdb::communication::Address;
 
-    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234));
+    blazingdb::communication::Node node(Address::Make("1.2.3.4", 1234, 5678));
     // Create message
     using blazingdb::communication::messages::NodeDataMessage;
     NodeDataMessage message(node);
