@@ -56,9 +56,15 @@ public:
     return length_;
   }
 
-  const Payload &
-  Get(std::size_t index) const final {
-    return *payloads_.at(index);
+protected:
+  std::unique_ptr<Iterator::Base>
+  Begin() const noexcept final {
+    return nullptr;
+  }
+
+  std::unique_ptr<Iterator::Base>
+  End() const noexcept final {
+    return nullptr;
   }
 
 private:

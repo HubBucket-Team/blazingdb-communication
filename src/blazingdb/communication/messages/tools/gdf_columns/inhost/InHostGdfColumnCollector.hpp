@@ -26,8 +26,12 @@ public:
   std::size_t
   Length() const noexcept final;
 
-  const Payload &
-  Get(std::size_t index) const final;
+protected:
+  std::unique_ptr<Iterator::Base>
+  Begin() const noexcept final;
+
+  std::unique_ptr<Iterator::Base>
+  End() const noexcept final;
 
 private:
   std::vector<const Payload *> payloads_;

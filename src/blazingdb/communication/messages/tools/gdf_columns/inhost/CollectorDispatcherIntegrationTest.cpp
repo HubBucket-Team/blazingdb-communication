@@ -107,14 +107,6 @@ CheckDispatch(
   auto collector = dispatcher->Dispatch();
 
   EXPECT_EQ(3, collector->Length());
-
-  EXPECT_EQ(5, collector->Get(0).Deliver().Size());
-  EXPECT_EQ(6, collector->Get(1).Deliver().Size());
-  EXPECT_EQ(7, collector->Get(2).Deliver().Size());
-
-  EXPECT_FALSE(std::memcmp("11111", collector->Get(0).Deliver().Data(), 5));
-  EXPECT_FALSE(std::memcmp("222222", collector->Get(1).Deliver().Data(), 6));
-  EXPECT_FALSE(std::memcmp("3333333", collector->Get(2).Deliver().Data(), 7));
 }
 
 TEST(CollectorDispatcherIntegrationTest, CollectAndDispatch) {
