@@ -123,21 +123,21 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  for (const Payload &payload : *collector) {
-    std::unique_ptr<GdfColumnValue> gdfColumnValue = GdfColumnValue::Make(
-        static_cast<const GdfColumnPayload &>(payload), agent);
+  //for (const Payload &payload : *collector) {
+    //std::unique_ptr<GdfColumnValue> gdfColumnValue = GdfColumnValue::Make(
+        //static_cast<const GdfColumnPayload &>(payload), agent);
 
-    gdfColumns.emplace_back(gdf_column{
-        const_cast<void *>(gdfColumnValue->data()),
-        reinterpret_cast<unsigned char *>(
-            const_cast<void *>(gdfColumnValue->valid())),
-        static_cast<int>(gdfColumnValue->size()),
-        static_cast<decltype(gdf_column::dtype)>(gdfColumnValue->dtype()),
-        static_cast<int>(gdfColumnValue->null_count()),
-        {},
-        const_cast<char *>(gdfColumnValue->column_name()),
-    });
-  }
+    //gdfColumns.emplace_back(gdf_column{
+        //const_cast<void *>(gdfColumnValue->data()),
+        //reinterpret_cast<unsigned char *>(
+            //const_cast<void *>(gdfColumnValue->valid())),
+        //static_cast<int>(gdfColumnValue->size()),
+        //static_cast<decltype(gdf_column::dtype)>(gdfColumnValue->dtype()),
+        //static_cast<int>(gdfColumnValue->null_count()),
+        //{},
+        //const_cast<char *>(gdfColumnValue->column_name()),
+    //});
+  //}
 
   return gdfColumns;
 }

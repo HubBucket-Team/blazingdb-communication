@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "InHostGdfColumnIterator.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -39,9 +41,18 @@ InHostGdfColumnCollector::Length() const noexcept {
   return payloads_.size();
 }
 
-const Payload &
-InHostGdfColumnCollector::Get(std::size_t index) const {
-  return *payloads_.at(index);
+std::unique_ptr<Collector::Iterator::Base>
+InHostGdfColumnCollector::Begin() const noexcept {
+  return std::make_unique<InHostGdfColumnIterator>(
+      std::forward<std::vector<const Payload *>::const_iterator>(
+          payloads_.cbegin()));
+}
+
+std::unique_ptr<Collector::Iterator::Base>
+InHostGdfColumnCollector::End() const noexcept {
+  return std::make_unique<InHostGdfColumnIterator>(
+      std::forward<std::vector<const Payload *>::const_iterator>(
+          payloads_.cend()));
 }
 
 }  // namespace gdf_columns

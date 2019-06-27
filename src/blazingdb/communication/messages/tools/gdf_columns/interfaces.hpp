@@ -405,52 +405,59 @@ public:
   virtual std::size_t
   Length() const noexcept = 0;
 
-  virtual const Payload &
-  Get(std::size_t index) const = 0;
-
-  const Payload &operator[](const std::size_t index) const {
-    return Get(index);
-  }
-
   class Iterator {
   public:
-    UC_INLINE constexpr explicit Iterator(const Collector & collector,
-                                          const std::size_t index)
-        : collector_{collector}, index_{index} {}
+    class Base {
+    public:
+      virtual const Base &
+      operator++() = 0;
 
-    UC_INLINE constexpr explicit Iterator(const Collector &collector)
-        : Iterator{collector, 0} {}
+      virtual bool
+      operator!=(const Base &) const = 0;
 
-    UC_INLINE constexpr Iterator &
-    operator++() {
-      ++index_;
+      virtual const PayloadableBuffer &operator*() const = 0;
+    };
+
+    UC_INLINE explicit Iterator(std::unique_ptr<Base> base)
+        : base_{std::move(base)} {}
+
+    UC_INLINE Iterator &
+              operator++() {
+      ++*base_;
       return *this;
     }
 
-    UC_INLINE constexpr bool
-    operator!=(const Iterator &other) {
-      return index_ != other.index_;
+    UC_INLINE bool
+    operator!=(const Iterator &other) const {
+      return *base_ != *other.base_;
     }
 
-    UC_INLINE const Payload &operator*() const {
+    UC_INLINE const PayloadableBuffer &operator*() const {
       // TODO(improve): to constexpr
-      return collector_[index_];
+      return **base_;
     }
 
   private:
-    const Collector &collector_;
-    std::size_t      index_;
+    std::unique_ptr<Base> base_;
   };
 
   Iterator
   begin() noexcept {
-    return Iterator{*this};
+    return Iterator{Begin()};
   }
 
   Iterator
   end() noexcept {
-    return Iterator{*this, Length()};
+    return Iterator{End()};
   }
+
+protected:
+  // TODO(improve): use constant iterators
+  virtual std::unique_ptr<Iterator::Base>
+  Begin() const noexcept = 0;
+
+  virtual std::unique_ptr<Iterator::Base>
+  End() const noexcept = 0;
 };
 
 class GdfColumnCollector : public Collector {
