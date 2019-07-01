@@ -71,9 +71,9 @@ CheckCollect() {
   ExpectCall(payload2, buffer2, "222222");
   ExpectCall(payload3, buffer3, "3333333");
 
-  collector->Add(payload1);
-  collector->Add(payload2);
-  collector->Add(payload3);
+  collector->Add(payload1.Deliver());
+  collector->Add(payload2.Deliver());
+  collector->Add(payload3.Deliver());
 
   EXPECT_EQ(3, collector->Length());
 

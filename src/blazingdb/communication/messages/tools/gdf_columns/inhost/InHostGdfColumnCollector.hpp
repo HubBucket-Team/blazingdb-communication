@@ -21,7 +21,7 @@ public:
   Collect() const noexcept final;
 
   Collector &
-  Add(const Payload &payload) noexcept final;
+  Add(const Buffer &buffer) noexcept final;
 
   std::size_t
   Length() const noexcept final;
@@ -34,7 +34,7 @@ protected:
   End() const noexcept final;
 
 private:
-  std::vector<const Payload *> payloads_;
+  std::vector<const Buffer *> buffers_;
 
   UC_CONCRETE(InHostGdfColumnCollector);
 };

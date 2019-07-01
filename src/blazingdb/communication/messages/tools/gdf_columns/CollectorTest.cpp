@@ -50,18 +50,18 @@ protected:
 
 TEST_F(CollectorTest, Add) {
   EXPECT_EQ(0, collector->Length());
-  collector->Add(payload[0]);
+  collector->Add(payload[0].Deliver());
   EXPECT_EQ(1, collector->Length());
-  collector->Add(payload[1]);
+  collector->Add(payload[1].Deliver());
   EXPECT_EQ(2, collector->Length());
-  collector->Add(payload[2]);
+  collector->Add(payload[2].Deliver());
   EXPECT_EQ(3, collector->Length());
 }
 
 TEST_F(CollectorTest, Iterate) {
-  collector->Add(payload[0]);
-  collector->Add(payload[1]);
-  collector->Add(payload[2]);
+  collector->Add(payload[0].Deliver());
+  collector->Add(payload[1].Deliver());
+  collector->Add(payload[2].Deliver());
 
   std::vector<const Buffer *> collectedBuffers;
   collectedBuffers.reserve(3);
@@ -77,12 +77,4 @@ TEST_F(CollectorTest, Iterate) {
   EXPECT_FALSE(std::memcmp("12345", collectedBuffers[0]->Data(), 5));
   EXPECT_FALSE(std::memcmp("123456", collectedBuffers[1]->Data(), 6));
   EXPECT_FALSE(std::memcmp("1234567", collectedBuffers[2]->Data(), 7));
-}
-
-TEST_F(CollectorTest, Collect) {
-  collector->Add(payload[0]);
-  collector->Add(payload[1]);
-  collector->Add(payload[2]);
-
-  std::unique_ptr<Buffer> buffer = collector->Collect();
 }

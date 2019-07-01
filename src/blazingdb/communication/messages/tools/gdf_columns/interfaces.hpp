@@ -24,6 +24,14 @@
 ///
 /// Remark: The suffix "InHost" refers to a family of concrete classes
 /// implementing the packaging using std::string.
+///
+/// Some details:
+/// - Why too intermediaries to produce a buffer?
+///   Because we can implement builders to produce internal chunks and wait
+///   until we have all setted data to make a buffer.
+///
+///   Each builder, dispatcher, payload, specialized can manage resources like
+///   memory. But its resources are unnecessary when we go through next phases.
 
 #include <memory>
 
@@ -397,8 +405,14 @@ public:
   virtual std::unique_ptr<Buffer>
   Collect() const noexcept = 0;
 
+  // TODO(deprecated): remove
+  Collector &
+  Add(const Payload &payload) noexcept UC_DEPRECATED {
+    return Add(payload.Deliver());
+  }
+
   virtual Collector &
-  Add(const Payload &payload) noexcept = 0;
+  Add(const Buffer &buffer) noexcept = 0;
 
   // collected
 
@@ -415,7 +429,7 @@ public:
       virtual bool
       operator!=(const Base &) const = 0;
 
-      virtual const PayloadableBuffer &operator*() const = 0;
+      virtual const Buffer &operator*() const = 0;
     };
 
     UC_INLINE explicit Iterator(std::unique_ptr<Base> base)
@@ -432,10 +446,7 @@ public:
       return *base_ != *other.base_;
     }
 
-    UC_INLINE const PayloadableBuffer &operator*() const {
-      // TODO(improve): to constexpr
-      return **base_;
-    }
+    UC_INLINE const Buffer &operator*() const { return **base_; }
 
   private:
     std::unique_ptr<Base> base_;

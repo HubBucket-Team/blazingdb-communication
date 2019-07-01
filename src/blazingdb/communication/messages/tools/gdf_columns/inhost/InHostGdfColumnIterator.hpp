@@ -13,32 +13,30 @@ namespace messages {
 namespace tools {
 namespace gdf_columns {
 
-class InHostGdfColumnIterator : public Collector::Iterator::Base {
+class UC_NOEXPORT InHostGdfColumnIterator : public Collector::Iterator::Base {
   UC_CONCRETE(InHostGdfColumnIterator);
 
 public:
   explicit InHostGdfColumnIterator(
-      std::vector<const Payload *>::const_iterator &&iterator)
+      std::vector<const Buffer *>::const_iterator &&iterator)
       : iterator_{std::move(iterator)} {}
 
-  virtual const Base &
+  const Base &
   operator++() final {
     ++iterator_;
     return *this;
   }
 
-  virtual bool
+  bool
   operator!=(const Base &other) const final {
     return iterator_ !=
            static_cast<const InHostGdfColumnIterator &>(other).iterator_;
   }
 
-  virtual const PayloadableBuffer &operator*() const final {
-    return static_cast<const PayloadableBuffer &>((*iterator_)->Deliver());
-  }
+  const Buffer &operator*() const final { return **iterator_; }
 
 private:
-  std::vector<const Payload *>::const_iterator iterator_;
+  std::vector<const Buffer *>::const_iterator iterator_;
 };
 
 }  // namespace gdf_columns
