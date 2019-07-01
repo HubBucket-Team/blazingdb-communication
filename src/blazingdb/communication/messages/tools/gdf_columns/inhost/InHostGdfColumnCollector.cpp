@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "InHostGdfColumnIterator.hpp"
+
 namespace blazingdb {
 namespace communication {
 namespace messages {
@@ -20,28 +22,37 @@ InHostGdfColumnCollector::Collect() const noexcept {
   builder.Add(ValueBuffer{Length()});
 
   std::for_each(
-      payloads_.cbegin(), payloads_.cend(), [&builder](const Payload *payload) {
-        builder.Add(ValueBuffer{payload->Deliver().Size()});
-        builder.Add(payload->Deliver());
+      buffers_.cbegin(), buffers_.cend(), [&builder](const Buffer *buffer) {
+        builder.Add(ValueBuffer{buffer->Size()});
+        builder.Add(*buffer);
       });
 
   return builder.Build();
 }
 
 Collector &
-InHostGdfColumnCollector::Add(const Payload &payload) noexcept {
-  payloads_.push_back(&payload);
+InHostGdfColumnCollector::Add(const Buffer &buffer) noexcept {
+  buffers_.push_back(&buffer);
   return *this;
 }
 
 std::size_t
 InHostGdfColumnCollector::Length() const noexcept {
-  return payloads_.size();
+  return buffers_.size();
 }
 
-const Payload &
-InHostGdfColumnCollector::Get(std::size_t index) const {
-  return *payloads_.at(index);
+std::unique_ptr<Collector::Iterator::Base>
+InHostGdfColumnCollector::Begin() const noexcept {
+  return std::make_unique<InHostGdfColumnIterator>(
+      std::forward<std::vector<const Buffer *>::const_iterator>(
+          buffers_.cbegin()));
+}
+
+std::unique_ptr<Collector::Iterator::Base>
+InHostGdfColumnCollector::End() const noexcept {
+  return std::make_unique<InHostGdfColumnIterator>(
+      std::forward<std::vector<const Buffer *>::const_iterator>(
+          buffers_.cend()));
 }
 
 }  // namespace gdf_columns

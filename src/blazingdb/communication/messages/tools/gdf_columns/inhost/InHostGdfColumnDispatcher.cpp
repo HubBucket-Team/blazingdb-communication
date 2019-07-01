@@ -15,7 +15,37 @@ namespace gdf_columns {
 
 namespace {
 
+class UC_NOEXPORT ReturnedIterator : public Collector::Iterator::Base {
+  UC_CONCRETE(ReturnedIterator);
+
+public:
+  explicit ReturnedIterator(
+      std::vector<std::unique_ptr<ViewBuffer>>::const_iterator &&iterator)
+      : iterator_{std::move(iterator)} {}
+
+  const Base &
+  operator++() final {
+    ++iterator_;
+    return *this;
+  }
+
+  bool
+  operator!=(const Base &other) const final {
+    return iterator_ != static_cast<const ReturnedIterator &>(other).iterator_;
+  }
+
+  const PayloadableBuffer &operator*() const final {
+    return static_cast<const PayloadableBuffer &>(
+        static_cast<const Buffer &>(**iterator_));
+  }
+
+private:
+  std::vector<std::unique_ptr<ViewBuffer>>::const_iterator iterator_;
+};
+
 class UC_NOEXPORT ReturnedCollector : public Collector {
+  UC_CONCRETE(ReturnedCollector);
+
 public:
   explicit ReturnedCollector(const Buffer &buffer)
       : buffer_{buffer},
@@ -47,7 +77,7 @@ public:
   }
 
   UC_NORETURN Collector &
-              Add(const Payload &) noexcept final {
+              Add(const Buffer &) noexcept final {
     UC_ABORT("Not supported");
   }
 
@@ -56,9 +86,15 @@ public:
     return length_;
   }
 
-  const Payload &
-  Get(std::size_t index) const final {
-    return *payloads_.at(index);
+protected:
+  std::unique_ptr<Iterator::Base>
+  Begin() const noexcept final {
+    return std::make_unique<ReturnedIterator>(buffers_.cbegin());
+  }
+
+  std::unique_ptr<Iterator::Base>
+  End() const noexcept final {
+    return std::make_unique<ReturnedIterator>(buffers_.cend());
   }
 
 private:
@@ -67,8 +103,6 @@ private:
 
   std::vector<std::unique_ptr<ViewBuffer>>                 buffers_;
   std::vector<std::unique_ptr<GdfColumnPayloadInHostBase>> payloads_;
-
-  UC_CONCRETE(ReturnedCollector);
 };
 
 }  // namespace

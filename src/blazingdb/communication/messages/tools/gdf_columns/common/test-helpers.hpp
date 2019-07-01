@@ -221,6 +221,7 @@ ReturnMake(Callable &&call, Args &&... args) {
 
 #include <blazingdb/uc/API.hpp>
 
+// Use to mock UCX behavior
 namespace uc {
 
 class MockAgent : public blazingdb::uc::Agent {
@@ -253,5 +254,29 @@ public:
 };
 
 }  // namespace uc
+
+#include "../interfaces.hpp"
+
+// Use to test gdf columns (de)serialization behavior
+namespace blazingdb {
+namespace testing {
+
+class MockPayload
+    : public blazingdb::communication::messages::tools::gdf_columns::Payload {
+public:
+  using Buffer = blazingdb::communication::messages::tools::gdf_columns::Buffer;
+
+  MOCK_CONST_METHOD0_NE(Deliver, const Buffer &());
+};
+
+class MockBuffer
+    : public blazingdb::communication::messages::tools::gdf_columns::Buffer {
+public:
+  MOCK_CONST_METHOD0_NE(Data, const void *());
+  MOCK_CONST_METHOD0_NE(Size, std::size_t());
+};
+
+}  // namespace testing
+}  // namespace blazingdb
 
 #endif

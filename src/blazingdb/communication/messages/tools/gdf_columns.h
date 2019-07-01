@@ -9,9 +9,9 @@
 /// The funtion `CollectFrom` converts a transported buffer to a collection of
 /// gdf columns.
 
+#include <cstring>
 #include <iostream>
 #include <vector>
-#include <cstring>
 
 #include "gdf_columns/interfaces.hpp"
 
@@ -52,32 +52,32 @@ DeliverFrom(const std::vector<gdf_column> &gdfColumns,
     validBuffers.emplace_back(CudaBuffer::Make(
         gdfColumn.valid, GdfColumnInfo<gdf_column>::ValidSize(gdfColumn)));
 
-    columnNameBuffers.emplace_back(HostBuffer::Make(
-        gdfColumn.col_name, std::strlen(gdfColumn.col_name)));
+    columnNameBuffers.emplace_back(
+        HostBuffer::Make(gdfColumn.col_name, std::strlen(gdfColumn.col_name)));
 
     const std::size_t       size      = gdfColumn.size;
     const std::int_fast32_t dtype     = gdfColumn.dtype;
     const std::size_t       nullCount = gdfColumn.null_count;
 
     // TODO(potential bug): optional setters
-    if(nullCount>0){
-    payloads.emplace_back(builder->Data(*dataBuffers.back())
-                              .Valid(*validBuffers.back())
-                              .Size(size)
-                              .DType(dtype)
-                              .NullCount(nullCount)
-                              .ColumnName(*columnNameBuffers.back())
-                              .Build());
-    }else{
-    payloads.emplace_back(builder->Data(*dataBuffers.back())
-                              .Size(size)
-                              .DType(dtype)
-                              .NullCount(nullCount)
-                              .ColumnName(*columnNameBuffers.back())
-                              .Build());
+    if (nullCount > 0) {
+      payloads.emplace_back(builder->Data(*dataBuffers.back())
+                                .Valid(*validBuffers.back())
+                                .Size(size)
+                                .DType(dtype)
+                                .NullCount(nullCount)
+                                .ColumnName(*columnNameBuffers.back())
+                                .Build());
+    } else {
+      payloads.emplace_back(builder->Data(*dataBuffers.back())
+                                .Size(size)
+                                .DType(dtype)
+                                .NullCount(nullCount)
+                                .ColumnName(*columnNameBuffers.back())
+                                .Build());
     }
 
-    collector->Add(*payloads.back());
+    collector->Add(payloads.back()->Deliver());
   }
 
   std::unique_ptr<Buffer> resultBuffer = collector->Collect();
@@ -123,9 +123,14 @@ CollectFrom(const std::string &content, blazingdb::uc::Agent &agent) {
   std::vector<gdf_column> gdfColumns;
   gdfColumns.reserve(collector->Length());
 
-  for (const Payload &payload : *collector) {
+  for (const Buffer &buffer : *collector) {
+    std::unique_ptr<Specialized> specialized =
+        GdfColumnSpecialized::MakeInHost(buffer);
+
+    const std::unique_ptr<const Payload> payload = specialized->Apply();
+
     std::unique_ptr<GdfColumnValue> gdfColumnValue = GdfColumnValue::Make(
-        static_cast<const GdfColumnPayload &>(payload), agent);
+        static_cast<const GdfColumnPayload &>(*payload), agent);
 
     gdfColumns.emplace_back(gdf_column{
         const_cast<void *>(gdfColumnValue->data()),

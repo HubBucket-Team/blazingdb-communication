@@ -21,16 +21,20 @@ public:
   Collect() const noexcept final;
 
   Collector &
-  Add(const Payload &payload) noexcept final;
+  Add(const Buffer &buffer) noexcept final;
 
   std::size_t
   Length() const noexcept final;
 
-  const Payload &
-  Get(std::size_t index) const final;
+protected:
+  std::unique_ptr<Iterator::Base>
+  Begin() const noexcept final;
+
+  std::unique_ptr<Iterator::Base>
+  End() const noexcept final;
 
 private:
-  std::vector<const Payload *> payloads_;
+  std::vector<const Buffer *> buffers_;
 
   UC_CONCRETE(InHostGdfColumnCollector);
 };

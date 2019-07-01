@@ -112,6 +112,7 @@ blazingdb_artifact (
     manager-test.cc
     messages/message-test.cpp
     messages/tools/gdf_columns-test.cpp
+    messages/tools/gdf_columns/CollectorTest.cpp
     messages/tools/gdf_columns/inhost/CollectorDispatcherIntegrationTest.cpp
     messages/tools/gdf_columns/inhost/InHostCategoryBuilderTest.cpp
     messages/tools/gdf_columns/inhost/InHostDTypeInfoBuilderTest.cpp
