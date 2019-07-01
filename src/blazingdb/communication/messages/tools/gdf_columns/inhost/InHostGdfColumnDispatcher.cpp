@@ -34,10 +34,7 @@ public:
     return iterator_ != static_cast<const ReturnedIterator &>(other).iterator_;
   }
 
-  const PayloadableBuffer &operator*() const final {
-    return static_cast<const PayloadableBuffer &>(
-        static_cast<const Buffer &>(**iterator_));
-  }
+  const Buffer &operator*() const final { return **iterator_; }
 
 private:
   std::vector<std::unique_ptr<ViewBuffer>>::const_iterator iterator_;

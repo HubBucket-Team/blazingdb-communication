@@ -531,17 +531,35 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
   using blazingdb::communication::messages::tools::gdf_columns::Collector;
   std::unique_ptr<Collector> collector = dispatcher->Dispatch();
 
-  using blazingdb::communication::messages::tools::gdf_columns::
-      GdfColumnPayload;
-
   EXPECT_EQ(3, collector->Length());
 
-  //EXPECT_EQ(10,
-            //static_cast<const GdfColumnPayload &>(collector->Get(0)).Size());
-  //EXPECT_EQ(25,
-            //static_cast<const GdfColumnPayload &>(collector->Get(1)).Size());
-  //EXPECT_EQ(50,
-            //static_cast<const GdfColumnPayload &>(collector->Get(2)).Size());
+  using blazingdb::communication::messages::tools::gdf_columns::
+      GdfColumnPayload;
+  std::vector<std::unique_ptr<GdfColumnPayload>> deliveredPayloads;
+  deliveredPayloads.reserve(collector->Length());
+
+  using blazingdb::communication::messages::tools::gdf_columns::Buffer;
+  std::transform(
+      collector->begin(),
+      collector->end(),
+      std::back_inserter(deliveredPayloads),
+      [](const Buffer &buffer) {
+        using blazingdb::communication::messages::tools::gdf_columns::
+            Specialized;
+
+        std::unique_ptr<Specialized> specialized =
+            blazingdb::communication::messages::tools::gdf_columns::
+                GdfColumnSpecialized::MakeInHost(buffer);
+
+        return std::unique_ptr<GdfColumnPayload>{
+            static_cast<GdfColumnPayload *>(specialized->Apply().release())};
+      });
+
+  EXPECT_EQ(3, deliveredPayloads.size());
+
+  EXPECT_EQ(10, deliveredPayloads[0]->Size());
+  EXPECT_EQ(25, deliveredPayloads[1]->Size());
+  EXPECT_EQ(50, deliveredPayloads[2]->Size());
 
   std::vector<gdf_column> gdf_columns =
       blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
