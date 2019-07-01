@@ -405,12 +405,6 @@ public:
   virtual std::unique_ptr<Buffer>
   Collect() const noexcept = 0;
 
-  // TODO(deprecated): remove
-  Collector &
-  Add(const Payload &payload) noexcept UC_DEPRECATED {
-    return Add(payload.Deliver());
-  }
-
   virtual Collector &
   Add(const Buffer &buffer) noexcept = 0;
 
