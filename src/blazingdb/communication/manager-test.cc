@@ -21,7 +21,7 @@ TEST(ManagerTest, ConnectionAndGenerateContext) {
       blazingdb::communication::network::Client::Make();
 
   blazingdb::communication::Node node(
-      blazingdb::communication::Address::Make("1.2.3.4", 1234));
+      blazingdb::communication::Address::Make("1.2.3.4", 1234, 5678));
 
   // Create message
   blazingdb::communication::messages::NodeDataMessage nodeDataMessage(node);

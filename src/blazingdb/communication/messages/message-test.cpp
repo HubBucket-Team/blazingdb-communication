@@ -78,7 +78,7 @@ public:
 
 static std::shared_ptr<blazingdb::communication::Node>
 CreateNode() {
-  auto address = blazingdb::communication::Address::Make("127.0.0.1", 8000);
+  auto address = blazingdb::communication::Address::Make("127.0.0.1", 8000, 5678);
   return blazingdb::communication::Node::Make(std::move(address));
 }
 
