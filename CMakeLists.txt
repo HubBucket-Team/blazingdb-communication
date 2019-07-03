@@ -28,6 +28,7 @@ include(ConfigureBlazingDBDependencies)
 include(ConfigureBoost)
 include(ConfigureRapidJSON)
 include(ConfigureSimpleWebServer)
+include(ConfigureGDR)
 include(ConfigureUCX)
 
 # BEGIN MAIN #
