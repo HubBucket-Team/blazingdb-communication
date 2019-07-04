@@ -342,7 +342,7 @@ protected:
                          static_cast<unsigned char*>(cudfColumn.valid),
                          cudfColumn.size,
                          cudfColumn.null_count,
-                         cudfColumn.col_name);
+                         cudfColumn.col_name ? cudfColumn.col_name : "");
                      return ralColumn;
                    });
 
