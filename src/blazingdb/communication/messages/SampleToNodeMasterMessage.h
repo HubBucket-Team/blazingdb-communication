@@ -11,156 +11,156 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-class SampleToNodeMasterMessage
-    : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
-private:
-  using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+    class SampleToNodeMasterMessage : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
+    private:
+        using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
 
-public:
-  using MessageType =
-      SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
+    public:
+        using MessageType = SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>;
 
-public:
-  SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
-                            std::shared_ptr<ContextToken>&& contextToken,
-                            const Node&                     sender_node,
-                            std::uint64_t                   total_row_size,
-                            std::vector<RalColumn>&&        samples)
-      : BaseClass(
-            std::move(messageToken), std::move(contextToken), sender_node),
-        total_row_size_{total_row_size},
-        samples_{std::move(samples)} {}
+    public:
+        SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
+                                  std::shared_ptr<ContextToken>&& contextToken,
+                                  const Node& sender_node,
+                                  std::uint64_t total_row_size,
+                                  std::vector<RalColumn>&& samples)
+        : BaseClass (std::move(messageToken), std::move(contextToken), sender_node),
+          total_row_size_{total_row_size},
+          samples_{std::move(samples)}
+        { }
 
-  SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
-                            std::shared_ptr<ContextToken>&& contextToken,
-                            const Node&                     sender_node,
-                            std::uint64_t                   total_row_size,
-                            const std::vector<RalColumn>&   samples)
-      : BaseClass(
-            std::move(messageToken), std::move(contextToken), sender_node),
-        total_row_size_{total_row_size},
-        samples_{samples} {}
+        SampleToNodeMasterMessage(std::unique_ptr<MessageToken>&& messageToken,
+                                  std::shared_ptr<ContextToken>&& contextToken,
+                                  const Node& sender_node,
+                                  std::uint64_t total_row_size,
+                                  const std::vector<RalColumn>& samples)
+        : BaseClass (std::move(messageToken), std::move(contextToken), sender_node),
+          total_row_size_{total_row_size},
+          samples_{samples}
+        { }
 
-public:
-  std::uint64_t
-  getTotalRowSize() const {
-    return total_row_size_;
-  }
-
-  std::vector<RalColumn>
-  getSamples() {
-    return std::move(samples_);
-  }
-
-public:
-  const std::string
-  serializeToJson() const override {
-    typename BaseClass::StringBuffer stringBuffer;
-    typename BaseClass::Writer       writer(stringBuffer);
-
-    writer.StartObject();
-    {
-      // Serialize Message
-      serializeMessage(writer, this);
-
-      // Serialize total_data_size
-      writer.Key("total_row_size");
-      writer.Uint64(total_row_size_);
-
-      // Serialize RalColumns
-      writer.Key("samples");
-      writer.StartArray();
-      {
-        for (const auto& sample : samples_) {
-          BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(sample));
+    public:
+        std::uint64_t getTotalRowSize() const {
+            return total_row_size_;
         }
-      }
-      writer.EndArray();
-    }
-    writer.EndObject();
 
-    return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
-  }
+        std::vector<RalColumn> getSamples() {
+            return std::move(samples_);
+        }
 
-  const std::string
-  serializeToBinary() const override {
-    return BaseClass::serializeToBinary(
-        const_cast<std::vector<RalColumn>&>(samples_));
-  }
+    public:
+        const std::string serializeToJson() const override {
+            typename BaseClass::StringBuffer stringBuffer;
+            typename BaseClass::Writer writer(stringBuffer);
 
-public:
-  static const std::string
-  getMessageID() {
-    return MessageID;
-  }
+            writer.StartObject();
+            {
+                // Serialize Message
+                serializeMessage(writer, this);
 
-  static std::shared_ptr<Message>
-  Make(const std::string& json, const std::string& binary) {
-    // Parse json
-    rapidjson::Document document;
-    document.Parse(json.c_str());
+                // Serialize total_data_size
+                writer.Key("total_row_size");
+                writer.Uint64(total_row_size_);
 
-    // Get main object
-    const auto& object = document.GetObject();
+                // Serialize RalColumns
+                writer.Key("samples");
+                writer.StartArray();
+                {
+                    for (const auto& sample : samples_) {
+                        BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(sample));
+                    }
+                }
+                writer.EndArray();
+            }
+            writer.EndObject();
 
-    // Get message values;
-    std::unique_ptr<Node>         sender_node;
-    std::unique_ptr<MessageToken> messageToken;
-    std::shared_ptr<ContextToken> contextToken;
-    deserializeMessage(
-        object["message"].GetObject(), messageToken, contextToken, sender_node);
+            return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
+        }
 
-    // Get total row size
-    std::uint64_t total_row_size = document["total_row_size"].GetUint64();
+        const std::string serializeToBinary() const override {
+            return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(samples_));
+        }
 
-    // blazingdb-uc
-    const Configuration& configuration =
-        blazingdb::communication::Configuration::Instance();
+    public:
+        static const std::string getMessageID() {
+            return MessageID;
+        }
 
-    std::unique_ptr<blazingdb::uc::Context> context =
-        configuration.WithGDR() ? blazingdb::uc::Context::GDR()
-                                : blazingdb::uc::Context::IPC();
+        static std::shared_ptr<Message>
+        Make(const std::string& json, const std::string& binary) {
+          // Parse json
+          rapidjson::Document document;
+          document.Parse(json.c_str());
 
-    auto agent = context->Agent();
+          // Get main object
+          const auto& object = document.GetObject();
 
-    // Get samples
-    std::hash<std::string> hasher;
-    auto                   hashed = hasher(binary);
-    std::cout << "****Make message from bin: " << binary << std::endl;
-    std::cout << "****Make message from: " << hashed << std::endl;
+          // Get message values;
+          std::unique_ptr<Node>         sender_node;
+          std::unique_ptr<MessageToken> messageToken;
+          std::shared_ptr<ContextToken> contextToken;
+          deserializeMessage(object["message"].GetObject(),
+                             messageToken,
+                             contextToken,
+                             sender_node);
 
-    std::vector<RalColumn> columns =
-        BaseClass::deserializeRalColumns(binary, *agent);
+          // Get total row size
+          std::uint64_t total_row_size = document["total_row_size"].GetUint64();
 
-    /// TODO(workaround): remove this.
-    /// Write code to manage the life cycle of a UC context.
-    agent.release();
-    context.release();
+          // blazingdb-uc
+          const Configuration& configuration =
+              blazingdb::communication::Configuration::Instance();
 
-    // Create the message
-    return std::make_shared<MessageType>(std::move(messageToken),
-                                         std::move(contextToken),
-                                         *sender_node,
-                                         total_row_size,
-                                         std::move(columns));
-  }
+          std::unique_ptr<blazingdb::uc::Context> context;
 
-private:
-  const uint64_t         total_row_size_;
-  std::vector<RalColumn> samples_;
+          if (configuration.WithGDR()) {
+            context = blazingdb::uc::Context::GDR();
+          } else {
+            context = blazingdb::uc::Context::IPCView();
+          }
 
-private:
-  static const std::string MessageID;
-};
+          auto agent = context->Agent();
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-const std::string
-    SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID{
-        "SampleToNodeMasterMessage"};
+          // Get samples
+          std::vector<RalColumn> columns;
+          std::size_t            binary_pointer = 0;
+          const auto& gpu_data_array = document["samples"].GetArray();
+          auto offset = 0;
+          auto buffer_size = context->serializedRecordSize();
+          for (const auto& gpu_data : gpu_data_array) {
+            RalColumn column 
+                = BaseClass::deserializeRalColumn(
+                    binary.substr(offset),
+                    buffer_size,
+                    gpu_data.GetObject(),
+                    agent.get());
 
-}  // namespace messages
-}  // namespace communication
-}  // namespace blazingdb
+            columns.emplace_back(std::move(column));
+            offset += 2 * buffer_size;
+          }
 
-#endif  // BLAZINGDB_COMMUNICATION_MESSAGES_SAMPLETONODEMASTERMESSAGE_H
+          // Create the message
+          return std::make_shared<MessageType>(std::move(messageToken),
+                                               std::move(contextToken),
+                                               *sender_node,
+                                               total_row_size,
+                                               std::move(columns));
+        }
+
+    private:
+        const uint64_t total_row_size_;
+        std::vector<RalColumn> samples_;
+
+    private:
+        static const std::string MessageID;
+    };
+
+    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+    const std::string SampleToNodeMasterMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID {"SampleToNodeMasterMessage"};
+
+} // namespace messages
+} // namespace communication
+} // namespace blazingdb
+
+#endif //BLAZINGDB_COMMUNICATION_MESSAGES_SAMPLETONODEMASTERMESSAGE_H

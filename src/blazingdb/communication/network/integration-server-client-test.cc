@@ -166,7 +166,7 @@ TEST(IntegrationServerClientTest, SendMessageToServerFromClient) {
 
   // Create node info
   std::shared_ptr<blazingdb::communication::Address> address =
-      blazingdb::communication::Address::Make("localhost", 8000, 8001);
+      blazingdb::communication::Address::Make("localhost", 8000, 5678);
 
   blazingdb::communication::Node node{std::move(address)};
 

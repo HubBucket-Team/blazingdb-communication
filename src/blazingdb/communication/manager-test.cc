@@ -10,7 +10,8 @@
 TEST(ManagerTest, ConnectionAndGenerateContext) {
   // Start manager
   std::unique_ptr<blazingdb::communication::Manager> manager =
-      blazingdb::communication::Manager::Make(8000);
+
+  blazingdb::communication::Manager::Make(9000);
 
   std::thread managerRunThread{[&manager]() { manager->Run(); }};
 

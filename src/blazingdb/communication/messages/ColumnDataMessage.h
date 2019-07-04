@@ -1,10 +1,10 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_COLUMNDATAMESSAGE_H
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COLUMNDATAMESSAGE_H
 
-#include <rapidjson/writer.h>
 #include <vector>
-#include "blazingdb/communication/messages/GpuComponentMessage.h"
+#include <rapidjson/writer.h>
 #include "blazingdb/communication/messages/Message.h"
+#include "blazingdb/communication/messages/GpuComponentMessage.h"
 
 #include <blazingdb/uc/Context.hpp>
 
@@ -13,129 +13,107 @@ namespace communication {
 namespace messages {
 
 template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-class ColumnDataMessage
-    : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
+class ColumnDataMessage : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
 private:
-  using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+    using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
 
 public:
-  using MessageType = ColumnDataMessage<RalColumn, CudfColumn, GpuFunctions>;
+    using MessageType = ColumnDataMessage<RalColumn, CudfColumn, GpuFunctions>;
 
 public:
-  ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
-                    std::shared_ptr<ContextToken>&& context_token,
-                    const Node&                     sender_node,
-                    std::vector<RalColumn>&&        columns)
-      : BaseClass(
-            std::move(message_token), std::move(context_token), sender_node),
-        columns{std::move(columns)} {}
+    ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
+                      std::shared_ptr<ContextToken>&& context_token,
+                      const Node& sender_node,
+                      std::vector<RalColumn>&& columns)
+    : BaseClass(std::move(message_token), std::move(context_token), sender_node),
+      columns{std::move(columns)}
+    { }
 
-  ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
-                    std::shared_ptr<ContextToken>&& context_token,
-                    const Node&                     sender_node,
-                    const std::vector<RalColumn>&   columns)
-      : BaseClass(
-            std::move(message_token), std::move(context_token), sender_node),
-        columns{columns} {}
-
-public:
-  std::vector<RalColumn>
-  getColumns() {
-    return std::move(columns);
-  }
+    ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
+                      std::shared_ptr<ContextToken>&& context_token,
+                      const Node& sender_node,
+                      const std::vector<RalColumn>& columns)
+    : BaseClass(std::move(message_token), std::move(context_token), sender_node),
+      columns{columns}
+    { }
 
 public:
-  const std::string
-  serializeToJson() const override {
-    typename BaseClass::StringBuffer stringBuffer;
-    typename BaseClass::Writer       writer(stringBuffer);
-
-    writer.StartObject();
-    {
-      // Serialize Message
-      serializeMessage(writer, this);
-
-      // Serialize columns
-      writer.Key("columns");
-      writer.StartArray();
-      {
-        for (const auto& column : columns) {
-          BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(column));
-        }
-      }
-      writer.EndArray();
+    std::vector<RalColumn> getColumns() {
+        return std::move(columns);
     }
-    writer.EndObject();
-
-    return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
-  }
-
-  const std::string
-  serializeToBinary() const override {
-    return BaseClass::serializeToBinary(
-        const_cast<std::vector<RalColumn>&>(columns));
-  }
 
 public:
-  static const std::string
-  getMessageID() {
-    return MessageID;
-  }
+    const std::string serializeToJson() const override {
+        typename BaseClass::StringBuffer stringBuffer;
+        typename BaseClass::Writer writer(stringBuffer);
 
-  static std::shared_ptr<Message>
-  Make(const std::string& json, const std::string& binary) {
-    // Parse json
-    rapidjson::Document document;
-    document.Parse(json.c_str());
+        writer.StartObject();
+        {
+            // Serialize Message
+            serializeMessage(writer, this);
 
-    // Get main object
-    const auto& object = document.GetObject();
+            // Serialize columns
+            writer.Key("columns");
+            writer.StartArray();
+            {
+                for (const auto &column : columns) {
+                    BaseClass::serializeRalColumn(writer, const_cast<RalColumn&>(column));
+                }
+            }
+            writer.EndArray();
+        }
+        writer.EndObject();
 
-    // Get message values;
-    std::unique_ptr<Node>         node;
-    std::unique_ptr<MessageToken> messageToken;
-    std::shared_ptr<ContextToken> contextToken;
-    deserializeMessage(
-        object["message"].GetObject(), messageToken, contextToken, node);
+        return std::string(stringBuffer.GetString(), stringBuffer.GetSize());
+    }
 
-    // blazingdb-uc
-    const Configuration& configuration =
-        blazingdb::communication::Configuration::Instance();
+    const std::string serializeToBinary() const override {
+        return BaseClass::serializeToBinary(const_cast<std::vector<RalColumn>&>(columns));
+    }
+ 
+public:
+    static const std::string getMessageID() {
+        return MessageID;
+    }
 
-    std::unique_ptr<blazingdb::uc::Context> context =
-        configuration.WithGDR() ? blazingdb::uc::Context::GDR()
-                                : blazingdb::uc::Context::IPC();
+    static std::shared_ptr<Message> Make(const std::string& json, const std::string& binary) {
+        // Parse json
+        rapidjson::Document document;
+        document.Parse(json.c_str());
 
-    auto agent = context->Agent();
+        // Get main object
+        const auto& object = document.GetObject();
 
-    // Get array columns (payload)
-    std::vector<RalColumn> columns =
-        BaseClass::deserializeRalColumns(binary, *agent);
+        // Get message values;
+        std::unique_ptr<Node> node;
+        std::unique_ptr<MessageToken> messageToken;
+        std::shared_ptr<ContextToken> contextToken;
+        deserializeMessage(object["message"].GetObject(), messageToken, contextToken, node);
 
-    agent.release();
-    context.release();
+        // Get array columns (payload)
+        std::size_t binary_pointer = 0;
+        std::vector<RalColumn> columns;
+        const auto& gpu_data_array = object["columns"].GetArray();
+        for (const auto& gpu_data : gpu_data_array) {
+            columns.emplace_back(BaseClass::deserializeRalColumnCPUBuffer(binary_pointer, binary, gpu_data.GetObject()));
+        }
 
-    // Create the message
-    return std::make_shared<MessageType>(std::move(messageToken),
-                                         std::move(contextToken),
-                                         *node,
-                                         std::move(columns));
-  }
+        // Create the message
+        return std::make_shared<MessageType>(std::move(messageToken), std::move(contextToken), *node, std::move(columns));
+    }
 
 private:
-  std::vector<RalColumn> columns;
+    std::vector<RalColumn> columns;
 
 private:
-  static const std::string MessageID;
+    static const std::string MessageID;
 };
 
 template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-const std::string
-    ColumnDataMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID{
-        "ColumnDataMessage"};
+const std::string ColumnDataMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID {"ColumnDataMessage"};
 
-}  // namespace messages
-}  // namespace communication
-}  // namespace blazingdb
+} // namespace messages
+} // namespace communication
+} // namespace blazingdb
 
-#endif  // BLAZINGDB_COMMUNICATION_MESSAGES_COLUMNDATAMESSAGE_H
+#endif //BLAZINGDB_COMMUNICATION_MESSAGES_COLUMNDATAMESSAGE_H

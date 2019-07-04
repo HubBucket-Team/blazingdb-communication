@@ -137,7 +137,8 @@ ExecServer() {
   std::thread serverThread{&Server::Run, server.get(), 8000};
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001, 8002);
+  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8001, 5678);
+
   Node                     node{std::move(address)};
   std::shared_ptr<Message> message =
       server->getMessage(contextTokenValueId, MockMessage::getMessageID());
@@ -160,7 +161,11 @@ ExecClient() {
 
   std::unique_ptr<Client> client = Client::Make();
 
+<<<<<<< HEAD
   std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8000, 8001);
+=======
+  std::shared_ptr<Address> address = Address::Make("127.0.0.1", 8000, 5678);
+>>>>>>> refs/remotes/origin/feature/ucx
   Node                     node{std::move(address)};
 
   std::shared_ptr<ContextToken> contextToken =
