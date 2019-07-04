@@ -123,13 +123,13 @@ namespace messages {
             for (const auto& column : columns) {
                 auto* column_ptr =  column.get_gdf_column();
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->data, GpuFunctions::getDataCapacity(column_ptr));
-                // valid == null, [\0, ...  \0] 
+                // valid == null, [\0, ...  \0]
                 result += GpuComponentMessage::RegisterAndGetBufferDescriptor(agent.get(), column_ptr->valid, GpuFunctions::getValidCapacity(column_ptr));
             }
             std::hash<std::string> hasher;
-            auto hashed = hasher(result); 
+            auto hashed = hasher(result);
 
-            std::cout << "****message sent: " << hashed << std::endl; 
+            std::cout << "****message sent: " << hashed << std::endl;
 
             UCPool::getInstance().push(agent.release());
             UCPool::getInstance().push(context.release());
@@ -228,7 +228,7 @@ namespace messages {
           auto validRecordData =
               reinterpret_cast<const std::uint8_t*>(binary_data.data()) + descriptor_size;
 
-          if (cudf_column.null_count != 0) { 
+          if (cudf_column.null_count != 0) {
             // So, there are some valids.
             std::size_t validSize = std::ceil(dataSize);
             cudaStatus = cudaMalloc(&valid, validSize);
@@ -238,7 +238,7 @@ namespace messages {
                 agent, validRecordData, valid, validSize);
           }
           // set gdf column
-          RalColumn ral_column; 
+          RalColumn ral_column;
           ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
                                                     data,
                                                     (unsigned char*)valid,
@@ -251,35 +251,35 @@ namespace messages {
           ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
           return ral_column;
         }
+
+        static std::vector<RalColumn>
+        deserializeRalColumns(const std::string&    binary,
+                              blazingdb::uc::Agent& agent) {
+          std::vector<CudfColumn> cudfColumns =
+              blazingdb::communication::messages::tools::gdf_columns::
+                  CollectFrom<CudfColumn>(binary, agent);
+
+          std::vector<RalColumn> ralColumns;
+          ralColumns.reserve(cudfColumns.size());
+          std::transform(cudfColumns.cbegin(),
+                         cudfColumns.cend(),
+                         std::back_inserter(ralColumns),
+                         [](const CudfColumn& cudfColumn) {
+                           RalColumn ralColumn;
+                           ralColumn.create_gdf_column_for_ipc(
+                               cudfColumn.dtype,
+                               cudfColumn.data,
+                               static_cast<unsigned char*>(cudfColumn.valid),
+                               cudfColumn.size,
+                               cudfColumn.null_count,
+                               cudfColumn.col_name);
+                           return ralColumn;
+                         });
+
+          return ralColumns;
+        }
     };
 
-  static std::vector<RalColumn>
-  deserializeRalColumns(const std::string&    binary,
-                        blazingdb::uc::Agent& agent) {
-    std::vector<CudfColumn> cudfColumns =
-        blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
-            CudfColumn>(binary, agent);
-
-    std::vector<RalColumn> ralColumns;
-    ralColumns.reserve(cudfColumns.size());
-    std::transform(cudfColumns.cbegin(),
-                   cudfColumns.cend(),
-                   std::back_inserter(ralColumns),
-                   [](const CudfColumn& cudfColumn) {
-                     RalColumn ralColumn;
-                     ralColumn.create_gdf_column_for_ipc(
-                         cudfColumn.dtype,
-                         cudfColumn.data,
-                         static_cast<unsigned char*>(cudfColumn.valid),
-                         cudfColumn.size,
-                         cudfColumn.null_count,
-                         cudfColumn.col_name);
-                     return ralColumn;
-                   });
-
-    return ralColumns;
-  }
-  
     }  // namespace messages
     }  // namespace communication
     }  // namespace blazingdb

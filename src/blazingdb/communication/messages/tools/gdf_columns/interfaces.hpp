@@ -5,18 +5,20 @@
 /// of gdf columns to transportable buffer through a channel like HTTP or TCP
 /// supporting UCX for cuda pointers.
 ///
-/// Workflow:
-/// Builder > Payload > Buffer > (channel) > Buffer > Specialized > Payload
-/// Collector > Buffer > (channel) > Buffer > Dispatcher > Collector
+/// # Workflow:
 ///
-/// The main responsabilites are the following:
-/// * for writing,
-///   * Builders: To put the serializable data and build the payload
-///   * Payload: Produce a transportable buffer with the data set from builder
-///   * Collector: A payload collection
-/// * for reading,
-///   * Dispatcher: Convert buffer to collector
-///   * Specialized: Convert buffer to payload
+///   Builder > Payload > Buffer > (channel) > Buffer > Specialized > Payload
+///   Collector > Buffer > (channel) > Buffer > Dispatcher > Collector
+///
+/// # Details:
+///   The main responsabilites are the following:
+///   * for writing,
+///     * Builders: To put the serializable data and build the payload
+///     * Payload: Produce a transportable buffer with the data set from builder
+///     * Collector: A payload collection
+///   * for reading,
+///     * Dispatcher: Convert buffer to collector
+///     * Specialized: Convert buffer to payload
 ///
 /// Remark: This is a internal domain layer to build transportable buffer with
 /// gdf columns. The file {@file messages/tools/gdf_columns.h} contains the top
@@ -25,8 +27,10 @@
 /// Remark: The suffix "InHost" refers to a family of concrete classes
 /// implementing the packaging using std::string.
 ///
-/// Some details:
+/// # Some details:
+///
 /// - Why too intermediaries to produce a buffer?
+///
 ///   Because we can implement builders to produce internal chunks and wait
 ///   until we have all setted data to make a buffer.
 ///
@@ -106,7 +110,7 @@ class UCBuffer : public HostBuffer {
   UC_INTERFACE(UCBuffer);
 
 public:
-  // TODO(api): move to nullable
+  // TODO(Api): Move to nullable
   static UC_INLINE constexpr const UCBuffer &
   From(const Buffer &buffer) noexcept {
     return static_cast<const UCBuffer &>(buffer);
@@ -177,9 +181,10 @@ class DTypeInfoPayload : public Payload {
   UC_INTERFACE(DTypeInfoPayload);
 
 public:
-  /// TODO(improve): std::int_fast32_t is a temporal representation of a enum
-  /// int value. The improvement is to use a EnumValue (with internal
-  /// ValueBuffer) to run into auto serialization of the current implementation.
+  // TODO(Improve): The type `std::int_fast32_t` is used as temporal
+  // representation of a enum int value. The improvement is to use a EnumValue
+  // (with internal ValueBuffer) to run into auto serialization of the current
+  // implementation.
   virtual std::int_fast32_t
   TimeUnit() const noexcept = 0;
 
@@ -457,7 +462,7 @@ public:
   }
 
 protected:
-  // TODO(improve): use constant iterators
+  // TODO(Improve): Use constant iterators
   virtual std::unique_ptr<Iterator::Base>
   Begin() const noexcept = 0;
 
