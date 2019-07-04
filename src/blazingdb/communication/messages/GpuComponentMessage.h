@@ -2,6 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 
 #include <cmath>
+#include <algorithm>
 
 #include <blazingdb/communication/Configuration.h>
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
@@ -11,6 +12,8 @@
 
 #include <cuda_runtime_api.h>
 #include "blazingdb/communication/messages/UCPool.h"
+
+#include "tools/gdf_columns.h"
 
 namespace blazingdb {
 namespace communication {
