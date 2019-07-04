@@ -253,6 +253,33 @@ namespace messages {
         }
     };
 
+  static std::vector<RalColumn>
+  deserializeRalColumns(const std::string&    binary,
+                        blazingdb::uc::Agent& agent) {
+    std::vector<CudfColumn> cudfColumns =
+        blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
+            CudfColumn>(binary, agent);
+
+    std::vector<RalColumn> ralColumns;
+    ralColumns.reserve(cudfColumns.size());
+    std::transform(cudfColumns.cbegin(),
+                   cudfColumns.cend(),
+                   std::back_inserter(ralColumns),
+                   [](const CudfColumn& cudfColumn) {
+                     RalColumn ralColumn;
+                     ralColumn.create_gdf_column_for_ipc(
+                         cudfColumn.dtype,
+                         cudfColumn.data,
+                         static_cast<unsigned char*>(cudfColumn.valid),
+                         cudfColumn.size,
+                         cudfColumn.null_count,
+                         cudfColumn.col_name);
+                     return ralColumn;
+                   });
+
+    return ralColumns;
+  }
+  
     }  // namespace messages
     }  // namespace communication
     }  // namespace blazingdb

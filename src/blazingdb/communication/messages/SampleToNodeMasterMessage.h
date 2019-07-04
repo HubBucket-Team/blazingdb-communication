@@ -123,22 +123,18 @@ namespace messages {
           auto agent = context->Agent();
 
           // Get samples
-          std::vector<RalColumn> columns;
-          std::size_t            binary_pointer = 0;
-          const auto& gpu_data_array = document["samples"].GetArray();
-          auto offset = 0;
-          auto buffer_size = context->serializedRecordSize();
-          for (const auto& gpu_data : gpu_data_array) {
-            RalColumn column 
-                = BaseClass::deserializeRalColumn(
-                    binary.substr(offset),
-                    buffer_size,
-                    gpu_data.GetObject(),
-                    agent.get());
-
-            columns.emplace_back(std::move(column));
-            offset += 2 * buffer_size;
-          }
+          std::hash<std::string> hasher;
+          auto                   hashed = hasher(binary);
+          std::cout << "****Make message from bin: " << binary << std::endl;
+          std::cout << "****Make message from: " << hashed << std::endl;
+      
+          std::vector<RalColumn> columns =
+              BaseClass::deserializeRalColumns(binary, *agent);
+      
+          /// TODO(workaround): remove this.
+          /// Write code to manage the life cycle of a UC context.
+          agent.release();
+          context.release();
 
           // Create the message
           return std::make_shared<MessageType>(std::move(messageToken),
