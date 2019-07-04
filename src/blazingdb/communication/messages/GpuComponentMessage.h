@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <unordered_map>
 
 #include <blazingdb/communication/Configuration.h>
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
@@ -18,6 +19,43 @@
 namespace blazingdb {
 namespace communication {
 namespace messages {
+
+namespace {
+    // TODO: move to RAL using cuDF utilities
+    template <class CudfColumn>
+    class CudfColumnInfo {
+    public:
+      static std::size_t
+      DataSize(const CudfColumn& c) {
+        return c.size * SizeOf.at(static_cast<int>(c.dtype));
+      }
+
+      static std::size_t
+      ValidSize(const CudfColumn& c) {
+        return std::ceil(c.null_count / 8);
+      }
+
+      static const std::unordered_map<int, const std::size_t> SizeOf;
+    };
+
+    template <class CudfColumn>
+    const std::unordered_map<int, const std::size_t>
+        CudfColumnInfo<CudfColumn>::SizeOf{
+            {0, -1},
+            {1, 8},
+            {2, 16},
+            {3, 32},
+            {4, 64},
+            {5, 32},
+            {6, 64},
+            {7, 32},
+            {8, 64},
+            {9, 64},
+            {10, -1},
+            {11, -1},
+            {12, -1},
+        };
+} // namespace
 
 template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
 class GpuComponentMessage : public BaseComponentMessage {
@@ -118,7 +156,6 @@ protected:
 
   static std::string
   serializeToBinary(std::vector<RalColumn>& columns) {
-    std::string result;
 
     std::unique_ptr<blazingdb::uc::Context> context;
 
@@ -133,18 +170,18 @@ protected:
 
     auto agent = context->Agent();
 
-    for (const auto& column : columns) {
-      auto* column_ptr = column.get_gdf_column();
-      result += GpuComponentMessage::RegisterAndGetBufferDescriptor(
-          agent.get(),
-          column_ptr->data,
-          GpuFunctions::getDataCapacity(column_ptr));
-      // valid == null, [\0, ...  \0]
-      result += GpuComponentMessage::RegisterAndGetBufferDescriptor(
-          agent.get(),
-          column_ptr->valid,
-          GpuFunctions::getValidCapacity(column_ptr));
-    }
+    // TODO(improve): use reference vector (check on gdf_column_cpp)
+    std::vector<CudfColumn> cudfColumns;
+    cudfColumns.reserve(columns.size());
+    std::transform(
+        columns.cbegin(),
+        columns.cend(),
+        std::back_inserter(cudfColumns),
+        [](const RalColumn& ralColumn) { return *ralColumn.get_gdf_column(); });
+    std::string result =
+        blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
+            CudfColumnInfo>(cudfColumns, *agent);
+
     std::hash<std::string> hasher;
     auto                   hashed = hasher(result);
 
