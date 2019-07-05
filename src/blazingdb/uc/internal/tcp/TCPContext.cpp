@@ -1,10 +1,16 @@
 #include "TCPContext.hpp"
 
+#include <uct/api/uct.h>
+
 #include <cassert>
 
 namespace blazingdb {
 namespace uc {
 namespace internal {
+
+typedef struct {
+    int  is_uct_desc;
+} recv_desc_t;
 
 TCPContext::TCPContext(const Resource &resource) : resource_{resource} {
   CHECK_UCS(
@@ -18,18 +24,14 @@ TCPContext::TCPContext(const Resource &resource) : resource_{resource} {
 
   CHECK_UCS(uct_md_iface_config_read(
       md_, resource.tl_name(), nullptr, nullptr, &iface_config_));
-  uct_iface_params_t iface_params{{{0}},
-                                  UCT_IFACE_OPEN_MODE_DEVICE,
-                                  {{resource_.tl_name(), resource_.dev_name()}},
-                                  nullptr,
-                                  0,
-                                  nullptr,
-                                  nullptr,
-                                  0,
-                                  nullptr,
-                                  nullptr,
-                                  nullptr,
-                                  nullptr};
+  
+  uct_iface_params_t iface_params;
+  iface_params.open_mode            = UCT_IFACE_OPEN_MODE_DEVICE;
+  iface_params.mode.device.tl_name  = resource.tl_name();
+  iface_params.mode.device.dev_name = resource.dev_name();
+  iface_params.stats_root           = NULL;
+  iface_params.rx_headroom          = sizeof(recv_desc_t);
+  
   CHECK_UCS(
       uct_iface_open(md_, worker_, &iface_params, iface_config_, &iface_));
 

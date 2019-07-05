@@ -21,7 +21,7 @@ TEST(TCPOnProcessesTest, Direct) {
     const void *data = CreateData(length, ownSeed, ownOffset);
     Print("own", data, length);
 
-    auto context = Context::IPC();
+    auto context = Context::TCP();
     auto agent   = context->Agent();
     auto buffer  = agent->Register(data, length);
 
@@ -35,7 +35,7 @@ TEST(TCPOnProcessesTest, Direct) {
     const void *data = CreateData(length, peerSeed, peerOffset);
     Print("peer", data, length);
 
-    auto context = Context::IPC();
+    auto context = Context::TCP();
     auto agent   = context->Agent();
     auto buffer  = agent->Register(data, length);
 
