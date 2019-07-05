@@ -46,7 +46,7 @@ public:
     const std::string serverPortPath =
         concreteAddress->ip() + ":" + std::to_string(concreteAddress->communication_port());
 
-    
+
     HttpClient httpClient{serverPortPath};
 
     std::map<std::string, std::string> headers{{"json_data", data}};
@@ -71,10 +71,6 @@ public:
 
         const auto server_address = getAddress(node);
         HttpClient httpClient{server_address};
-
-        auto &concreteAddress = *static_cast<
-              const blazingdb::communication::internal::ConcreteAddress *>(
-              node.address());
 
         const std::string head_json = message->serializeToJson();
         const std::string buffer_descriptors = message->serializeToBinary();
