@@ -123,7 +123,7 @@ public:
     if (configuration.WithGDR()) {
       context = blazingdb::uc::Context::GDR();
     } else {
-      context = blazingdb::uc::Context::IPCView();
+      context = blazingdb::uc::Context::IPC();
     }
 
     auto agent = context->Agent();
