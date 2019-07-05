@@ -42,11 +42,20 @@ RemoteBuffer::RemoteBuffer(const void *const          data,
       async_context_{async_context},
       worker_{worker},
       iface_{iface} {
+
   if (0U != (md_attr.cap.reg_mem_types & UC_BIT(UCT_MD_MEM_TYPE_CUDA))) {
     CHECK_UCS(uct_md_mem_reg(md_,
                              const_cast<void *const>(data),
                              size,
                              UCT_MD_MEM_ACCESS_ALL,
+                             &mem_));
+    assert(static_cast<void *>(mem_) != UC_MEM_HANDLE_NULL);
+  } else if (0U != (md_attr.cap.reg_mem_types & UC_BIT(UCT_MD_MEM_TYPE_HOST))) {
+    //TODO c.gonzales para ucx-tcp no esta entrando aqui ...
+    CHECK_UCS(uct_md_mem_reg(md_,
+                             const_cast<void *const>(data),
+                             size,
+                             UCT_MD_MEM_ACCESS_RMA, //TODO c.gonzales mira que flag usar con rdma da unsupportted operation
                              &mem_));
     assert(static_cast<void *>(mem_) != UC_MEM_HANDLE_NULL);
   }

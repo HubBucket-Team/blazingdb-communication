@@ -4,6 +4,8 @@
 
 #include <cassert>
 
+#include "TCPAgent.hpp"
+
 namespace blazingdb {
 namespace uc {
 namespace internal {
@@ -12,7 +14,9 @@ typedef struct {
     int  is_uct_desc;
 } recv_desc_t;
 
-TCPContext::TCPContext(const Resource &resource) : resource_{resource} {
+TCPContext::TCPContext(const Resource &resource, const Trader &trader)
+    : resource_{resource}
+    , trader_{trader} {
   CHECK_UCS(
       uct_md_config_read(resource.md_name(), nullptr, nullptr, &md_config_));
   CHECK_UCS(uct_md_open(resource.md_name(), md_config_, &md_));
@@ -68,7 +72,14 @@ TCPContext::~TCPContext() {
 
 std::unique_ptr<uc::Agent>
 TCPContext::Agent() const {
-  return nullptr;
+  CHECK_UCS(uct_ep_create_connected(const_cast<uct_iface_h>(iface_),
+                                    device_addr_,
+                                    iface_addr_,
+                                    const_cast<uct_ep_h *>(&ep_)));
+  
+  return std::make_unique<TCPAgent>(
+      md_, md_attr_, *async_context_, worker_, iface_, 
+      *device_addr_, *iface_addr_, ep_, trader_);
 }
 
 std::size_t

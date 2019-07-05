@@ -57,7 +57,8 @@ Context::GDR() {
 std::unique_ptr<Context>
 Context::TCP() {
   UC_STATIC_LOCAL(internal::TCPResource, resource);
-  return std::make_unique<internal::TCPContext>(resource);
+  UC_STATIC_LOCAL(VoidTrader, trader);
+  return std::make_unique<internal::TCPContext>(resource, trader);
 }
 
 std::vector<Context::Capability>

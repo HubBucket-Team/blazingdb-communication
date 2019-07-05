@@ -12,11 +12,12 @@
 
 namespace blazingdb {
 namespace uc {
+class Trader;
 namespace internal {
 
 class UC_NOEXPORT TCPContext : public Context {
 public:
-  explicit TCPContext(const Resource &resource);
+  explicit TCPContext(const Resource &resource, const Trader &trader);
 
   ~TCPContext();
 
@@ -51,7 +52,10 @@ private:
 
   uct_device_addr_t *device_addr_;
   uct_iface_addr_t * iface_addr_;
-
+  
+  uct_ep_h ep_;
+  const Trader &       trader_;
+  
   UC_CONCRETE(TCPContext);
 };
 

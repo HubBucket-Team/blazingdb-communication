@@ -21,7 +21,8 @@ public:
                     const uct_iface_h&         iface,
                     const uct_device_addr_t&   device_addr,
                     const uct_iface_addr_t&    iface_addr,
-                    const Trader &trader);
+                    const uct_ep_h&            ep,
+                    const Trader&              trader);
 
   ~TCPAgent() final;
 

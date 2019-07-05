@@ -13,16 +13,15 @@ TCPAgent::TCPAgent(const uct_md_h&            md,
                    const uct_iface_h&         iface,
                    const uct_device_addr_t&   device_addr,
                    const uct_iface_addr_t&    iface_addr,
-                   const Trader &trader)
-    : ep_{nullptr},
+                   const uct_ep_h&            ep,
+                   const Trader&              trader)
+    : ep_{ep},
       md_{md},
       md_attr_{md_attr},
       async_context_{async_context},
       worker_{worker},
       iface_{iface},
       trader_{trader} {
-  CHECK_UCS(uct_ep_create_connected(
-      const_cast<uct_iface_h>(iface), &device_addr, &iface_addr, &ep_));
 }
 
 TCPAgent::~TCPAgent() { uct_ep_destroy(ep_); }
