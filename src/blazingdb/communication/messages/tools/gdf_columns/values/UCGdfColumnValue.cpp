@@ -62,7 +62,7 @@ UCGdfColumnValue::UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
       memoryRuntime,
       agent,
       gdfColumnPayload.Valid(),
-      std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate
+      (((gdfColumnPayload.Size() / 8)+63)/64)*64,  // TODO: calculate
       validUcBuffer_,
       validUcTransport_);
 }
