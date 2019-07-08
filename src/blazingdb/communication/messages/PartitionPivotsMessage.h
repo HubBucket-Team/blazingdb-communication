@@ -13,15 +13,29 @@ namespace messages {
 /*
 This is the same class ColumnDataMessage with the name changed needs refactor
 */
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-class PartitionPivotsMessage
-    : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
+class PartitionPivotsMessage : public GpuComponentMessage<RalColumn,
+                                                          CudfColumn,
+                                                          GpuFunctions,
+                                                          NvCategory,
+                                                          NvstringsTransfer> {
 private:
-  using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+  using BaseClass = GpuComponentMessage<RalColumn,
+                                        CudfColumn,
+                                        GpuFunctions,
+                                        NvCategory,
+                                        NvstringsTransfer>;
 
 public:
-  using MessageType =
-      PartitionPivotsMessage<RalColumn, CudfColumn, GpuFunctions>;
+  using MessageType = PartitionPivotsMessage<RalColumn,
+                                             CudfColumn,
+                                             GpuFunctions,
+                                             NvCategory,
+                                             NvstringsTransfer>;
 
 public:
   PartitionPivotsMessage(std::unique_ptr<MessageToken>&& message_token,
@@ -131,10 +145,17 @@ private:
   static const std::string MessageID;
 };
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-const std::string
-    PartitionPivotsMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID{
-        "PartitionPivotsMessage"};
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
+const std::string PartitionPivotsMessage<RalColumn,
+                                         CudfColumn,
+                                         GpuFunctions,
+                                         NvCategory,
+                                         NvstringsTransfer>::MessageID{
+    "PartitionPivotsMessage"};
 
 }  // namespace messages
 }  // namespace communication

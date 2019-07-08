@@ -12,6 +12,7 @@
 #include "inhost/InHostGdfColumnSpecialized.hpp"
 
 #include "values/UCGdfColumnValue.hpp"
+#include "values/UCDTypeInfoValue.hpp"
 #include "values/interfaces.hpp"
 
 namespace blazingdb {
@@ -46,6 +47,14 @@ GdfColumnValue::Make(const GdfColumnPayload &gdfColumnPayload,
   return std::make_unique<UCGdfColumnValue>(
       MemoryRuntime::MakeCuda(), gdfColumnPayload, agent);
 }
+
+std::unique_ptr<DTypeInfoValue>
+DTypeInfoValue::Make(const DTypeInfoPayload &dtypeInfoPayload,
+                     blazingdb::uc::Agent &  agent) {
+  return std::make_unique<UCDTypeInfoValue>(
+      MemoryRuntime::MakeCuda(), dtypeInfoPayload, agent);
+}
+
 
 std::unique_ptr<GdfColumnBuilder>
 GdfColumnBuilder::MakeInHost(blazingdb::uc::Agent &agent) {

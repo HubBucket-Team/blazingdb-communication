@@ -37,6 +37,7 @@ TEST(UCGdfColumnValueTest, MakeValue) {
         .WillOnce(testing::Return(reinterpret_cast<void *const>(111)));
     EXPECT_CALL(*memoryRuntime, Allocate(testing::_))
         .WillOnce(testing::Return(reinterpret_cast<void *const>(222)));
+        //TODO Add nvstrings support
   }
   EXPECT_CALL(*memoryRuntime, Synchronize).WillRepeatedly(testing::Return());
 

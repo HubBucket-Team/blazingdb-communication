@@ -51,7 +51,7 @@ LinkThrough(std::unique_ptr<MemoryRuntime>&            memoryRuntime,
 UCGdfColumnValue::UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
                                    const GdfColumnPayload& gdfColumnPayload,
                                    blazingdb::uc::Agent&   agent)
-    : gdfColumnPayload_{gdfColumnPayload} {
+    : gdfColumnPayload_{gdfColumnPayload}, agent_{agent} {
   data_  = LinkThrough(memoryRuntime,
                       agent,
                       gdfColumnPayload.Data(),
@@ -62,7 +62,7 @@ UCGdfColumnValue::UCGdfColumnValue(std::unique_ptr<MemoryRuntime> memoryRuntime,
       memoryRuntime,
       agent,
       gdfColumnPayload.Valid(),
-      (((gdfColumnPayload.Size() / 8)+63)/64)*64,  // TODO: calculate
+      std::ceil(gdfColumnPayload.NullCount() / 8),  // TODO: calculate
       validUcBuffer_,
       validUcTransport_);
 }
@@ -94,9 +94,9 @@ UCGdfColumnValue::null_count() const noexcept {
 
 const DTypeInfoValue&
 UCGdfColumnValue::dtype_info() const noexcept {
-  static DTypeInfoValue* dtypeInfoValue_;
-  UC_ABORT("Not support");
-  return *dtypeInfoValue_;
+  static DTypeInfoValue & dtypeInfoValue = *DTypeInfoValue::Make(
+        static_cast<const DTypeInfoPayload &>(*gdfColumnPayload_.DTypeInfo().ToPayload()), agent_);
+  return dtypeInfoValue;
 }
 
 const char*

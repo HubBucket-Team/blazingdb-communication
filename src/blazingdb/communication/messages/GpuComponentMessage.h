@@ -1,8 +1,8 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 #include <unordered_map>
 
 #include <blazingdb/communication/Configuration.h>
@@ -19,45 +19,73 @@
 namespace blazingdb {
 namespace communication {
 namespace messages {
-
 namespace {
-    // TODO: move to RAL using cuDF utilities
-    template <class CudfColumn>
-    class CudfColumnInfo {
-    public:
-      static std::size_t
-      DataSize(const CudfColumn& c) {
-        return c.size * SizeOf.at(static_cast<int>(c.dtype));
-      }
+// TODO: move to RAL using cuDF utilities
+template <class CudfColumn>
+class CudfColumnInfo {
+public:
+  static std::size_t
+  DataSize(const CudfColumn& c) {
+    return c.size * SizeOf.at(static_cast<int>(c.dtype));
+  }
 
-      static std::size_t
-      ValidSize(const CudfColumn& c) {
-        return std::ceil(c.null_count / 8);
-      }
+  static std::size_t
+  ValidSize(const CudfColumn& c) {
+    return std::ceil(c.null_count / 8);
+  }
 
-      static const std::unordered_map<int, const std::size_t> SizeOf;
+  static const std::unordered_map<int, const std::size_t> SizeOf;
+
+  /**
+   * @brief  These enums indicate the possible data types for a gdf_column
+   */
+  typedef enum {
+    GDF_invalid = 0,
+    GDF_INT8,
+    GDF_INT16,
+    GDF_INT32,
+    GDF_SIZE_TYPE = GDF_INT32,
+    GDF_INT64,
+    GDF_FLOAT32,
+    GDF_FLOAT64,
+    GDF_BOOL8,      ///< Boolean stored in 8 bits per Boolean. zero==false,
+                    ///< nonzero==true.
+    GDF_DATE32,     ///< int32_t days since the UNIX epoch
+    GDF_DATE64,     ///< int64_t milliseconds since the UNIX epoch
+    GDF_TIMESTAMP,  ///< Exact timestamp encoded with int64 since UNIX epoch
+                    ///< (Default unit millisecond)
+    GDF_CATEGORY,
+    GDF_STRING,
+    GDF_STRING_CATEGORY,  ///< Stores indices of an NVCategory in data and in
+                          ///< extra col info a reference to the nv_category
+    N_GDF_TYPES,          ///< additional types should go BEFORE N_GDF_TYPES
+  } gdf_dtype;
+};
+
+template <class CudfColumn>
+const std::unordered_map<int, const std::size_t>
+    CudfColumnInfo<CudfColumn>::SizeOf{
+        {0, -1},
+        {1, 8},
+        {2, 16},
+        {3, 32},
+        {4, 64},
+        {5, 32},
+        {6, 64},
+        {7, 32},
+        {8, 64},
+        {9, 64},
+        {10, -1},
+        {11, -1},
+        {12, -1},
     };
+}  // namespace
 
-    template <class CudfColumn>
-    const std::unordered_map<int, const std::size_t>
-        CudfColumnInfo<CudfColumn>::SizeOf{
-            {0, -1},
-            {1, 8},
-            {2, 16},
-            {3, 32},
-            {4, 64},
-            {5, 32},
-            {6, 64},
-            {7, 32},
-            {8, 64},
-            {9, 64},
-            {10, -1},
-            {11, -1},
-            {12, -1},
-        };
-} // namespace
-
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
 class GpuComponentMessage : public BaseComponentMessage {
 protected:
   GpuComponentMessage(std::unique_ptr<MessageToken>&& message_token,
@@ -156,7 +184,6 @@ protected:
 
   static std::string
   serializeToBinary(std::vector<RalColumn>& columns) {
-
     std::unique_ptr<blazingdb::uc::Context> context;
 
     const blazingdb::communication::Configuration& configuration =
@@ -178,9 +205,13 @@ protected:
         columns.cend(),
         std::back_inserter(cudfColumns),
         [](const RalColumn& ralColumn) { return *ralColumn.get_gdf_column(); });
+
     std::string result =
         blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
-            CudfColumnInfo>(cudfColumns, *agent);
+            CudfColumnInfo,
+            CudfColumn,
+            NvCategory,
+            NvstringsTransfer>(cudfColumns, *agent);
 
     std::hash<std::string> hasher;
     auto                   hashed = hasher(result);
@@ -327,7 +358,10 @@ protected:
                         blazingdb::uc::Agent& agent) {
     std::vector<CudfColumn> cudfColumns =
         blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
-            CudfColumn>(binary, agent);
+            CudfColumnInfo,
+            CudfColumn,
+            NvCategory,
+            NvstringsTransfer>(binary, agent);
 
     std::vector<RalColumn> ralColumns;
     ralColumns.reserve(cudfColumns.size());

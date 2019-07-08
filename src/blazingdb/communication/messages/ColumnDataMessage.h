@@ -12,14 +12,29 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-class ColumnDataMessage
-    : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
+class ColumnDataMessage : public GpuComponentMessage<RalColumn,
+                                                     CudfColumn,
+                                                     GpuFunctions,
+                                                     NvCategory,
+                                                     NvstringsTransfer> {
 private:
-  using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+  using BaseClass = GpuComponentMessage<RalColumn,
+                                        CudfColumn,
+                                        GpuFunctions,
+                                        NvCategory,
+                                        NvstringsTransfer>;
 
 public:
-  using MessageType = ColumnDataMessage<RalColumn, CudfColumn, GpuFunctions>;
+  using MessageType = ColumnDataMessage<RalColumn,
+                                        CudfColumn,
+                                        GpuFunctions,
+                                        NvCategory,
+                                        NvstringsTransfer>;
 
 public:
   ColumnDataMessage(std::unique_ptr<MessageToken>&& message_token,
@@ -129,10 +144,17 @@ private:
   static const std::string MessageID;
 };
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-const std::string
-    ColumnDataMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID{
-        "ColumnDataMessage"};
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
+const std::string ColumnDataMessage<RalColumn,
+                                    CudfColumn,
+                                    GpuFunctions,
+                                    NvCategory,
+                                    NvstringsTransfer>::MessageID{
+    "ColumnDataMessage"};
 
 }  // namespace messages
 }  // namespace communication

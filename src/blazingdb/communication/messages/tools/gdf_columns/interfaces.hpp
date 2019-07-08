@@ -265,6 +265,9 @@ public:
 
   virtual const CategoryValue &
   category() const noexcept = 0;
+
+  static std::unique_ptr<DTypeInfoValue>
+  Make(const DTypeInfoPayload &dtypeInfoPayload, blazingdb::uc::Agent &agent);
 };
 
 class GdfColumnValue : public Value {

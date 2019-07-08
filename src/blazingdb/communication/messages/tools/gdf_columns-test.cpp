@@ -431,7 +431,9 @@ public:
   int               size;
   std::int_fast32_t dtype;
   int               null_count;
-  class {
+  struct {
+    std::int_fast32_t time_unit;
+    void* category;
   } dtype_info;
   char *col_name;
 };
@@ -462,6 +464,74 @@ public:
   static inline std::size_t
   ValidSize(const gdf_column &) noexcept {
     return 2;
+  }
+
+  /**
+   * @brief  These enums indicate the possible data types for a gdf_column
+   */
+  typedef enum {
+    GDF_invalid = 0,
+    GDF_INT8,
+    GDF_INT16,
+    GDF_INT32,
+    GDF_SIZE_TYPE = GDF_INT32,
+    GDF_INT64,
+    GDF_FLOAT32,
+    GDF_FLOAT64,
+    GDF_BOOL8,      ///< Boolean stored in 8 bits per Boolean. zero==false,
+                    ///< nonzero==true.
+    GDF_DATE32,     ///< int32_t days since the UNIX epoch
+    GDF_DATE64,     ///< int64_t milliseconds since the UNIX epoch
+    GDF_TIMESTAMP,  ///< Exact timestamp encoded with int64 since UNIX epoch
+                    ///< (Default unit millisecond)
+    GDF_CATEGORY,
+    GDF_STRING,
+    GDF_STRING_CATEGORY,  ///< Stores indices of an NVCategory in data and in
+                          ///< extra col info a reference to the nv_category
+    N_GDF_TYPES,          ///< additional types should go BEFORE N_GDF_TYPES
+  } gdf_dtype;
+};
+
+struct nvstrings_transfer {
+  char *       base_address;
+  unsigned int keys;
+  void *       strs;
+
+  size_t size;
+  void * mem;
+
+  unsigned int count;
+  void *       vals;  // map
+};
+
+//TODO Mock en la carpeta helpers
+class nvcategory {
+public:
+  int
+  create_transfer(nvstrings_transfer &ptr) {
+    ptr.base_address = new char[4];
+    ptr.base_address = (char *)"0xA";
+
+    ptr.keys = 1;
+
+    ptr.strs = new char[5];
+    ptr.strs = reinterpret_cast<void *>((char *)"str1");
+
+    ptr.size = 3;
+
+    ptr.mem = new char[10];
+    ptr.mem = reinterpret_cast<void *>((char *)"123456789");
+
+    ptr.count = 4;
+
+    ptr.vals = new char[5];  // map
+    ptr.vals = reinterpret_cast<void *>((char *)"a0b1");
+  }
+
+  static nvcategory *
+  create_from_transfer(nvstrings_transfer &ptr) {
+    nvcategory *rtn = new nvcategory;
+    return rtn;
   }
 };
 
@@ -520,7 +590,7 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
 
   std::string result =
       blazingdb::communication::messages::tools::gdf_columns::DeliverFrom<
-          GdfColumnInfoDummy>(gdfColumns, agent);
+          GdfColumnInfoDummy, gdf_column, nvcategory, nvstrings_transfer>(gdfColumns, agent);
 
   BufferForTest resultBuffer(result);
 
@@ -563,7 +633,7 @@ TEST(GdfColumnsTest, DeliverAndCollect) {
 
   std::vector<gdf_column> gdf_columns =
       blazingdb::communication::messages::tools::gdf_columns::CollectFrom<
-          gdf_column>(result, agent);
+          GdfColumnInfoDummy, gdf_column, nvcategory, nvstrings_transfer>(result, agent);
 
   EXPECT_EQ(10, gdf_columns[0].size);
   EXPECT_EQ(25, gdf_columns[1].size);

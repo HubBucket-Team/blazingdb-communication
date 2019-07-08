@@ -53,6 +53,8 @@ private:
 
   const void* data_;
   const void* valid_;
+
+  blazingdb::uc::Agent&          agent_;
 };
 
 }  // namespace gdf_columns

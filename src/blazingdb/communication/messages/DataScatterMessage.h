@@ -10,14 +10,29 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-class DataScatterMessage
-    : public GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions> {
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
+class DataScatterMessage : public GpuComponentMessage<RalColumn,
+                                                      CudfColumn,
+                                                      GpuFunctions,
+                                                      NvCategory,
+                                                      NvstringsTransfer> {
 private:
-  using BaseClass = GpuComponentMessage<RalColumn, CudfColumn, GpuFunctions>;
+  using BaseClass = GpuComponentMessage<RalColumn,
+                                        CudfColumn,
+                                        GpuFunctions,
+                                        NvCategory,
+                                        NvstringsTransfer>;
 
 public:
-  using MessageType = DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>;
+  using MessageType = DataScatterMessage<RalColumn,
+                                         CudfColumn,
+                                         GpuFunctions,
+                                         NvCategory,
+                                         NvstringsTransfer>;
 
 public:
   DataScatterMessage(const ContextToken&      context_token,
@@ -123,13 +138,20 @@ private:
   static const std::string MessageID;
 };
 
-template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-const std::string
-    DataScatterMessage<RalColumn, CudfColumn, GpuFunctions>::MessageID{
-        "DataScatterMessage"};
+template <typename RalColumn,
+          typename CudfColumn,
+          typename GpuFunctions,
+          typename NvCategory,
+          typename NvstringsTransfer>
+const std::string DataScatterMessage<RalColumn,
+                                     CudfColumn,
+                                     GpuFunctions,
+                                     NvCategory,
+                                     NvstringsTransfer>::MessageID{
+    "DataScatterMessage"};
 
 }  // namespace messages
 }  // namespace communication
 }  // namespace blazingdb
 
-#endif  // BLAZINGDB_COMMUNICATION_MESSAGES_DATASCATTERMESSAGE_H
+#endif //BLAZINGDB_COMMUNICATION_MESSAGES_DATASCATTERMESSAGE_H
