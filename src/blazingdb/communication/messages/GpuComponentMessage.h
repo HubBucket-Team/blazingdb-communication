@@ -113,12 +113,22 @@ namespace messages {
 
             RalColumn ral_column;
             if (!is_ipc) {
-                ral_column.create_gdf_column(cudf_column.dtype,
-                                             cudf_column.size,
-                                             (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                             (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                             dtype_size,
-                                             column_name);
+            	if(cudf_column.null_count == 0){
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 (typename GpuFunctions::ValidTypePointer)nullptr,
+                                                 dtype_size,
+                                                 column_name);
+            	}else{
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
+                                                 dtype_size,
+                                                 column_name);
+            	}
+
             }
             else {
                 ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
