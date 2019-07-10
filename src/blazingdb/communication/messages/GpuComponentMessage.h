@@ -113,7 +113,7 @@ namespace messages {
 
             RalColumn ral_column;
             if (!is_ipc) {
-            	if(cudf_column.null_count == 0){
+            	if(cudf_column.null_count == 0 && cudf_column.valid == nullptr){
                     ral_column.create_gdf_column(cudf_column.dtype,
                                                  cudf_column.size,
                                                  (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
