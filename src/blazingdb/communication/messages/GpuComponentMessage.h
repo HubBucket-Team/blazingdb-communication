@@ -7,6 +7,23 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
+    namespace tools {
+    class GdfColumnInHost {
+    public:
+      explicit GdfColumnInHost(const std::string& body,
+                               const std::size_t lastPosition) {}
+
+      const void* data() const noexcept { return nullptr; }
+
+      const void* valid() const noexcept { return nullptr; }
+    private:
+      void *data_;
+      void *valid_;
+      void *category_1;
+      void *category_2;
+    };
+    }
+
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class GpuComponentMessage : public BaseComponentMessage {
     protected:
