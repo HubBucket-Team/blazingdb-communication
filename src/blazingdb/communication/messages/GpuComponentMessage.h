@@ -7,138 +7,147 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
-    class GpuComponentMessage : public BaseComponentMessage {
-    protected:
-        GpuComponentMessage(std::unique_ptr<MessageToken>&& message_token,
-                            std::shared_ptr<ContextToken>&& context_token,
-                            const Node& sender_node)
-        : BaseComponentMessage(std::move(message_token), std::move(context_token), sender_node)
-        { }
+template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
+class GpuComponentMessage : public BaseComponentMessage {
+protected:
+  GpuComponentMessage(std::unique_ptr<MessageToken>&& message_token,
+                      std::shared_ptr<ContextToken>&& context_token,
+                      const Node& sender_node)
+      : BaseComponentMessage(std::move(message_token), std::move(context_token),
+                             sender_node) {}
 
-    protected:
-        GpuComponentMessage(const ContextToken& context_token, const MessageToken::TokenType& message_token)
-        : BaseComponentMessage(context_token, message_token)
-        { }
+protected:
+  GpuComponentMessage(const ContextToken& context_token,
+                      const MessageToken::TokenType& message_token)
+      : BaseComponentMessage(context_token, message_token) {}
 
-        GpuComponentMessage(std::shared_ptr<ContextToken>&& context_token, const MessageToken::TokenType& message_token)
-        : BaseComponentMessage(std::move(context_token), message_token)
-        { }
+  GpuComponentMessage(std::shared_ptr<ContextToken>&& context_token,
+                      const MessageToken::TokenType& message_token)
+      : BaseComponentMessage(std::move(context_token), message_token) {}
 
-    protected:
-        static void serializeCudfColumn(BaseComponentMessage::Writer& writer, CudfColumn* column) {
-            writer.StartObject();
-            {
-                writer.Key("size");
-                writer.Uint64(column->size);
+protected:
+  static void serializeCudfColumn(BaseComponentMessage::Writer& writer,
+                                  CudfColumn* column) {
+    writer.StartObject();
+    {
+      writer.Key("size");
+      writer.Uint64(column->size);
 
-                writer.Key("dtype");
-                writer.Uint(column->dtype);
+      writer.Key("dtype");
+      writer.Uint(column->dtype);
 
-                writer.Key("null_count");
-                writer.Uint64(column->null_count);
+      writer.Key("null_count");
+      writer.Uint64(column->null_count);
 
-                writer.Key("dtype_info");
-                writer.Uint(column->dtype_info.time_unit);
-            }
-            writer.EndObject();
-        }
+      writer.Key("dtype_info");
+      writer.Uint(column->dtype_info.time_unit);
+    }
+    writer.EndObject();
+  }
 
-        static void serializeRalColumn(BaseComponentMessage::Writer& writer, RalColumn& column) {
-            writer.StartObject();
-            {
-                writer.Key("is_ipc");
-                writer.Bool(column.is_ipc());
+  static void serializeRalColumn(BaseComponentMessage::Writer& writer,
+                                 RalColumn& column) {
+    writer.StartObject();
+    {
+      writer.Key("is_ipc");
+      writer.Bool(column.is_ipc());
 
-                writer.Key("column_token");
-                writer.Uint64(column.get_column_token());
+      writer.Key("column_token");
+      writer.Uint64(column.get_column_token());
 
-                writer.Key("column_name");
-                auto column_name = column.name();
-                writer.String(column_name.c_str(), column_name.length());
+      writer.Key("column_name");
+      auto column_name = column.name();
+      writer.String(column_name.c_str(), column_name.length());
 
-                writer.Key("cudf_column");
-                serializeCudfColumn(writer, column.get_gdf_column());
-            }
-            writer.EndObject();
-        }
+      writer.Key("cudf_column");
+      serializeCudfColumn(writer, column.get_gdf_column());
+    }
+    writer.EndObject();
+  }
 
-        static std::string serializeToBinary(std::vector<RalColumn>& columns) {
-            std::string result;
+  static std::string serializeToBinary(std::vector<RalColumn>& columns) {
+    std::string result;
 
-            std::size_t capacity = 0;
-            for (const auto& column : columns) {
-                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
-            }
-            result.resize(capacity);
+    std::size_t capacity = 0;
+    for (const auto& column : columns) {
+      capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
+      capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
+    }
+    result.resize(capacity);
 
-            std::size_t binary_pointer = 0;
-            for (const auto& column : columns) {
-                GpuFunctions::copyGpuToCpu(binary_pointer, result, const_cast<RalColumn&>(column));
-            }
+    std::size_t binary_pointer = 0;
+    for (const auto& column : columns) {
+      GpuFunctions::copyGpuToCpu(binary_pointer, result,
+                                 const_cast<RalColumn&>(column));
+    }
 
-            return result;
-        }
+    return result;
+  }
 
-        static CudfColumn deserializeCudfColumn(rapidjson::Value::ConstObject&& object) {
-            CudfColumn column;
+  static CudfColumn deserializeCudfColumn(
+      rapidjson::Value::ConstObject&& object) {
+    CudfColumn column;
 
-            column.size = object["size"].GetUint64();
+    column.size = object["size"].GetUint64();
 
-            column.dtype = (typename GpuFunctions::DType)object["dtype"].GetUint();
+    column.dtype = (typename GpuFunctions::DType)object["dtype"].GetUint();
 
-            column.null_count = object["null_count"].GetUint64();
+    column.null_count = object["null_count"].GetUint64();
 
-            column.dtype_info = (typename GpuFunctions::DTypeInfo) { (typename GpuFunctions::TimeUnit)object["dtype_info"].GetUint() };
+    column.dtype_info = (typename GpuFunctions::DTypeInfo){
+        (typename GpuFunctions::TimeUnit)object["dtype_info"].GetUint()};
 
-            return column;
-        }
+    return column;
+  }
 
-        static RalColumn deserializeRalColumn(std::size_t& binary_pointer, const std::string& binary_data, rapidjson::Value::ConstObject&& object) {
-            const auto& column_name_data = object["column_name"];
-            std::string column_name(column_name_data.GetString(), column_name_data.GetStringLength());
+  static RalColumn deserializeRalColumn(
+      std::size_t& binary_pointer, const std::string& binary_data,
+      rapidjson::Value::ConstObject&& object) {
+    const auto& column_name_data = object["column_name"];
+    std::string column_name(column_name_data.GetString(),
+                            column_name_data.GetStringLength());
 
-            bool is_ipc = object["is_ipc"].GetBool();
+    bool is_ipc = object["is_ipc"].GetBool();
 
-            std::uint64_t column_token = object["column_token"].GetUint64();
+    std::uint64_t column_token = object["column_token"].GetUint64();
 
-            auto cudf_column = deserializeCudfColumn(object["cudf_column"].GetObject());
+    auto cudf_column = deserializeCudfColumn(object["cudf_column"].GetObject());
 
-            // Calculate pointers and update binary_pointer
-            std::size_t dtype_size = GpuFunctions::getDTypeSize(cudf_column.dtype);
-            std::size_t data_pointer = binary_pointer;
-            std::size_t valid_pointer = data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
-            binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
+    // Calculate pointers and update binary_pointer
+    std::size_t dtype_size = GpuFunctions::getDTypeSize(cudf_column.dtype);
+    std::size_t data_pointer = binary_pointer;
+    std::size_t valid_pointer =
+        data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
+    binary_pointer =
+        valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
 
-            RalColumn ral_column;
-            if (!is_ipc) {
-                ral_column.create_gdf_column(cudf_column.dtype,
-                                             cudf_column.size,
-                                             (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                             (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                             dtype_size,
-                                             column_name);
-            }
-            else {
-                ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
-                                                     (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                     (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                                     cudf_column.size,
-                                                     cudf_column.null_count,
-                                                     column_name);
-            }
+    RalColumn ral_column;
+    if (!is_ipc) {
+      ral_column.create_gdf_column(
+          cudf_column.dtype, cudf_column.size,
+          (typename GpuFunctions::DataTypePointer) & binary_data[data_pointer],
+          (typename GpuFunctions::ValidTypePointer) &
+              binary_data[valid_pointer],
+          dtype_size, column_name);
+    } else {
+      ral_column.create_gdf_column_for_ipc(
+          cudf_column.dtype,
+          (typename GpuFunctions::DataTypePointer) & binary_data[data_pointer],
+          (typename GpuFunctions::ValidTypePointer) &
+              binary_data[valid_pointer],
+          cudf_column.size, cudf_column.null_count, column_name);
+    }
 
-            ral_column.set_column_token(column_token);
-            ral_column.get_gdf_column()->null_count = cudf_column.null_count;
-            ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
+    ral_column.set_column_token(column_token);
+    ral_column.get_gdf_column()->null_count = cudf_column.null_count;
+    ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
 
-            return ral_column;
-        }
-    };
+    return ral_column;
+  }
+};
 
-} // namespace messages
-} // namespace communication
-} // namespace blazingdb
+}  // namespace messages
+}  // namespace communication
+}  // namespace blazingdb
 
-#endif //BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
+#endif  // BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
