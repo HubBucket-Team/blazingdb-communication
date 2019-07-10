@@ -39,7 +39,7 @@ protected:
       writer.Key("null_count");
       writer.Uint64(column->null_count);
 
-      writer.Key("dtype_info");
+      writer.Key("dtype_info-time_unit");
       writer.Uint(column->dtype_info.time_unit);
     }
     writer.EndObject();
@@ -95,7 +95,8 @@ protected:
     column.null_count = object["null_count"].GetUint64();
 
     column.dtype_info = (typename GpuFunctions::DTypeInfo){
-        (typename GpuFunctions::TimeUnit)object["dtype_info"].GetUint()};
+        (typename GpuFunctions::TimeUnit)object["dtype_info-time_unit"]
+            .GetUint()};
 
     return column;
   }
