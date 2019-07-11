@@ -45,6 +45,14 @@ namespace test {
         return is_ipc_column;
     }
 
+    gdf_valid_type* gdf_column_cpp::valid() const {
+        return column->valid;
+    }
+
+    gdf_size_type gdf_column_cpp::null_count() const {
+        return column->null_count;
+    }
+
     column_token_t gdf_column_cpp::get_column_token() const {
         return column_token;
     }
@@ -90,7 +98,20 @@ namespace test {
         is_ipc_column = false;
         column_token = 0;
     }
-
+    
+    void gdf_column_cpp::create_gdf_column(gdf_dtype dtype,
+                                           std::size_t num_values,
+                                           void* input_data,
+                                           std::size_t width_per_value,
+                                           const std::string& column_name) {
+        // TODO: this is not exactly as the ral, passed nullptr as valid so it just works in the tests
+        column = blazingdb::test::make((char*)input_data, nullptr, num_values, dtype, column_name);
+        allocated_size_valid = num_values * get_dtype_width(dtype);
+        allocated_size_data = num_values;
+        this->column_name = column_name;
+        is_ipc_column = false;
+        column_token = 0;
+    }
 
     void gdf_column_cpp::create_gdf_column_for_ipc(gdf_dtype dtype,
                                                    void* input_data,

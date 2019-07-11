@@ -57,6 +57,9 @@ namespace messages {
                 auto column_name = column.name();
                 writer.String(column_name.c_str(), column_name.length());
 
+                writer.Key("has_valids");
+                writer.Bool(column.null_count() > 0 || (column.null_count() == 0 && column.valid() != nullptr));
+
                 writer.Key("cudf_column");
                 serializeCudfColumn(writer, column.get_gdf_column());
             }
@@ -103,6 +106,8 @@ namespace messages {
 
             std::uint64_t column_token = object["column_token"].GetUint64();
 
+            bool has_valids = object["has_valids"].GetBool();
+
             auto cudf_column = deserializeCudfColumn(object["cudf_column"].GetObject());
 
             // Calculate pointers and update binary_pointer
@@ -113,22 +118,27 @@ namespace messages {
 
             RalColumn ral_column;
             if (!is_ipc) {
-            	if(cudf_column.null_count == 0 && cudf_column.valid == nullptr){
-                    ral_column.create_gdf_column(cudf_column.dtype,
-                                                 cudf_column.size,
-                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                 (typename GpuFunctions::ValidTypePointer)nullptr,
-                                                 dtype_size,
-                                                 column_name);
-            	}else{
+            	if(cudf_column.null_count > 0){
                     ral_column.create_gdf_column(cudf_column.dtype,
                                                  cudf_column.size,
                                                  (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
                                                  (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
                                                  dtype_size,
                                                  column_name);
+            	} else if(has_valids) {
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 dtype_size,
+                                                 column_name);
+                } else {
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 (typename GpuFunctions::ValidTypePointer)nullptr,
+                                                 dtype_size,
+                                                 column_name);
             	}
-
             }
             else {
                 ral_column.create_gdf_column_for_ipc(cudf_column.dtype,

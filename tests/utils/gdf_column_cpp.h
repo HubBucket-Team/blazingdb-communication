@@ -34,6 +34,10 @@ namespace test {
 
         bool is_ipc() const;
 
+        gdf_valid_type* valid() const;
+
+        gdf_size_type null_count() const;
+
         column_token_t get_column_token() const;
 
         void set_column_token(column_token_t column_token);
@@ -43,6 +47,12 @@ namespace test {
                                std::size_t num_values,
                                void* input_data,
                                gdf_valid_type* input_valid,
+                               std::size_t width_per_value,
+                               const std::string& column_name);
+
+        void create_gdf_column(gdf_dtype dtype,
+                               std::size_t num_values,
+                               void* input_data,
                                std::size_t width_per_value,
                                const std::string& column_name);
 
