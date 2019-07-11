@@ -7,28 +7,6 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-namespace tools {
-
-template <class GpuFunctions>
-class GdfColumnInHost {
-public:
-  explicit GdfColumnInHost(const std::string& body,
-                           const std::size_t lastPosition,
-                           rapidjson::Value::ConstObject &ralcolumn_info) {}
-
-  const void* data() const noexcept { return nullptr; }
-
-  const void* valid() const noexcept { return nullptr; }
-
-private:
-  void* data_;
-  void* valid_;
-  void* category_1;
-  void* category_2;
-};
-
-}  // namespace tools
-
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class GpuComponentMessage : public BaseComponentMessage {
     protected:
@@ -140,9 +118,6 @@ private:
             std::size_t data_pointer = binary_pointer;
             std::size_t valid_pointer = data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
             binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
-
-            tools::GdfColumnInHost<GpuFunctions> gdfColumn{
-                binary_data, binary_pointer, object};
 
             RalColumn ral_column;
             if (!is_ipc) {
