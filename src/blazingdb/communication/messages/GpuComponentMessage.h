@@ -7,22 +7,27 @@ namespace blazingdb {
 namespace communication {
 namespace messages {
 
-    namespace tools {
-    class GdfColumnInHost {
-    public:
-      explicit GdfColumnInHost(const std::string& body,
-                               const std::size_t lastPosition) {}
+namespace tools {
 
-      const void* data() const noexcept { return nullptr; }
+template <class GpuFunctions>
+class GdfColumnInHost {
+public:
+  explicit GdfColumnInHost(const std::string& body,
+                           const std::size_t lastPosition,
+                           rapidjson::Value::ConstObject &ralcolumn_info) {}
 
-      const void* valid() const noexcept { return nullptr; }
-    private:
-      void *data_;
-      void *valid_;
-      void *category_1;
-      void *category_2;
-    };
-    }
+  const void* data() const noexcept { return nullptr; }
+
+  const void* valid() const noexcept { return nullptr; }
+
+private:
+  void* data_;
+  void* valid_;
+  void* category_1;
+  void* category_2;
+};
+
+}  // namespace tools
 
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class GpuComponentMessage : public BaseComponentMessage {
@@ -76,6 +81,12 @@ namespace messages {
 
                 writer.Key("cudf_column");
                 serializeCudfColumn(writer, column.get_gdf_column());
+
+                writer.Key("category_info-size-1");
+                writer.Uint64(100);  // TODO:
+
+                writer.Key("category_info-size-2");
+                writer.Uint64(200);  // TODO:
             }
             writer.EndObject();
         }
@@ -129,6 +140,9 @@ namespace messages {
             std::size_t data_pointer = binary_pointer;
             std::size_t valid_pointer = data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
             binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
+
+            tools::GdfColumnInHost<GpuFunctions> gdfColumn{
+                binary_data, binary_pointer, object};
 
             RalColumn ral_column;
             if (!is_ipc) {
