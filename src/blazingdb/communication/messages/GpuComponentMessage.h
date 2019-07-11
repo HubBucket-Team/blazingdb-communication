@@ -60,11 +60,14 @@ namespace messages {
                 writer.Key("cudf_column");
                 serializeCudfColumn(writer, column.get_gdf_column());
 
-                writer.Key("category_info-size-1");
+                writer.Key("category_info-strings_size");
                 writer.Uint64(100);  // TODO:
 
-                writer.Key("category_info-size-2");
-                writer.Uint64(200);  // TODO:
+                writer.Key("category_info-offsets_size");
+                writer.Uint64(100);  // TODO:
+
+                writer.Key("category_info-keys_length");
+                writer.Uint64(100);  // TODO:
             }
             writer.EndObject();
         }
@@ -120,37 +123,67 @@ namespace messages {
             binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
 
             RalColumn ral_column;
-            if (!is_ipc) {
-            	if(cudf_column.null_count == 0 && cudf_column.valid == nullptr){
-                    ral_column.create_gdf_column(cudf_column.dtype,
-                                                 cudf_column.size,
-                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                 (typename GpuFunctions::ValidTypePointer)nullptr,
-                                                 dtype_size,
-                                                 column_name);
-            	}else{
-                    ral_column.create_gdf_column(cudf_column.dtype,
-                                                 cudf_column.size,
-                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                 (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                                 dtype_size,
-                                                 column_name);
-            	}
 
+            if (GpuFunctions::isGdfString(cudf_column)) {
+              const std::size_t stringsSize =
+                  object["category_info-strings_size"].GetUint64();
+              const std::size_t offsetsSize =
+                  object["category_info-offsets_size"].GetUint64();
+
+              const std::size_t stringsIndex = binary_pointer;
+              const std::size_t offsetsIndex = stringsPointer + stringsSize;
+
+              binary_pointer += stringsSize + offsetsSize;
+
+              void* stringsPointer =
+                  static_cast<typename GpuFunctions::NVStrings*>(
+                      &binary_data[stringsIndex]);
+              void* offsetsPointer =
+                  static_cast<typename GpuFunctions::NVStrings*>(
+                      &binary_data[offsetsIndex]);
+
+              typename GpuFunctions::NVStrings* nvStrings =
+                  GpuFunctions::CreateNVStrings(stringsPointer, offsetsPointer,
+                                                stringsSize, offsetsSize);
+
+              const std::size_t keysLength =
+                  object["category_info-keys_length"].GetUint64();
+
+              ral_column.create_gdf_column(nvStrings, keysLength, column_name);
+            } else {  // gdf is not string
+              if (!is_ipc) {
+                if (cudf_column.null_count == 0 &&
+                    cudf_column.valid == nullptr) {
+                  ral_column.create_gdf_column(
+                      cudf_column.dtype, cudf_column.size,
+                      (typename GpuFunctions::DataTypePointer) &
+                          binary_data[data_pointer],
+                      (typename GpuFunctions::ValidTypePointer) nullptr,
+                      dtype_size, column_name);
+                } else {
+                  ral_column.create_gdf_column(
+                      cudf_column.dtype, cudf_column.size,
+                      (typename GpuFunctions::DataTypePointer) &
+                          binary_data[data_pointer],
+                      (typename GpuFunctions::ValidTypePointer) &
+                          binary_data[valid_pointer],
+                      dtype_size, column_name);
+                }
+
+              } else {
+                ral_column.create_gdf_column_for_ipc(
+                    cudf_column.dtype,
+                    (typename GpuFunctions::DataTypePointer) &
+                        binary_data[data_pointer],
+                    (typename GpuFunctions::ValidTypePointer) &
+                        binary_data[valid_pointer],
+                    cudf_column.size, cudf_column.null_count, column_name);
+              }
+
+              ral_column.set_column_token(column_token);
+              ral_column.get_gdf_column()->null_count = cudf_column.null_count;
+              ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
             }
-            else {
-                ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
-                                                     (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                     (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                                     cudf_column.size,
-                                                     cudf_column.null_count,
-                                                     column_name);
-            }
-
-            ral_column.set_column_token(column_token);
-            ral_column.get_gdf_column()->null_count = cudf_column.null_count;
-            ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
-
             return ral_column;
         }
     };
