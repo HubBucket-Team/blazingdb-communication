@@ -59,15 +59,6 @@ namespace messages {
 
                 writer.Key("cudf_column");
                 serializeCudfColumn(writer, column.get_gdf_column());
-
-                writer.Key("category_info-strings_size");
-                writer.Uint64(100);  // TODO:
-
-                writer.Key("category_info-offsets_size");
-                writer.Uint64(100);  // TODO:
-
-                writer.Key("category_info-keys_length");
-                writer.Uint64(100);  // TODO:
             }
             writer.EndObject();
         }
@@ -77,8 +68,12 @@ namespace messages {
 
             std::size_t capacity = 0;
             for (const auto& column : columns) {
-                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
+              if (!GpuFunctions::isGdfString(*column.get_gdf_column())) {
+                capacity +=
+                    GpuFunctions::getDataCapacity(column.get_gdf_column());
+                capacity +=
+                    GpuFunctions::getValidCapacity(column.get_gdf_column());
+              }
             }
             result.resize(capacity);
 
@@ -126,28 +121,32 @@ namespace messages {
 
             if (GpuFunctions::isGdfString(cudf_column)) {
               const std::size_t stringsSize =
-                  object["category_info-strings_size"].GetUint64();
+                  *reinterpret_cast<const std::size_t*>(&binary_data[0]);
               const std::size_t offsetsSize =
-                  object["category_info-offsets_size"].GetUint64();
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[sizeof(const std::size_t)]);
 
-              const std::size_t stringsIndex = binary_pointer;
-              const std::size_t offsetsIndex = stringsPointer + stringsSize;
+              const std::size_t stringsIndex =
+                  binary_pointer + 3 * sizeof(const std::size_t);
+              const std::size_t offsetsIndex = stringsIndex + stringsSize;
 
-              binary_pointer += stringsSize + offsetsSize;
+              binary_pointer +=
+                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
 
-              void* stringsPointer =
-                  static_cast<typename GpuFunctions::NVStrings*>(
+              const void* stringsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
                       &binary_data[stringsIndex]);
-              void* offsetsPointer =
-                  static_cast<typename GpuFunctions::NVStrings*>(
+              const void* offsetsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
                       &binary_data[offsetsIndex]);
 
-              typename GpuFunctions::NVStrings* nvStrings =
-                  GpuFunctions::CreateNVStrings(stringsPointer, offsetsPointer,
-                                                stringsSize, offsetsSize);
-
               const std::size_t keysLength =
-                  object["category_info-keys_length"].GetUint64();
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[2 * sizeof(const std::size_t)]);
+
+              typename GpuFunctions::NvStrings* nvStrings =
+                  GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
+                                                keysLength);
 
               ral_column.create_gdf_column(nvStrings, keysLength, column_name);
             } else {  // gdf is not string
