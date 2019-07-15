@@ -7,11 +7,21 @@ namespace communication {
 namespace network {
 
 std::shared_ptr<Message> MessageQueue::getMessage(const MessageTokenType& messageToken) {
+    
+    
+    
     std::unique_lock<std::mutex> lock(mutex_);
+    
+    std::cout << "TF1: " << messageToken << std::endl;
+    std::cout << "TF1: " << this->message_queue_.size() << std::endl;
+
     condition_variable_.wait(lock, 
                             [&, this]{ return std::any_of(this->message_queue_.cbegin(),
                                                         this->message_queue_.cend(), 
-                                                        [&](const auto& e){ return e->getMessageTokenValue() == messageToken; }); });
+                                                        [&](const auto& e){ 
+            std::cout << "TF2: " << e->getMessageTokenValue() << std::endl;
+            return e->getMessageTokenValue() == messageToken; }); 
+    });
     return getMessageQueue(messageToken);
 }
 

@@ -21,9 +21,10 @@ public:
   virtual Context* generateContext(std::string logicalPlan, int clusterSize) = 0;
   // void completedTask(int id);
 
-  static std::unique_ptr<Manager> Make();
+  static std::unique_ptr<Manager> Make(int communicationTcpPort);
 
   static std::unique_ptr<Manager> Make(
+      int communicationTcpPort,
       const std::vector<Node>&
           nodes);  // This is temporary, new nodes will be added in the http
                    // server thread created in the listen method

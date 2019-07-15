@@ -9,30 +9,36 @@ namespace internal {
 
 class ConcreteAddress : public Address {
 public:
-  ConcreteAddress(const std::string &ip, const std::int16_t port)
-      : ip_{std::move(ip)}, port_{port} {}
+  ConcreteAddress(const std::string &ip, const std::int16_t communication_port, const std::int16_t protocol_port)
+      : ip_{std::move(ip)}, communication_port_{communication_port}, protocol_port_{protocol_port} {}
 
   bool SameValueAs(const Address &address) const final {
     const ConcreteAddress &concreteAddress =
         *static_cast<const ConcreteAddress *>(&address);
-    return (ip_ == concreteAddress.ip_) && (port_ == concreteAddress.port_);
+    return (ip_ == concreteAddress.ip_) && (communication_port_ == concreteAddress.communication_port_) && (protocol_port_ == concreteAddress.protocol_port_);
   }
 
   const std::string &ip() const noexcept { return ip_; }
 
-  std::int16_t port() const noexcept { return port_; }
+  std::int16_t communication_port() const noexcept { return communication_port_; }
+  
+  std::int16_t protocol_port() const noexcept { return protocol_port_; }
 
   void serializeToJson(JsonSerializable::Writer& writer) const {
       writer.Key("addressIp");
       writer.String(ip_.c_str());
 
-      writer.Key("addressPort");
-      writer.Int(port_);
+      writer.Key("addressCommunicationPort");
+      writer.Int(communication_port_);
+      
+      writer.Key("addressProtocolPort");
+      writer.Int(protocol_port_);
   };
 
 private:
   const std::string ip_;
-  const std::int16_t port_;
+  const std::int16_t communication_port_;
+  const std::int16_t protocol_port_; // For TCP socket // TODO percy c.gonzales JP
 };
 
 }  // namespace internal
