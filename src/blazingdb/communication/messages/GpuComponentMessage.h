@@ -117,46 +117,47 @@ namespace messages {
                   GpuFunctions::getDTypeSize(cudf_column.dtype);
 
             if (GpuFunctions::isGdfString(cudf_column)) {
-              if (cudf_column.size > 0) {
-                const std::size_t stringsSize =
-                    *reinterpret_cast<const std::size_t*>(
-                        &binary_data[binary_pointer]);
-                const std::size_t offsetsSize =
-                    *reinterpret_cast<const std::size_t*>(
-                        &binary_data[binary_pointer + sizeof(const std::size_t)]);
-
-                const std::size_t stringsIndex =
-                    binary_pointer + 3 * sizeof(const std::size_t);
-                const std::size_t offsetsIndex = stringsIndex + stringsSize;
-
-                const void* stringsPointer =
-                    reinterpret_cast<const typename GpuFunctions::NvStrings*>(
-                        &binary_data[stringsIndex]);
-                const void* offsetsPointer =
-                    reinterpret_cast<const typename GpuFunctions::NvStrings*>(
-                        &binary_data[offsetsIndex]);
-
-                const std::size_t keysLength =
-                    *reinterpret_cast<const std::size_t*>(
-                        &binary_data[binary_pointer +
-                                    2 * sizeof(const std::size_t)]);
-
-                typename GpuFunctions::NvStrings* nvStrings =
-                    GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
-                                                  keysLength);
-
-                typename GpuFunctions::NvCategory* nvCategory =
-                    GpuFunctions::NvCategory::create_from_strings(*nvStrings);
-
-                binary_pointer +=
-                    stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
-
-                ral_column.create_gdf_column(nvCategory, keysLength, column_name);
-              } else {
+              if (!cudf_column.size) {
                 typename GpuFunctions::NvCategory* nvCategory =
                     GpuFunctions::NvCategory::create_from_array(nullptr, 0);
                 ral_column.create_gdf_column(nvCategory, 0, column_name);
+                return ral_column;
               }
+
+              const std::size_t stringsSize =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer]);
+              const std::size_t offsetsSize =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer + sizeof(const std::size_t)]);
+
+              const std::size_t stringsIndex =
+                  binary_pointer + 3 * sizeof(const std::size_t);
+              const std::size_t offsetsIndex = stringsIndex + stringsSize;
+
+              const void* stringsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
+                      &binary_data[stringsIndex]);
+              const void* offsetsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
+                      &binary_data[offsetsIndex]);
+
+              const std::size_t keysLength =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer +
+                                   2 * sizeof(const std::size_t)]);
+
+              typename GpuFunctions::NvStrings* nvStrings =
+                  GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
+                                                keysLength);
+
+              typename GpuFunctions::NvCategory* nvCategory =
+                  GpuFunctions::NvCategory::create_from_strings(*nvStrings);
+
+              binary_pointer +=
+                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
+
+              ral_column.create_gdf_column(nvCategory, keysLength, column_name);
             } else {  // gdf is not string
               // Calculate pointers and update binary_pointer
               std::size_t data_pointer = binary_pointer;
