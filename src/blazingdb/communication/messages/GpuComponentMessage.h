@@ -38,7 +38,7 @@ namespace messages {
                 writer.Key("null_count");
                 writer.Uint64(column->null_count);
 
-                writer.Key("dtype_info");
+                writer.Key("dtype_info-time_unit");
                 writer.Uint(column->dtype_info.time_unit);
             }
             writer.EndObject();
@@ -71,8 +71,12 @@ namespace messages {
 
             std::size_t capacity = 0;
             for (const auto& column : columns) {
-                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
+              if (!GpuFunctions::isGdfString(*column.get_gdf_column())) {
+                capacity +=
+                    GpuFunctions::getDataCapacity(column.get_gdf_column());
+                capacity +=
+                    GpuFunctions::getValidCapacity(column.get_gdf_column());
+              }
             }
             result.resize(capacity);
 
@@ -93,7 +97,9 @@ namespace messages {
 
             column.null_count = object["null_count"].GetUint64();
 
-            column.dtype_info = (typename GpuFunctions::DTypeInfo) { (typename GpuFunctions::TimeUnit)object["dtype_info"].GetUint() };
+            column.dtype_info = (typename GpuFunctions::DTypeInfo){
+                (typename GpuFunctions::TimeUnit)object["dtype_info-time_unit"]
+                    .GetUint()};
 
             return column;
         }
@@ -117,8 +123,40 @@ namespace messages {
             binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
 
             RalColumn ral_column;
-            if (!is_ipc) {
-            	if(cudf_column.null_count > 0){
+
+            if (GpuFunctions::isGdfString(cudf_column)) {
+              const std::size_t stringsSize =
+                  *reinterpret_cast<const std::size_t*>(&binary_data[0]);
+              const std::size_t offsetsSize =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[sizeof(const std::size_t)]);
+
+              const std::size_t stringsIndex =
+                  binary_pointer + 3 * sizeof(const std::size_t);
+              const std::size_t offsetsIndex = stringsIndex + stringsSize;
+
+              binary_pointer +=
+                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
+
+              const void* stringsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
+                      &binary_data[stringsIndex]);
+              const void* offsetsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
+                      &binary_data[offsetsIndex]);
+
+              const std::size_t keysLength =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[2 * sizeof(const std::size_t)]);
+
+              typename GpuFunctions::NvStrings* nvStrings =
+                  GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
+                                                keysLength);
+
+              ral_column.create_gdf_column(nvStrings, keysLength, column_name);
+            } else {  // gdf is not string
+              if (!is_ipc) {
+                if(cudf_column.null_count > 0){
                     ral_column.create_gdf_column(cudf_column.dtype,
                                                  cudf_column.size,
                                                  (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
@@ -139,20 +177,20 @@ namespace messages {
                                                  dtype_size,
                                                  column_name);
             	}
-            }
-            else {
-                ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
-                                                     (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                     (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                                     cudf_column.size,
-                                                     cudf_column.null_count,
-                                                     column_name);
-            }
+              } else {
+                ral_column.create_gdf_column_for_ipc(
+                    cudf_column.dtype,
+                    (typename GpuFunctions::DataTypePointer) &
+                        binary_data[data_pointer],
+                    (typename GpuFunctions::ValidTypePointer) &
+                        binary_data[valid_pointer],
+                    cudf_column.size, cudf_column.null_count, column_name);
+              }
 
-            ral_column.set_column_token(column_token);
-            ral_column.get_gdf_column()->null_count = cudf_column.null_count;
-            ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
-
+              ral_column.set_column_token(column_token);
+              ral_column.get_gdf_column()->null_count = cudf_column.null_count;
+              ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
+            }
             return ral_column;
         }
     };
