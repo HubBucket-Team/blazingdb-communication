@@ -153,7 +153,10 @@ namespace messages {
                   GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
                                                 keysLength);
 
-              ral_column.create_gdf_column(nvStrings, keysLength, column_name);
+              typename GpuFunctions::NvCategory* nvCategory =
+                  GpuFunctions::NvCategory::create_from_strings(*nvStrings);
+
+              ral_column.create_gdf_column(nvCategory, keysLength, column_name);
             } else {  // gdf is not string
               if (!is_ipc) {
                 if(cudf_column.null_count > 0){
