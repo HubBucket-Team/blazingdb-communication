@@ -2,6 +2,7 @@
 #define BLAZINGDB_COMMUNICATION_MESSAGES_SAMPLETONODEMASTERMESSAGE_H
 
 #include <vector>
+
 #include "blazingdb/communication/Node.h"
 #include "blazingdb/communication/messages/GpuComponentMessage.h"
 

@@ -111,27 +111,19 @@ namespace messages {
 
             auto cudf_column = deserializeCudfColumn(object["cudf_column"].GetObject());
 
-            // Calculate pointers and update binary_pointer
-            std::size_t dtype_size = GpuFunctions::getDTypeSize(cudf_column.dtype);
-            std::size_t data_pointer = binary_pointer;
-            std::size_t valid_pointer = data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
-            binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
-
             RalColumn ral_column;
 
             if (GpuFunctions::isGdfString(cudf_column)) {
               const std::size_t stringsSize =
-                  *reinterpret_cast<const std::size_t*>(&binary_data[0]);
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer]);
               const std::size_t offsetsSize =
                   *reinterpret_cast<const std::size_t*>(
-                      &binary_data[sizeof(const std::size_t)]);
+                      &binary_data[binary_pointer + sizeof(const std::size_t)]);
 
               const std::size_t stringsIndex =
                   binary_pointer + 3 * sizeof(const std::size_t);
               const std::size_t offsetsIndex = stringsIndex + stringsSize;
-
-              binary_pointer +=
-                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
 
               const void* stringsPointer =
                   reinterpret_cast<const typename GpuFunctions::NvStrings*>(
@@ -142,7 +134,8 @@ namespace messages {
 
               const std::size_t keysLength =
                   *reinterpret_cast<const std::size_t*>(
-                      &binary_data[2 * sizeof(const std::size_t)]);
+                      &binary_data[binary_pointer +
+                                   2 * sizeof(const std::size_t)]);
 
               typename GpuFunctions::NvStrings* nvStrings =
                   GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
@@ -151,8 +144,20 @@ namespace messages {
               typename GpuFunctions::NvCategory* nvCategory =
                   GpuFunctions::NvCategory::create_from_strings(*nvStrings);
 
+              binary_pointer +=
+                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
+
               ral_column.create_gdf_column(nvCategory, keysLength, column_name);
             } else {  // gdf is not string
+              // Calculate pointers and update binary_pointer
+              std::size_t dtype_size =
+                  GpuFunctions::getDTypeSize(cudf_column.dtype);
+              std::size_t data_pointer = binary_pointer;
+              std::size_t valid_pointer =
+                  data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
+              binary_pointer =
+                  valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
+
               if (!is_ipc) {
                 if (cudf_column.null_count == 0 &&
                     cudf_column.valid == nullptr) {
