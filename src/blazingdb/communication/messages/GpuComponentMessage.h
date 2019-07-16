@@ -38,7 +38,7 @@ namespace messages {
                 writer.Key("null_count");
                 writer.Uint64(column->null_count);
 
-                writer.Key("dtype_info");
+                writer.Key("dtype_info-time_unit");
                 writer.Uint(column->dtype_info.time_unit);
             }
             writer.EndObject();
@@ -57,6 +57,9 @@ namespace messages {
                 auto column_name = column.name();
                 writer.String(column_name.c_str(), column_name.length());
 
+                writer.Key("has_valids");
+                writer.Bool(column.null_count() > 0 || (column.null_count() == 0 && column.valid() != nullptr));
+
                 writer.Key("cudf_column");
                 serializeCudfColumn(writer, column.get_gdf_column());
             }
@@ -68,8 +71,15 @@ namespace messages {
 
             std::size_t capacity = 0;
             for (const auto& column : columns) {
-                capacity += GpuFunctions::getDataCapacity(column.get_gdf_column());
-                capacity += GpuFunctions::getValidCapacity(column.get_gdf_column());
+              if (!GpuFunctions::isGdfString(*column.get_gdf_column())) {
+                capacity +=
+                    GpuFunctions::getDataCapacity(column.get_gdf_column());
+                capacity +=
+                    GpuFunctions::getValidCapacity(column.get_gdf_column());
+              }
+              // WARNING!!! Here we are only getting the size for non-string columns. The size we need for string columns is determined inside the copyGpuToCpu where it is resized again. 
+              // THIS is a bad performance issue. This needs to be addressed
+              // TODO!!
             }
             result.resize(capacity);
 
@@ -90,7 +100,9 @@ namespace messages {
 
             column.null_count = object["null_count"].GetUint64();
 
-            column.dtype_info = (typename GpuFunctions::DTypeInfo) { (typename GpuFunctions::TimeUnit)object["dtype_info"].GetUint() };
+            column.dtype_info = (typename GpuFunctions::DTypeInfo){
+                (typename GpuFunctions::TimeUnit)object["dtype_info-time_unit"]
+                    .GetUint()};
 
             return column;
         }
@@ -103,36 +115,93 @@ namespace messages {
 
             std::uint64_t column_token = object["column_token"].GetUint64();
 
+            bool has_valids = object["has_valids"].GetBool();
+
             auto cudf_column = deserializeCudfColumn(object["cudf_column"].GetObject());
 
-            // Calculate pointers and update binary_pointer
-            std::size_t dtype_size = GpuFunctions::getDTypeSize(cudf_column.dtype);
-            std::size_t data_pointer = binary_pointer;
-            std::size_t valid_pointer = data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
-            binary_pointer = valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
-
             RalColumn ral_column;
-            if (!is_ipc) {
-                ral_column.create_gdf_column(cudf_column.dtype,
-                                             cudf_column.size,
-                                             (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                             (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                             dtype_size,
-                                             column_name);
-            }
-            else {
-                ral_column.create_gdf_column_for_ipc(cudf_column.dtype,
-                                                     (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
-                                                     (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
-                                                     cudf_column.size,
-                                                     cudf_column.null_count,
-                                                     column_name);
-            }
 
-            ral_column.set_column_token(column_token);
-            ral_column.get_gdf_column()->null_count = cudf_column.null_count;
-            ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
+            if (GpuFunctions::isGdfString(cudf_column)) {
+              const std::size_t stringsSize =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer]);
+              const std::size_t offsetsSize =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer + sizeof(const std::size_t)]);
 
+              const std::size_t stringsIndex =
+                  binary_pointer + 3 * sizeof(const std::size_t);
+              const std::size_t offsetsIndex = stringsIndex + stringsSize;
+
+              const void* stringsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
+                      &binary_data[stringsIndex]);
+              const void* offsetsPointer =
+                  reinterpret_cast<const typename GpuFunctions::NvStrings*>(
+                      &binary_data[offsetsIndex]);
+
+              const std::size_t keysLength =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary_data[binary_pointer +
+                                   2 * sizeof(const std::size_t)]);
+
+              typename GpuFunctions::NvStrings* nvStrings =
+                  GpuFunctions::CreateNvStrings(stringsPointer, offsetsPointer,
+                                                keysLength);
+
+              typename GpuFunctions::NvCategory* nvCategory =
+                  GpuFunctions::NvCategory::create_from_strings(*nvStrings);
+
+              binary_pointer +=
+                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
+
+              ral_column.create_gdf_column(nvCategory, keysLength, column_name);
+            } else {  // gdf is not string
+              // Calculate pointers and update binary_pointer
+              std::size_t dtype_size =
+                  GpuFunctions::getDTypeSize(cudf_column.dtype);
+              std::size_t data_pointer = binary_pointer;
+              std::size_t valid_pointer =
+                  data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
+              binary_pointer =
+                  valid_pointer + GpuFunctions::getValidCapacity(&cudf_column);
+
+              if (!is_ipc) {
+                if(cudf_column.null_count > 0){
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 (typename GpuFunctions::ValidTypePointer)&binary_data[valid_pointer],
+                                                 dtype_size,
+                                                 column_name);
+            	} else if(has_valids) {
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 dtype_size,
+                                                 column_name);
+                } else {
+                    ral_column.create_gdf_column(cudf_column.dtype,
+                                                 cudf_column.size,
+                                                 (typename GpuFunctions::DataTypePointer)&binary_data[data_pointer],
+                                                 (typename GpuFunctions::ValidTypePointer)nullptr,
+                                                 dtype_size,
+                                                 column_name);
+            	}
+              } else {
+                ral_column.create_gdf_column_for_ipc(
+                    cudf_column.dtype,
+                    (typename GpuFunctions::DataTypePointer) &
+                        binary_data[data_pointer],
+                    (typename GpuFunctions::ValidTypePointer) &
+                        binary_data[valid_pointer],
+                    cudf_column.size, cudf_column.null_count, column_name);
+              }
+
+              ral_column.set_column_token(column_token);
+              ral_column.get_gdf_column()->null_count = cudf_column.null_count;
+              ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
+            }
             return ral_column;
         }
     };

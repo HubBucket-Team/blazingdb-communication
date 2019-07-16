@@ -7,6 +7,14 @@ using namespace blazingdb::communication;
 
 void Cluster::addNode(const Node& node) {
   std::unique_lock<std::mutex> lock(condition_mutex);
+
+  if (std::find_if(nodes_.cbegin(), nodes_.cend(), [&](auto& n){ return *n == node; }) != nodes_.end()) {
+    // TODO: workaround until implement a proper discovery and heartbeat for workers
+    // If the node crashed and its trying to register again with the same address,
+    // ignore it because its already on the cluster
+    return;
+  }
+
   nodes_.push_back(Node::makeShared(node));
 
   // TODO: Delete this
@@ -14,7 +22,7 @@ void Cluster::addNode(const Node& node) {
       *static_cast<const internal::ConcreteAddress*>(node.address());
 
   const std::string nodeAsString =
-      concreteAddress.ip() + "," + std::to_string(concreteAddress.port());
+      concreteAddress.ip() + "," + std::to_string(concreteAddress.communication_port());
   std::cout << nodeAsString << "\n";
 }
 
