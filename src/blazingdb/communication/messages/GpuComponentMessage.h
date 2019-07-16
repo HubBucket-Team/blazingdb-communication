@@ -77,6 +77,9 @@ namespace messages {
                 capacity +=
                     GpuFunctions::getValidCapacity(column.get_gdf_column());
               }
+              // WARNING!!! Here we are only getting the size for non-string columns. The size we need for string columns is determined inside the copyGpuToCpu where it is resized again. 
+              // THIS is a bad performance issue. This needs to be addressed
+              // TODO!!
             }
             result.resize(capacity);
 
