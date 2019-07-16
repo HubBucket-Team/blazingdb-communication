@@ -121,7 +121,17 @@ namespace messages {
 
             RalColumn ral_column;
 
+            std::size_t dtype_size =
+                  GpuFunctions::getDTypeSize(cudf_column.dtype);
+
             if (GpuFunctions::isGdfString(cudf_column)) {
+              if (!cudf_column.size) {
+                typename GpuFunctions::NvCategory* nvCategory =
+                    GpuFunctions::NvCategory::create_from_array(nullptr, 0);
+                ral_column.create_gdf_column(nvCategory, 0, column_name);
+                return ral_column;
+              }
+
               const std::size_t stringsSize =
                   *reinterpret_cast<const std::size_t*>(
                       &binary_data[binary_pointer]);
@@ -158,8 +168,6 @@ namespace messages {
               ral_column.create_gdf_column(nvCategory, keysLength, column_name);
             } else {  // gdf is not string
               // Calculate pointers and update binary_pointer
-              std::size_t dtype_size =
-                  GpuFunctions::getDTypeSize(cudf_column.dtype);
               std::size_t data_pointer = binary_pointer;
               std::size_t valid_pointer =
                   data_pointer + GpuFunctions::getDataCapacity(&cudf_column);
