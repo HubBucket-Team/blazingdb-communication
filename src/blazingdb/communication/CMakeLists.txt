@@ -43,6 +43,7 @@ blazingdb_artifact (
     ContextToken.h
     Cluster.h
     Address.h
+    Address-Internal.h
     shared/Identity.h
     shared/macros.h
     shared/Entity.h
