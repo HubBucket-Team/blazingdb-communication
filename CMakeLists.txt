@@ -42,9 +42,9 @@ include(ConfigureBlazingDBDependencies)
 
 # NOTE Do not change the inclusion order
 # Configure dependencies
-include(ConfigureBoost)
-include(ConfigureRapidJSON)
-include(ConfigureSimpleWebServer)
+#include(ConfigureBoost)
+#include(ConfigureRapidJSON)
+#include(ConfigureSimpleWebServer)
 
 # BEGIN MAIN #
 
