@@ -103,20 +103,16 @@ public:
 
 private:
   static std::shared_ptr<Address> ConcreteAddressFrom(const Buffer& buffer) {
-    // TODO: change to istream or avoid string
-    const char* it = std::find(buffer.data(), buffer.data() + buffer.size(), ',');
 
-    if (it == buffer.data() + buffer.size()) {
-      throw std::runtime_error("Bad buffer");
-    }
-
-    const std::string ip{buffer.data(), it};
-    const std::uint16_t communication_port = std::atoi(++it);
-
-    it = std::find(it, buffer.data() + buffer.size(), ',');
-
-    const std::uint16_t protocol_port = std::atoi(++it);
-
+    std::string buffer_str(buffer.data(), buffer.size());
+    int pos1 = buffer_str.find(",");
+    const std::string ip =buffer_str.substr(0,pos1);
+    int pos2 = buffer_str.find(",", pos1 + 1);
+    std::string communication_port_str =buffer_str.substr(pos1 + 1,pos2);
+    const std::uint16_t communication_port = std::atoi(communication_port_str.c_str());
+    std::string protocol_port_str =buffer_str.substr(pos2 + 1);
+    const std::uint16_t protocol_port = std::atoi(protocol_port_str.c_str());
+    
     return std::make_shared<internal::ConcreteAddress>(ip, communication_port, protocol_port);
   }
 };
