@@ -28,6 +28,8 @@ public:
 
   void serializeToJson(JsonSerializable::Writer& writer) const override;
 
+  void print() const;
+
   static Node make(const rapidjson::Value::Object& object);
   static std::unique_ptr<Node> makeUnique(const rapidjson::Value::Object& object);
 

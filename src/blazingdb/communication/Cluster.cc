@@ -17,13 +17,7 @@ void Cluster::addNode(const Node& node) {
 
   nodes_.push_back(Node::makeShared(node));
 
-  // TODO: Delete this
-  const internal::ConcreteAddress& concreteAddress =
-      *static_cast<const internal::ConcreteAddress*>(node.address());
-
-  const std::string nodeAsString =
-      concreteAddress.ip() + "," + std::to_string(concreteAddress.communication_port());
-  std::cout << nodeAsString << "\n";
+  node.print();
 }
 
 size_t Cluster::getTotalNodes() const { return nodes_.size(); }
