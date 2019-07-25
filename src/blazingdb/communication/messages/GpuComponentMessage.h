@@ -124,17 +124,6 @@ namespace messages {
 
             std::size_t dtype_size = GpuFunctions::getDTypeSize(cudf_column.dtype);
 
-            std::cout<<"deserializeRalColumn name: "<<column_name<<std::endl;
-            std::cout<<"deserializeRalColumn size: "<<cudf_column.size<<std::endl;
-            if (cudf_column.size == 0)
-                std::cout<<"deserializeRalColumn size is 0 "<<cudf_column.size<<std::endl;
-
-            std::cout<<"deserializeRalColumn dtype: "<<cudf_column.dtype<<std::endl;
-            if (has_valids)
-                std::cout<<"deserializeRalColumn has_valids: "<<"true"<<std::endl;
-            else
-                std::cout<<"deserializeRalColumn has_valids: "<<"false"<<std::endl;
-
             if (GpuFunctions::isGdfString(cudf_column)) {
               if (!cudf_column.size) {
                 typename GpuFunctions::NvCategory* nvCategory =
