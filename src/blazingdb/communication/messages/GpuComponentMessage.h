@@ -82,12 +82,21 @@ namespace messages {
               // THIS is a bad performance issue. This needs to be addressed
               // TODO!!
             }
+
+            const typename GpuFunctions::StringsInfo* stringsInfo =
+                GpuFunctions::createStringsInfo(columns);
+
+            capacity += GpuFunctions::getStringsCapacity(stringsInfo);
             result.resize(capacity);
 
             std::size_t binary_pointer = 0;
             for (const auto& column : columns) {
-                GpuFunctions::copyGpuToCpu(binary_pointer, result, const_cast<RalColumn&>(column));
+              GpuFunctions::copyGpuToCpu(binary_pointer, result,
+                                         const_cast<RalColumn&>(column),
+                                         stringsInfo);
             }
+
+            GpuFunctions::destroyStringsInfo(stringsInfo);
 
             return result;
         }
