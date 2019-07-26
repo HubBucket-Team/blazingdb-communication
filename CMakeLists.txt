@@ -44,7 +44,7 @@ include(ConfigureBlazingDBDependencies)
 # Configure dependencies
 include(ConfigureBoost)
 #include(ConfigureRapidJSON)
-#include(ConfigureSimpleWebServer)
+include(ConfigureSimpleWebServer)
 
 # BEGIN MAIN #
 
