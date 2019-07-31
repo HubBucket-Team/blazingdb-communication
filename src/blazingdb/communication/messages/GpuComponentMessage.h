@@ -3,6 +3,7 @@
 
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
 #include <iostream>
+#include <chrono>
 
 namespace blazingdb {
 namespace communication {
@@ -109,6 +110,8 @@ namespace messages {
         }
 
         static RalColumn deserializeRalColumn(std::size_t& binary_pointer, const std::string& binary_data, rapidjson::Value::ConstObject&& object) {
+	        auto	start = std::chrono::high_resolution_clock::now();
+
             const auto& column_name_data = object["column_name"];
             std::string column_name(column_name_data.GetString(), column_name_data.GetStringLength());
 
@@ -210,6 +213,10 @@ namespace messages {
               ral_column.get_gdf_column()->null_count = cudf_column.null_count;
               ral_column.get_gdf_column()->dtype_info = cudf_column.dtype_info;
             }
+            std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration<double, std::milli>(end-start).count();
+
+            GpuFunctions::log("-> deserializeRalColumn " + std::to_string(duration) + " ms" );
             return ral_column;
         }
     };
