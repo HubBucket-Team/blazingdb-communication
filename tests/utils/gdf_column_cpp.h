@@ -3,6 +3,7 @@
 
 #include <string>
 #include "tests/utils/gdf_column.h"
+#include "tests/utils/custrings.h"
 
 namespace blazingdb {
 namespace test {
@@ -56,6 +57,7 @@ namespace test {
                                std::size_t width_per_value,
                                const std::string& column_name);
 
+        void create_gdf_column(NVCategory* category, size_t num_values, std::string column_name);
 
         void create_gdf_column_for_ipc(gdf_dtype dtype,
                                                    void* input_data,

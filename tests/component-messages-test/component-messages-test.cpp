@@ -29,6 +29,9 @@ struct GpuFunctions {
 
     using DataTypePointer = void*;
     using ValidTypePointer = blazingdb::test::gdf_valid_type*;
+    
+    using NvStrings = NVStrings;
+    using NvCategory = NVCategory;
 
 
     static void copyGpuToCpu(std::size_t& binary_pointer, std::string& result, blazingdb::test::gdf_column_cpp& column) {
@@ -51,6 +54,16 @@ struct GpuFunctions {
 
     static std::size_t getDTypeSize(blazingdb::test::gdf_dtype type) {
         return blazingdb::test::get_dtype_width(type);
+    }
+
+    static std::size_t isGdfString(blazingdb::test::gdf_column& column) {
+      return false;
+    }
+
+    static NvStrings* CreateNvStrings(const void * stringsPointer,
+                                    const void *      offsetsPointer,
+                                    const std::size_t keysLength){
+        return nullptr;
     }
 };
 
@@ -79,14 +92,14 @@ TEST_F(ComponentMessagesTest, ColumnDataMessage) {
     auto gdf_column_cpp_1 = blazingdb::test::build(gdf_column_1.get(),
                                                    gdf_column_1->size,
                                                    gdf_column_1->size * blazingdb::test::get_dtype_width(gdf_column_1->dtype),
-                                                   "column another name 1",
+                                                   "column name 1",
                                                    false,
                                                    123);
 
     auto gdf_column_cpp_2 = blazingdb::test::build(gdf_column_2.get(),
                                                    gdf_column_2->size,
                                                    gdf_column_2->size * blazingdb::test::get_dtype_width(gdf_column_2->dtype),
-                                                   "column name another 2",
+                                                   "column name 2",
                                                    false,
                                                    3567);
 
@@ -156,14 +169,14 @@ TEST_F(ComponentMessagesTest, DataScatterMessage) {
     auto gdf_column_cpp_1 = blazingdb::test::build(gdf_column_1.get(),
                                                    gdf_column_1->size,
                                                    gdf_column_1->size * blazingdb::test::get_dtype_width(gdf_column_1->dtype),
-                                                   "column another name 1",
+                                                   "column name 1",
                                                    false,
                                                    123);
 
     auto gdf_column_cpp_2 = blazingdb::test::build(gdf_column_2.get(),
                                                    gdf_column_2->size,
                                                    gdf_column_2->size * blazingdb::test::get_dtype_width(gdf_column_2->dtype),
-                                                   "column name another 2",
+                                                   "column name 2",
                                                    false,
                                                    3567);
 
@@ -237,14 +250,14 @@ TEST_F(ComponentMessagesTest, SampleToNodeMasterMessage) {
     auto gdf_column_cpp_1 = blazingdb::test::build(gdf_column_1.get(),
                                                    gdf_column_1->size,
                                                    gdf_column_1->size * blazingdb::test::get_dtype_width(gdf_column_1->dtype),
-                                                   "column name another 1",
+                                                   "column name 1",
                                                    true,
                                                    123);
 
     auto gdf_column_cpp_2 = blazingdb::test::build(gdf_column_2.get(),
                                                    gdf_column_2->size,
                                                    gdf_column_2->size * blazingdb::test::get_dtype_width(gdf_column_2->dtype),
-                                                   "column name another 2",
+                                                   "column name 2",
                                                    false,
                                                    3567);
 

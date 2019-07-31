@@ -113,6 +113,9 @@ namespace test {
         column_token = 0;
     }
 
+    void gdf_column_cpp::create_gdf_column(NVCategory* category, size_t num_values, std::string column_name){
+    }
+
     void gdf_column_cpp::create_gdf_column_for_ipc(gdf_dtype dtype,
                                                    void* input_data,
                                                    gdf_valid_type* input_valid,
@@ -144,7 +147,7 @@ namespace test {
         column->valid = new gdf_valid_type[input_valid_size];
         memcpy(column->valid, input_valid, input_valid_size);
 
-        column->col_name = new char[std::strlen(input_column->col_name)];
+        column->col_name = new char[std::strlen(input_column->col_name)+1];
         std::strcpy(column->col_name, input_column->col_name);
 
         column->size = input_data_size;
