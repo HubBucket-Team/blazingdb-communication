@@ -19,7 +19,7 @@ blazingdb_artifact (
     messages/MessageToken.cc
     messages/DataPivot.cpp
     messages/NodeDataMessage.cc
-
+    
   INCLUDES
     PUBLIC ${PROJECT_SOURCE_DIR}/src
 
