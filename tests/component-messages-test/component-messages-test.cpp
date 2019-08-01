@@ -65,6 +65,10 @@ struct GpuFunctions {
                                     const std::size_t keysLength){
         return nullptr;
     }
+    
+    static void log(std::string message) {
+    
+    }
 };
 
 

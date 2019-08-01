@@ -33,6 +33,6 @@ enable_testing()
 # -------------------
 message(STATUS "******** Configuring tests ********")
 
-add_subdirectory(component-messages-test)
+# add_subdirectory(component-messages-test)
 
 message(STATUS "******** Tests are ready ********")
