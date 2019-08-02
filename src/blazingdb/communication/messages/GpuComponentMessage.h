@@ -1,9 +1,13 @@
 #ifndef BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 #define BLAZINGDB_COMMUNICATION_MESSAGES_COMPONENTMESSAGE_H
 
-#include "blazingdb/communication/messages/BaseComponentMessage.h"
-#include <iostream>
+#include <algorithm>
 #include <chrono>
+#include <future>
+#include <iostream>
+#include <vector>
+
+#include "blazingdb/communication/messages/BaseComponentMessage.h"
 
 namespace blazingdb {
 namespace communication {
@@ -90,12 +94,23 @@ namespace messages {
             capacity += GpuFunctions::getStringsCapacity(stringsInfo);
             result.resize(capacity);
 
+            std::vector<std::future<void>> futures;
+            futures.reserve(columns.size());
+
             std::size_t binary_pointer = 0;
-            for (const auto& column : columns) {
-              GpuFunctions::copyGpuToCpu(binary_pointer, result,
-                                         const_cast<RalColumn&>(column),
-                                         stringsInfo);
-            }
+
+            std::for_each(
+                columns.cbegin(), columns.cend(),
+                [&futures, &binary_pointer, &result,
+                 &stringsInfo](const RalColumn& column) {
+                  futures.push_back(std::async(
+                      std::launch::async, GpuFunctions::copyGpuToCpu,
+                      std::ref(binary_pointer), std::ref(result),
+                      std::ref(const_cast<RalColumn&>(column)), stringsInfo));
+                });
+
+            std::for_each(futures.begin(), futures.end(),
+                          [](std::future<void>& future) { future.wait(); });
 
             GpuFunctions::destroyStringsInfo(stringsInfo);
 
@@ -111,9 +126,9 @@ namespace messages {
 
             column.null_count = object["null_count"].GetUint64();
 
-            column.dtype_info = (typename GpuFunctions::DTypeInfo){
-                (typename GpuFunctions::TimeUnit)object["dtype_info-time_unit"]
-                    .GetUint()};
+            column.dtype_info.time_unit =
+                static_cast<typename GpuFunctions::TimeUnit>(
+                    object["dtype_info-time_unit"].GetUint());
 
             return column;
         }
