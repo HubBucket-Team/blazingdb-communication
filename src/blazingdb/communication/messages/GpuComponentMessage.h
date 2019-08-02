@@ -94,20 +94,40 @@ namespace messages {
             capacity += GpuFunctions::getStringsCapacity(stringsInfo);
             result.resize(capacity);
 
+            std::vector<std::size_t> offsets;
+            offsets.reserve(columns.size());
+
+            offsets.push_back(0);
+
+            for (const auto& column : columns) {
+              std::size_t preOff = offsets.back();
+
+              std::size_t dataSize = 0;
+              std::size_t validSize = 0;
+
+              if (GpuFunctions::isGdfString(*column.get_gdf_column())) {
+                dataSize = GpuFunctions::getStringTotalSize(
+                    stringsInfo, column.get_gdf_column());
+              } else {
+                dataSize =
+                    GpuFunctions::getDataCapacity(column.get_gdf_column());
+                validSize =
+                    GpuFunctions::getValidCapacity(column.get_gdf_column());
+              }
+
+              offsets.push_back(preOff + dataSize + validSize);
+            }
+
             std::vector<std::future<void>> futures;
             futures.reserve(columns.size());
 
-            std::size_t binary_pointer = 0;
+            for (std::size_t i = 0; i < columns.size(); i++) {
+              RalColumn& column = columns[i];
 
-            std::for_each(
-                columns.cbegin(), columns.cend(),
-                [&futures, &binary_pointer, &result,
-                 &stringsInfo](const RalColumn& column) {
-                  futures.push_back(std::async(
-                      std::launch::async, GpuFunctions::copyGpuToCpu,
-                      std::ref(binary_pointer), std::ref(result),
-                      std::ref(const_cast<RalColumn&>(column)), stringsInfo));
-                });
+              futures.push_back(std::async(
+                  std::launch::async, GpuFunctions::copyGpuToCpu, offsets[i],
+                  std::ref(result), std::ref(column), stringsInfo));
+            }
 
             std::for_each(futures.begin(), futures.end(),
                           [](std::future<void>& future) { future.wait(); });
