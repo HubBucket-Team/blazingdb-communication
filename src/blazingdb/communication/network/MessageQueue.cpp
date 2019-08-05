@@ -32,12 +32,17 @@ void MessageQueue::putMessage(std::shared_ptr<Message>& message) {
 }
 
 std::shared_ptr<Message> MessageQueue::getMessageQueue(const MessageTokenType& messageToken) {
-    auto it = std::remove_if(message_queue_.begin(), message_queue_.end(),
-                            [&messageToken](const auto& e){ return e->getMessageTokenValue() == messageToken; });
-    // TODO: throw exception if no message was found though I think is safe to asume there will be always
-    // at least one whit the messageToken requested due to the conditional variable
-    std::shared_ptr<Message> message = *it;
-    message_queue_.erase(it, it + 1);
+    auto it = std::partition(message_queue_.begin(), message_queue_.end(),
+                            [&messageToken](const auto& e){ return e->getMessageTokenValue() != messageToken; });
+
+    std::shared_ptr<Message> message;
+    if (it != message_queue_.end()) {
+        // This should always execute because there will be always at least one message
+        // with the messageToken requested due to the conditional variable.
+        message = *it;
+        message_queue_.erase(it, it + 1);
+    }
+    
     return message;
 }
 
