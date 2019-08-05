@@ -90,12 +90,9 @@ namespace messages {
             ContextToken::TokenType context_token = object["message"]["contextToken"].GetInt();
 
             // Get array columns (payload)
-            std::size_t binary_pointer = 0;
-            std::vector<RalColumn> columns;
             const auto& gpu_data_array = object["columns"].GetArray();
-            for (const auto& gpu_data : gpu_data_array) {
-                columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
-            }
+            std::vector<RalColumn> columns =
+                BaseClass::deserializeRalColumns(binary, gpu_data_array);
 
             // Create the message
             return std::make_shared<MessageType>(ContextToken::Make(context_token), std::move(columns));

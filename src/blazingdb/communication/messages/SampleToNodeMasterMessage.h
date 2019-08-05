@@ -104,12 +104,9 @@ namespace messages {
             std::uint64_t total_row_size = document["total_row_size"].GetUint64();
 
             // Get samples
-            std::vector<RalColumn> columns;
-            std::size_t binary_pointer = 0;
             const auto& gpu_data_array = document["samples"].GetArray();
-            for (const auto& gpu_data : gpu_data_array) {
-                columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
-            }
+            std::vector<RalColumn> columns =
+                BaseClass::deserializeRalColumns(binary, gpu_data_array);
 
             // Create the message
             return std::make_shared<MessageType>(std::move(messageToken),

@@ -92,12 +92,9 @@ public:
         deserializeMessage(object["message"].GetObject(), messageToken, contextToken, node);
 
         // Get array columns (payload)
-        std::size_t binary_pointer = 0;
-        std::vector<RalColumn> columns;
-        const auto& gpu_data_array = object["columns"].GetArray();
-        for (const auto& gpu_data : gpu_data_array) {
-            columns.emplace_back(BaseClass::deserializeRalColumn(binary_pointer, binary, gpu_data.GetObject()));
-        }
+        const auto&            gpu_data_array = object["columns"].GetArray();
+        std::vector<RalColumn> columns =
+            BaseClass::deserializeRalColumns(binary, gpu_data_array);
 
         // Create the message
         return std::make_shared<MessageType>(std::move(messageToken), std::move(contextToken), *node, std::move(columns));

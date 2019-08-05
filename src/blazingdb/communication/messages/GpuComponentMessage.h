@@ -7,11 +7,25 @@
 #include <iostream>
 #include <vector>
 
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/range.hpp>
+
 #include "blazingdb/communication/messages/BaseComponentMessage.h"
 
 namespace blazingdb {
 namespace communication {
 namespace messages {
+
+namespace {
+template <class... Containers>
+inline auto zip(Containers&&... containers)
+    -> boost::iterator_range<boost::zip_iterator<
+        decltype(boost::make_tuple(std::begin(containers)...))>> {
+  return boost::make_iterator_range(
+      boost::make_zip_iterator(boost::make_tuple(std::begin(containers)...)),
+      boost::make_zip_iterator(boost::make_tuple(std::end(containers)...)));
+}
+}  // namespace
 
     template <typename RalColumn, typename CudfColumn, typename GpuFunctions>
     class GpuComponentMessage : public BaseComponentMessage {
@@ -83,7 +97,7 @@ namespace messages {
                 capacity +=
                     GpuFunctions::getValidCapacity(column.get_gdf_column());
               }
-              // WARNING!!! Here we are only getting the size for non-string columns. The size we need for string columns is determined inside the copyGpuToCpu where it is resized again. 
+              // WARNING!!! Here we are only getting the size for non-string columns. The size we need for string columns is determined inside the copyGpuToCpu where it is resized again.
               // THIS is a bad performance issue. This needs to be addressed
               // TODO!!
             }
@@ -123,14 +137,16 @@ namespace messages {
 
             for (std::size_t i = 0; i < columns.size(); i++) {
               RalColumn& column = columns[i];
+              const std::size_t offset = offsets[i];
 
               futures.push_back(std::async(
-                  std::launch::async, GpuFunctions::copyGpuToCpu, offsets[i],
+                  std::launch::async, GpuFunctions::copyGpuToCpu, offset,
                   std::ref(result), std::ref(column), stringsInfo));
             }
 
-            std::for_each(futures.begin(), futures.end(),
-                          [](std::future<void>& future) { future.wait(); });
+            for (std::future<void> &future : futures) {
+              future.wait();
+            }
 
             GpuFunctions::destroyStringsInfo(stringsInfo);
 
@@ -153,8 +169,11 @@ namespace messages {
             return column;
         }
 
-        static RalColumn deserializeRalColumn(std::size_t& binary_pointer, const std::string& binary_data, rapidjson::Value::ConstObject&& object) {
-	        auto	start = std::chrono::high_resolution_clock::now();
+        static RalColumn deserializeRalColumn(
+            std::size_t                     binary_pointer,
+            const std::string&              binary_data,
+            rapidjson::Value::ConstObject&& object) {
+          auto	start = std::chrono::high_resolution_clock::now();
 
             const auto& column_name_data = object["column_name"];
             std::string column_name(column_name_data.GetString(), column_name_data.GetStringLength());
@@ -262,6 +281,89 @@ namespace messages {
 
             GpuFunctions::log("-> deserializeRalColumn " + std::to_string(duration) + " ms" );
             return ral_column;
+        }
+
+        static std::vector<RalColumn> deserializeRalColumns(
+            const std::string& binary,
+            const rapidjson::GenericValue<rapidjson::UTF8<char>>::Array&
+                gpu_data_array) {
+          const std::size_t gpuDataSize =
+              static_cast<const std::size_t>(gpu_data_array.Size());
+
+          std::vector<std::size_t> offsets;
+          offsets.reserve(gpuDataSize);
+
+          std::size_t lastOffset = 0;
+
+          auto last = gpu_data_array.end() - 1;
+          for (const auto& gpu_data : gpu_data_array) {
+            offsets.push_back(lastOffset);
+
+            if (&gpu_data == last) {
+              break;
+            }
+
+            CudfColumn cudfColumn = deserializeCudfColumn(
+                gpu_data.GetObject()["cudf_column"].GetObject());
+
+            if (GpuFunctions::isGdfString(cudfColumn)) {
+              if (!cudfColumn.size) {
+                continue;
+              }
+
+              const std::size_t stringsSize =
+                  *reinterpret_cast<const std::size_t*>(&binary[lastOffset]);
+              const std::size_t offsetsSize =
+                  *reinterpret_cast<const std::size_t*>(
+                      &binary[lastOffset + sizeof(const std::size_t)]);
+
+              lastOffset +=
+                  stringsSize + offsetsSize + 3 * sizeof(const std::size_t);
+            } else {
+              lastOffset += GpuFunctions::getDataCapacity(&cudfColumn) +
+                            GpuFunctions::getValidCapacity(&cudfColumn);
+            }
+          }
+
+          std::vector<std::future<RalColumn>> futures;
+          futures.reserve(gpuDataSize);
+
+          const auto& futurePairs = zip(offsets, gpu_data_array);
+          std::transform(
+              futurePairs.begin(),
+              futurePairs.end(),
+              std::back_inserter(futures),
+              [&binary](const boost::tuples::cons<
+                        unsigned long&,
+                        boost::tuples::cons<rapidjson::GenericValue<
+                                                rapidjson::UTF8<char>,
+                                                rapidjson::MemoryPoolAllocator<
+                                                    rapidjson::CrtAllocator>>&,
+                                            boost::tuples::null_type>>& pair) {
+                std::size_t offset = pair.get<0>();
+                const rapidjson::GenericValue<
+                    rapidjson::UTF8<char>,
+                    rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>>&
+                    gpu_data = pair.get<1>();
+
+                return std::async(std::launch::async,
+                                  deserializeRalColumn,
+                                  offset,
+                                  std::ref(binary),
+                                  std::move(gpu_data.GetObject()));
+              });
+
+          std::vector<RalColumn> columns;
+          columns.reserve(gpuDataSize);
+          std::transform(futures.begin(),
+                         futures.end(),
+                         std::back_inserter(columns),
+                         [](std::future<RalColumn>& future) {
+                           future.wait();
+                           return future.get();
+                         });
+
+          return columns;
         }
     };
 
